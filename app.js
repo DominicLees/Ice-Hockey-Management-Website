@@ -1,5 +1,6 @@
 const express = require('express');
 const session = require('express-session');
+const mongoose = require('mongoose');
 const crypto = require('crypto');
 
 const app = express();
@@ -20,9 +21,18 @@ app.use(session({
     cookie: { secure: enviroment == "production" }
 }))
 
+// Connect to MongoDB
+const dbName = process.env.NODE_ENV === 'production' ? 'production' : 'development';
+mongoose.connect(`mongodb+srv://${config.mongoLogin}/?retryWrites=true&w=majority`, {dbName})
+.then((result) => console.log(`Connected to database: ${result.connections[0].name}`))
+.catch((error) => console.log(error));
+
 app.get('/', (req, res) => {
     res.render('index');
 })
+
+const authRouter = require('./routers/auth.js')
+app.use('/', authRouter);
 
 app.listen(PORT, () => {
     console.log(`Server is listening on port ${PORT} in ${enviroment} mode`);
