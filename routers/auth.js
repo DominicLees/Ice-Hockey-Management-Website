@@ -54,8 +54,9 @@ authRouter.post('/signup', (req, res) => {
 })
 
 authRouter.post('/login', (req, res) => {
+    req.session.responses.authEmailSent = true;
+
     if (!req.foundUser) {
-        req.session.responses.accountNotFound = true;
         return res.redirect('/');
     }
 
