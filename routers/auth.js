@@ -69,4 +69,10 @@ authRouter.post('/login', (req, res) => {
     // Send login email
 })
 
+authRouter.get('/logout', (req, res) => {
+    req.session.authenticated = false;
+    req.session.account = {};
+    res.redirect('/');
+})
+
 module.exports = authRouter;
