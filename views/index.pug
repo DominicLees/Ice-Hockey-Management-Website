@@ -23,3 +23,12 @@ body
         h3 Please enter a name
     if responses.successfulSignUp
         h3 Account created successfully
+
+
+    h2 Login
+    form(action="/login", method="post") 
+        label(for="email") Email: 
+        input(type="text" id="email" name="email")
+        br
+        br
+        input(type="submit", value="Login")

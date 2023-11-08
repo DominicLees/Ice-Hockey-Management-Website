@@ -29,10 +29,11 @@ mongoose.connect(`mongodb+srv://${config.mongoLogin}/?retryWrites=true&w=majorit
 
 // MIDDLEWARE
 
-// Pass any responses to res.locals
+// Pass any responses and account informtion to res.locals
 app.use('/', (req, res, next) => {
     res.locals.responses = req.session.responses || {};
     req.session.responses = {};
+    res.locals.account = req.session.account;
     next();
 })
 
@@ -44,6 +45,18 @@ app.get('/', (req, res) => {
 
 const authRouter = require('./routers/auth.js');
 app.use('/', authRouter);
+
+// Users need to be logged in to access routes below this point
+app.use('/', (req, res, next) => {
+    if (!req.session.authenticated) {
+        return res.redirect('/');
+    }
+    next();
+})
+
+app.get('/dashboard', (req, res) => {
+    res.render('dashboard');
+})
 
 app.listen(PORT, () => {
     console.log(`Server is listening on port ${PORT} in ${enviroment} mode`);
