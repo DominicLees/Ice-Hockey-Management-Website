@@ -8,9 +8,24 @@ const enviroment = process.env.NODE_ENV || config.enviroment || "dev";
 const autoVerify = enviroment == "dev" && config.autoVerify == "true";
 if (autoVerify) { console.log('Auto verify new accounts is enabled') }
 
+// Check if the email given by the user already has an account
+authRouter.use(['/login', '/signup'], (req, res, next) => {
+    req.validEmail = validateEmail(req.body.email);
+    if (!req.validEmail) {return next()}
+    User.findOne({email: req.body.email}).then(result => {
+        req.foundUser = result;
+        next();
+    }).catch(error => {
+        console.log(error);
+        res.status(500).send();
+    })
+})
+
 authRouter.post('/signup', (req, res) => {
     // Validate input
-    if (!validateEmail(req.body.email)) {
+    if (req.foundUser) {
+        req.session.responses.emailInUse = true;
+    } if (!req.validEmail) {
         req.session.responses.invalidSignUpEmail = true;
     } if (req.body.name.length == 0) {
         req.session.responses.invalidName = true;
