@@ -27,11 +27,22 @@ mongoose.connect(`mongodb+srv://${config.mongoLogin}/?retryWrites=true&w=majorit
 .then((result) => console.log(`Connected to database: ${result.connections[0].name}`))
 .catch((error) => console.log(error));
 
+// MIDDLEWARE
+
+// Pass any responses to res.locals
+app.use('/', (req, res, next) => {
+    res.locals.responses = req.session.responses || {};
+    req.session.responses = {};
+    next();
+})
+
+// ROUTES
+
 app.get('/', (req, res) => {
     res.render('index');
 })
 
-const authRouter = require('./routers/auth.js')
+const authRouter = require('./routers/auth.js');
 app.use('/', authRouter);
 
 app.listen(PORT, () => {

@@ -2,3 +2,22 @@ head
     title Hockey
 body
     h1 Hockey
+
+    h2 Sign Up
+    form(action="/signup", method="post") 
+        label(for="email") Email: 
+        input(type="text" id="email" name="email")
+        br
+        br
+        label(for="name") Name: 
+        input(type="text" id="name" name="name")
+        br
+        br
+        input(type="submit", value="Sign Up")
+
+    if responses.invalidSignUpEmail
+        h3 Please enter a valid email
+    if responses.invalidName
+        h3 Please enter a name
+    if responses.successfulSignUp
+        h3 Account created successfully
