@@ -24,7 +24,22 @@ teamRouter.post('/new', (req, res) => {
     })
 
     newTeam.save().then(result => {
-        res.redirect('/' + code);
+        res.redirect('/team/' + code);
+    }).catch(error => {
+        console.log(error);
+        res.status(500).send();
+    })
+})
+
+teamRouter.get('/:code', (req, res) => {
+    Team.findOne({code: req.params.code}).populate('coach').then(result => {
+        if (result == null) {
+            return res.status(404).send();
+        }
+
+        res.render('pages/team/teamProfile', {
+            team: result
+        })
     }).catch(error => {
         console.log(error);
         res.status(500).send();

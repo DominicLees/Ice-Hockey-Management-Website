@@ -1,0 +1,7 @@
+head
+    title= team.name
+body
+    h1= team.name
+    if team.coach._id == account._id
+        span Share this link with your players: 
+        a(href="join/"+team.code) join/#{team.code}
