@@ -31,18 +31,30 @@ teamRouter.post('/new', (req, res) => {
     })
 })
 
-teamRouter.get('/:code', (req, res) => {
+teamRouter.use(['/join/:code', '/:code'], (req, res, next) => {
+    console.log(req.params.code)
     Team.findOne({code: req.params.code}).populate('coach').then(result => {
         if (result == null) {
             return res.status(404).send();
         }
 
-        res.render('pages/team/teamProfile', {
-            team: result
-        })
+        req.foundTeam = result;
+        next();
     }).catch(error => {
         console.log(error);
         res.status(500).send();
+    })
+})
+
+teamRouter.get('/:code', (req, res) => {
+    res.render('pages/team/teamProfile', {
+        team: req.foundTeam
+    })
+})
+
+teamRouter.get('/join/:code', (req, res) => {
+    res.render('pages/team/join', {
+        team: req.foundTeam
     })
 })
 
