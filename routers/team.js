@@ -31,13 +31,14 @@ teamRouter.post('/new', (req, res) => {
     })
 })
 
+// Check for all routes that use a team code, that the team code is valid
 teamRouter.use(['/join/:code', '/:code'], (req, res, next) => {
-    console.log(req.params.code)
     Team.findOne({code: req.params.code}).populate('coach').then(result => {
         if (result == null) {
             return res.status(404).send();
         }
 
+        // Save data for later so we don't have to query for it again
         req.foundTeam = result;
         next();
     }).catch(error => {
@@ -46,14 +47,19 @@ teamRouter.use(['/join/:code', '/:code'], (req, res, next) => {
     })
 })
 
-teamRouter.get('/:code', (req, res) => {
-    res.render('pages/team/teamProfile', {
+teamRouter.get('/join/:code', (req, res) => {
+    res.render('pages/team/join', {
         team: req.foundTeam
     })
 })
 
-teamRouter.get('/join/:code', (req, res) => {
-    res.render('pages/team/join', {
+teamRouter.post('/join/:code', (req, res) => {
+    // TODO: Save player profile to DB
+    res.send(req.body.positions)
+})
+
+teamRouter.get('/:code', (req, res) => {
+    res.render('pages/team/teamProfile', {
         team: req.foundTeam
     })
 })
