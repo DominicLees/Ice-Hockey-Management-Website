@@ -2,3 +2,11 @@ head
     title Dashboard
 body
     h1 Welcome #{account.name}
+    h2 Your Teams
+    button
+        a(href="/team/new") Create New Team
+    table
+        thead 
+            tr
+                th Team Name
+                th Role

@@ -1,10 +1,9 @@
 const express = require('express');
 const session = require('express-session');
 const mongoose = require('mongoose');
-const crypto = require('crypto');
 
 const app = express();
-const PORT = 8000;
+const port = 8000;
 const config = require('./config.json');
 const enviroment = process.env.NODE_ENV || config.enviroment || "dev";
 
@@ -29,7 +28,7 @@ mongoose.connect(`mongodb+srv://${config.mongoLogin}/?retryWrites=true&w=majorit
 
 // MIDDLEWARE
 
-// Pass any responses and account informtion to res.locals
+// Pass any responses and account information to res.locals
 app.use('/', (req, res, next) => {
     res.locals.responses = req.session.responses || {};
     req.session.responses = {};
@@ -58,6 +57,9 @@ app.get('/dashboard', (req, res) => {
     res.render('dashboard');
 })
 
-app.listen(PORT, () => {
-    console.log(`Server is listening on port ${PORT} in ${enviroment} mode`);
+const teamRouter = require('./routers/team.js');
+app.use('/team', teamRouter);
+
+app.listen(port, () => {
+    console.log(`Server is listening on port ${port} in ${enviroment} mode`);
 })
