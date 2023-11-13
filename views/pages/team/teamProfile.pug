@@ -1,7 +1,20 @@
 head
     title= team.name
 body
+    include /partials/navbar.pug
     h1= team.name
     if team.coach._id == account._id
         span Share this link with your players: 
         a(href="join/"+team.code) join/#{team.code}
+
+    if players
+        table
+            thead
+                tr
+                    th Name
+                    th Positions
+            tbody
+                for player in players
+                    tr
+                        td= player.user.name
+                        td= player.positions
