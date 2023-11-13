@@ -11,6 +11,7 @@ const enviroment = process.env.NODE_ENV || config.enviroment || "dev";
 app.set('view engine', "pug");
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
+app.use('/public', express.static('./public'))
 
 // Setup Express-Session
 app.use(session({
@@ -53,9 +54,8 @@ app.use('/', (req, res, next) => {
     next();
 })
 
-app.get('/dashboard', (req, res) => {
-    res.render('dashboard');
-})
+const dashRouter = require('./routers/dashboard');
+app.use('/dashboard', dashRouter);
 
 const teamRouter = require('./routers/team.js');
 app.use('/team', teamRouter);
