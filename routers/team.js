@@ -78,8 +78,19 @@ teamRouter.post('/join/:code', (req, res) => {
 })
 
 teamRouter.get('/:code', (req, res) => {
-    res.render('pages/team/teamProfile', {
-        team: req.foundTeam
+    // if the user is not the coach of the team, show them the normal team profile
+    if (req.foundTeam.coach._id != req.session.account._id) {
+        return res.render('pages/team/teamProfile', {
+            team: req.foundTeam
+        })
+    }
+
+    // if the user is the coach of the team show them the player list
+    Player.find({team: req.foundTeam._id}).populate('user').then(result => {
+        res.render('pages/team/teamProfile', {
+            team: req.foundTeam,
+            players: result
+        })
     })
 })
 
