@@ -53,9 +53,8 @@ app.use('/', (req, res, next) => {
     next();
 })
 
-app.get('/dashboard', (req, res) => {
-    res.render('dashboard');
-})
+const dashRouter = require('./routers/dashboard');
+app.use('/dashboard', dashRouter);
 
 const teamRouter = require('./routers/team.js');
 app.use('/team', teamRouter);

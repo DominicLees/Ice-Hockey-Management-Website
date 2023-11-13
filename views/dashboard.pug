@@ -10,3 +10,12 @@ body
             tr
                 th Team Name
                 th Role
+        tbody
+            each team in teams
+                td
+                    a(href="/team/" + team.code)= team.name
+                td
+                    if team.coach == account._id
+                        span Coach
+                    else
+                        span Player
