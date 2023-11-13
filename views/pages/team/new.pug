@@ -1,0 +1,13 @@
+head
+    title New Team
+body
+    h1 New Team
+    form(action="./new", method="post") 
+        label(for="name") Team Name: 
+        input(type="text" name="name" id="name")
+        br
+        br
+        input(type="submit", value="Create Team") 
+
+    if responses.noTeamName
+        h3 Please enter a team name
