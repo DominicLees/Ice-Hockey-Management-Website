@@ -1,0 +1,48 @@
+body {
+    font-family: arial;
+    margin: 0px;
+}
+
+a {
+    text-decoration: none;
+    color: black;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: lightgray;
+
+    .left {
+        float: left;
+
+        h3 {
+            margin: 0px;
+            margin-left: 5px;
+            font-size: 32px;
+        }
+    }
+
+    .right {
+        float: right;
+
+        ul {
+            list-style: none;
+            height: 100%;
+
+            li {
+                display: inline;
+                box-sizing: border-box;
+
+                a {
+                    padding: 1rem;
+                }
+
+                a:hover {
+                    background-color: gray;
+                }
+            }
+        }
+    }
+}
