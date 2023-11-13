@@ -2,6 +2,7 @@ const express = require('express');
 const crypto = require('crypto');
 const teamRouter = express.Router();
 const Team = require('./../schemas/team');
+const Player = require('./../schemas/player');
 
 teamRouter.get('/new', (req, res) => {
     res.render('pages/team/new');
@@ -54,8 +55,26 @@ teamRouter.get('/join/:code', (req, res) => {
 })
 
 teamRouter.post('/join/:code', (req, res) => {
-    // TODO: Save player profile to DB
-    res.send(req.body.positions)
+    // validate user input
+    if (req.body.positions == null) {
+        req.session.responses.noPositionsSelected = true;
+        return res.redirect(req.originalUrl);
+    }
+
+    // Save player profile to DB
+    const newPlayer = new Player({
+        user: req.session.account._id,
+        team: req.foundTeam._id,
+        positions: req.body.positions
+    })
+    
+    newPlayer.save().then(result => {
+        res.redirect('/dashboard')
+    }).catch(error => {
+        console.log(error);
+        res.status(500).send();
+    });
+
 })
 
 teamRouter.get('/:code', (req, res) => {
