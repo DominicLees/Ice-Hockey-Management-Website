@@ -6,6 +6,11 @@ body
     if team.coach._id == account._id
         span Share this link with your players: 
         a(href="join/"+team.code) join/#{team.code}
+        br
+        button
+            a(href=team.code+"/game/new") Create Game +
+        br
+        br
 
     if players
         table
