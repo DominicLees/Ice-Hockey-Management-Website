@@ -9,7 +9,7 @@ teamRouter.get('/new', (req, res) => {
 })
 
 teamRouter.post('/new', (req, res) => {
-    // validate input
+    // Validate input
     if (req.body.name.length == 0) {
         req.session.responses.noTeamName = true;
         return res.redirect('/new');
@@ -17,7 +17,7 @@ teamRouter.post('/new', (req, res) => {
 
     const code = crypto.randomBytes(3).toString('hex');
 
-    // create new team
+    // Create new team
     const newTeam = new Team({
         name: req.body.name,
         coach: req.session.account._id,
@@ -55,7 +55,7 @@ teamRouter.get('/join/:code', (req, res) => {
 })
 
 teamRouter.post('/join/:code', (req, res) => {
-    // validate user input
+    // Validate user input
     if (req.body.positions == null) {
         req.session.responses.noPositionsSelected = true;
         return res.redirect(req.originalUrl);
@@ -80,7 +80,7 @@ teamRouter.post('/join/:code', (req, res) => {
 teamRouter.get('/:code', (req, res) => {
     Player.find({team: req.foundTeam._id}).populate('user').then(result => {
         let players;
-        // if the user is the coach of the team or is a player on the team, show them the normal team profile
+        // If the user is the coach of the team or is a player on the team, show them the normal team profile
         if (req.foundTeam.coach._id == req.session.account._id || result.filter(player => player.user._id == req.session.account._id).length > 0) {
             players = result;
         }
