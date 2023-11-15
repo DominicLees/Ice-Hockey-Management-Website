@@ -26,6 +26,6 @@
     "sass": "^1.69.5"
   },
   "nodemonConfig": {
-    "ignore": ["./gulpfile.js", "public/js/*.js"]
+    "ignore": ["./gulpfile.js", "src/js/*.js", "public/js/*.js"]
   }
 }
