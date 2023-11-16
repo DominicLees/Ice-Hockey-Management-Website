@@ -40,7 +40,7 @@ gameRouter.post('/new', (req, res) => {
 })
 
 gameRouter.use(['/:gameId'], (req, res, next) => {
-    Game.findOne({gameId: req.query.gameId}).populate('playersSignedUp').then(result => {
+    Game.findOne({gameId: req.params.gameId}).populate('playersSignedUp').then(result => {
         if (result == null) {
             return res.status(404).send();
         }
@@ -53,7 +53,7 @@ gameRouter.use(['/:gameId'], (req, res, next) => {
 })
 
 gameRouter.get('/:gameId', (req, res) => {
-    res.render('gamePage', {
+    res.render('pages/game/gamePage', {
         game: req.foundGame,
         team: req.foundTeam,
     })

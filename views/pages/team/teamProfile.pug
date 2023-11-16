@@ -39,4 +39,5 @@ body
                         for game in games
                             tr
                                 td= new Date(game.date).toJSON().slice(0,10)
-                                td= game.opponent
+                                td
+                                    a(href="./" + team.code + "/game/" + game.gameId)= game.opponent

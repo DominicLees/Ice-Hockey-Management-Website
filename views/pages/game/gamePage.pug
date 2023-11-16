@@ -1,0 +1,9 @@
+head
+    if game.atHome
+        - var gameTitle = team.name + " vs " + game.opponent
+    else
+        - var gameTitle = game.opponent + " vs " + team.name
+    title= gameTitle
+body
+    include ../../partials/navbar.pug
+    h1= gameTitle
