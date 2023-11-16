@@ -5,6 +5,7 @@ const gameSchema = new mongoose.Schema({
     opponent: {type: String, required: true},
     date: {type: Date, required: true},
     playersSignedUp: {type: [mongoose.Schema.Types.ObjectId], ref: 'Player'},
+    gameId: {type: String, required: true}
 })
 
 module.exports = mongoose.model('Game', gameSchema);

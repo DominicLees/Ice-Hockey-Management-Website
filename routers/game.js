@@ -1,4 +1,5 @@
 const express = require('express');
+const crypto = require('crypto');
 const gameRouter = express.Router();
 const Game = require('../schemas/game');
 
@@ -25,7 +26,8 @@ gameRouter.post('/new', (req, res) => {
     const newGame = new Game({
         team: req.foundTeam._id,
         opponent: req.body.opponent,
-        date: inputDate
+        date: inputDate,
+        gameId: crypto.randomBytes(3).toString('hex')
     })
 
     newGame.save().then(result => {
