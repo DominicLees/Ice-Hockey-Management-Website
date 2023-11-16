@@ -38,4 +38,24 @@ gameRouter.post('/new', (req, res) => {
     })
 })
 
+gameRouter.use(['/:gameId'], (req, res, next) => {
+    Game.findOne({gameId: req.query.gameId}).populate('playersSignedUp').then(result => {
+        if (result == null) {
+            return res.status(404).send();
+        }
+        req.foundGame = result;
+        next();
+    }).catch(error => {
+        console.log(error);
+        res.status(500).send();
+    })
+})
+
+gameRouter.get('/:gameId', (req, res) => {
+    res.render('gamePage', {
+        game: req.foundGame,
+        team: req.foundTeam,
+    })
+})
+
 module.exports = gameRouter;
