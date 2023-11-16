@@ -3,3 +3,18 @@ head
 body
     include ../../partials/navbar.pug
     h1 New Game
+    form(action="./new", method="post")
+        label(for="opponent") Opponent: 
+        input(type="text" name="opponent" id="opponent")
+        br
+        br
+        label(for="date") Start time: 
+        input(type="datetime-local", name="date" id="date")
+        br
+        br
+        input(type="submit", value="Create Game")
+
+    if responses.noOpponent
+        h3 Please enter the name of the opponent
+    if responses.pastDate
+        h3 Please enter a date in the future
