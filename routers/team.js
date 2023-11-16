@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const teamRouter = express.Router();
 const Team = require('./../schemas/team');
 const Player = require('./../schemas/player');
+const Game = require('./../schemas/game');
 
 teamRouter.get('/new', (req, res) => {
     res.render('pages/team/new');
@@ -78,18 +79,24 @@ teamRouter.post('/join/:code', (req, res) => {
 })
 
 teamRouter.get('/:code', (req, res) => {
+    let players;
     Player.find({team: req.foundTeam._id}).populate('user').then(result => {
-        let players;
         // If the user is the coach of the team or is a player on the team, show them the normal team profile
         if (req.foundTeam.coach._id == req.session.account._id || result.filter(player => player.user._id == req.session.account._id).length > 0) {
             players = result;
         }
 
+        // Next find all the games this team is playing
+        return Game.find({team: req.foundTeam._id})
+    }).then(result => {
         res.render('pages/team/teamProfile', {
             team: req.foundTeam,
-            players: players
+            players: players,
+            games: result
         })
+    }).catch(error => {
+        console.log(error);
+        res.status(500).send();
     })
 })
-
 module.exports = teamRouter;

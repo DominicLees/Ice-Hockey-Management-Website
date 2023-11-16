@@ -13,6 +13,7 @@ body
         br
 
     if players
+        h2 Players
         table
             thead
                 tr
@@ -23,3 +24,16 @@ body
                     tr
                         td= player.user.name
                         td= player.positions
+
+    if games
+        h2 Schedule
+        table
+            thead
+                tr
+                    th Date
+                    th Opponent
+            tbody
+                for game in games
+                    tr
+                        td= new Date(game.date).toJSON().slice(0,10)
+                        td= game.opponent
