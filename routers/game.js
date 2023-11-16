@@ -26,6 +26,7 @@ gameRouter.post('/new', (req, res) => {
     const newGame = new Game({
         team: req.foundTeam._id,
         opponent: req.body.opponent,
+        atHome: req.body.homeOrAway == "home",
         date: inputDate,
         gameId: crypto.randomBytes(3).toString('hex')
     })

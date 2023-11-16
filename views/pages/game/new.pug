@@ -8,6 +8,13 @@ body
         input(type="text" name="opponent" id="opponent")
         br
         br
+        label(for="homeOrAway") Home or Away: 
+        input(type="radio" name="homeOrAway" id="home" value="home" checked)
+        label(for="home") Home
+        input(type="radio" name="homeOrAway" id="away" value="away")
+        label(for="away") Away
+        br
+        br
         label(for="date") Start time: 
         input(type="datetime-local", name="date" id="date")
         br
