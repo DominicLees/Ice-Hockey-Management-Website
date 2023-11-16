@@ -1,5 +1,6 @@
 head
     title= team.name
+    link(rel="stylesheet", href="/public/css/teamProfile.css")
 body
     include /partials/navbar.pug
     h1= team.name
@@ -10,30 +11,32 @@ body
         button
             a(href=team.code+"/game/new") Create Game +
         br
-        br
 
-    if players
-        h2 Players
-        table
-            thead
-                tr
-                    th Name
-                    th Positions
-            tbody
-                for player in players
-                    tr
-                        td= player.user.name
-                        td= player.positions
+    div.container
+        if players
+            div.content#players
+                h2 Players
+                table
+                    thead
+                        tr
+                            th Name
+                            th Positions
+                    tbody
+                        for player in players
+                            tr
+                                td= player.user.name
+                                td= player.positions
 
-    if games
-        h2 Schedule
-        table
-            thead
-                tr
-                    th Date
-                    th Opponent
-            tbody
-                for game in games
-                    tr
-                        td= new Date(game.date).toJSON().slice(0,10)
-                        td= game.opponent
+        if games
+            div.content#schedule
+                h2 Schedule
+                table
+                    thead
+                        tr
+                            th Date
+                            th Opponent
+                    tbody
+                        for game in games
+                            tr
+                                td= new Date(game.date).toJSON().slice(0,10)
+                                td= game.opponent

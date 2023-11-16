@@ -1,0 +1,45 @@
+h1 {
+    text-align: center;
+    font-size: 56px;
+    margin: 20px;
+}
+
+.container {
+    // Flexbox
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    align-content: flex-start; 
+    column-gap: 30px;  
+}
+
+.content {
+    // Make content boxes take up the full width of the page
+    flex-grow: 1;
+
+    h2 {
+        text-align: center;
+        margin: 10px;
+    }
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+
+    td, th {
+        text-align: center;
+        font-size: 16px;
+        border: 1px solid black;
+        padding: 2px;
+    }
+
+    thead tr {
+        background-color: lightgray;
+    }
+
+    tr:nth-child(even){
+        background-color: 
+    #f2f2f2;}
+
+}
