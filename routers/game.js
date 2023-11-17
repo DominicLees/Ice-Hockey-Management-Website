@@ -11,7 +11,9 @@ gameRouter.post('/new', (req, res) => {
     // Validate Input
     if (req.body.opponent.length == 0) {
         req.session.responses.noOpponent = true;
-    } 
+    } if (req.body.homeOrAway == null) {
+        req.session.responses.noHomeOrAway = true;
+    }
     const inputDate = new Date(req.body.date);
     if (isNaN(inputDate) || inputDate < new Date()) {
         req.session.responses.pastDate = true;
