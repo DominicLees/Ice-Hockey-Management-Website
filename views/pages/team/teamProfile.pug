@@ -38,6 +38,7 @@ body
                     tbody
                         for game in games
                             tr
-                                td= new Date(game.date).toJSON().slice(0,10)
+                                - var date = new Date(game.date)
+                                td= date.toJSON().slice(0,10).split('-').reverse().join('/') + " at " + date.toLocaleTimeString()
                                 td
                                     a(href="./" + team.code + "/game/" + game.gameId)= game.opponent
