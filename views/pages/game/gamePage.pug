@@ -1,0 +1,20 @@
+head
+    if game.atHome
+        - var gameTitle = team.name + " vs " + game.opponent
+    else
+        - var gameTitle = game.opponent + " vs " + team.name
+    title= gameTitle
+body
+    include ../../partials/navbar.pug
+    h1= gameTitle
+
+    button
+        if game.playersSignedUp.some(e => e.user._id == account._id)
+            a(href=game.gameId+"/leave") Leave Game
+        else
+            a(href=game.gameId+"/signup") Sign Up
+
+    h2 Players Signed Up
+    ul
+        for signedPlayer in game.playersSignedUp
+            li= signedPlayer.user.name

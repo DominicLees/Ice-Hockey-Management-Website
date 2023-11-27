@@ -62,6 +62,9 @@ app.use('/dashboard', dashRouter);
 const teamRouter = require('./routers/team.js');
 app.use('/team', teamRouter);
 
+const gameRouter = require('./routers/game.js');
+app.use('/team/:code/game', gameRouter);
+
 app.listen(port, () => {
     console.log(`Server is listening on port ${port} in ${enviroment} mode`);
 })
