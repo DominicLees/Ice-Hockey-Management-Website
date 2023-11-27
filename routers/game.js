@@ -2,6 +2,7 @@ const express = require('express');
 const crypto = require('crypto');
 const gameRouter = express.Router();
 const Game = require('../schemas/game');
+const Player = require('../schemas/player');
 
 gameRouter.get('/new', (req, res) => {
     res.render('pages/game/new');
@@ -42,11 +43,21 @@ gameRouter.post('/new', (req, res) => {
 })
 
 gameRouter.use(['/:gameId'], (req, res, next) => {
-    Game.findOne({gameId: req.params.gameId}).populate('playersSignedUp').then(result => {
+    // Find the user data for all of the players that have signed up
+    Game.findOne({gameId: req.params.gameId}).populate({
+        path: 'playersSignedUp',
+        populate: {
+            path: 'user'
+        }
+    }).then(result => {
         if (result == null) {
             return res.status(404).send();
         }
         req.foundGame = result;
+        // Find the player profile for the user for this team
+        return Player.findOne({user: req.session.account._id, team: result.team})
+    }).then(result => {
+        req.foundPlayer = result;
         next();
     }).catch(error => {
         console.log(error);
@@ -58,6 +69,23 @@ gameRouter.get('/:gameId', (req, res) => {
     res.render('pages/game/gamePage', {
         game: req.foundGame,
         team: req.foundTeam,
+        player: req.foundPlayer
+    })
+})
+
+gameRouter.get('/:gameId/signup', (req, res) => {
+    // If user is already signed up, do not add them to the list again
+    if (req.foundGame.playersSignedUp.some(e => e._id.toString() == req.foundPlayer._id.toString())) { return res.redirect('./') }
+    req.foundGame.playersSignedUp.push(req.foundPlayer._id);
+    req.foundGame.save().then(result => {
+        res.redirect('./');
+    })
+})
+
+gameRouter.get('/:gameId/leave', (req, res) => {
+    req.foundGame.playersSignedUp = req.foundGame.playersSignedUp.filter(e => e._id.toString() != req.foundPlayer._id.toString());
+    req.foundGame.save().then(result => {
+        res.redirect('./');
     })
 })
 
