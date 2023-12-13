@@ -6,6 +6,10 @@ body
     h2 Your Teams
     button
         a(href="/team/new") Create New Team
+
+    if responses.teamDeleteSuccessful
+        h3 Team deleted successfully
+
     table
         thead 
             tr

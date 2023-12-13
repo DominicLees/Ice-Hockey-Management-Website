@@ -107,15 +107,16 @@ teamRouter.get('/:code', (req, res) => {
 teamRouter.get('/:code/delete', (req, res, next) => {
     // Only the head coach can delete a team
     if (!req.isCoach) {
-        const err = new Error('Forbidden');
-        err.status = 403;
-        return next(err);
+        const error = new Error('Forbidden');
+        error.status = 403;
+        return next(error);
     }
 
     Team.deleteOne({_id: req.foundTeam._id}).then(() => {
+        req.session.responses.teamDeleteSuccessful = true;
         res.redirect('/dashboard');
-    }).catch(err => {
-        next(err);
+    }).catch(error => {
+        next(error);
     })
 })
 
