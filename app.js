@@ -65,8 +65,20 @@ app.use('/team', teamRouter);
 const gameRouter = require('./routers/game.js');
 app.use('/team/:code/game', gameRouter);
 
+// ERROR HANDLING
+
+// Handles 404s and provides test routes for the server to intentionally throw errors
 const errorRouter = require('./routers/error.js');
 app.use('/', errorRouter);
+
+// Catch errors thrown by all route handlers
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.render('error', {
+        code: err.status,
+        stack: enviroment == "dev" ? err.stack : null
+    })
+})
 
 app.listen(port, () => {
     console.log(`Server is listening on port ${port} in ${enviroment} mode`);

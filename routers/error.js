@@ -35,13 +35,4 @@ errorRouter.use((req, res, next) => {
     res.redirect('/404');
 })
 
-// Catch errors thrown by route handlers
-errorRouter.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.render('error', {
-        code: err.status,
-        stack: enviroment == "dev" ? err.stack : null
-    })
-})
-
 module.exports = errorRouter;

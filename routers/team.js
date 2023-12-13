@@ -28,8 +28,7 @@ teamRouter.post('/new', (req, res) => {
     newTeam.save().then(result => {
         res.redirect('/team/' + code);
     }).catch(error => {
-        console.log(error);
-        res.status(500).send();
+        next(error);
     })
 })
 
@@ -44,8 +43,7 @@ teamRouter.use(['/join/:code', '/:code'], (req, res, next) => {
         req.foundTeam = result;
         next();
     }).catch(error => {
-        console.log(error);
-        res.status(500).send();
+        next(error);
     })
 })
 
@@ -72,8 +70,7 @@ teamRouter.post('/join/:code', (req, res) => {
     newPlayer.save().then(result => {
         res.redirect('/dashboard')
     }).catch(error => {
-        console.log(error);
-        res.status(500).send();
+        next(error);
     });
 
 })
@@ -95,8 +92,7 @@ teamRouter.get('/:code', (req, res) => {
             games: result
         })
     }).catch(error => {
-        console.log(error);
-        res.status(500).send();
+        next(error);
     })
 })
 module.exports = teamRouter;
