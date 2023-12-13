@@ -50,7 +50,7 @@ gameRouter.use(['/:gameId'], (req, res, next) => {
         }
     }).then(result => {
         if (result == null) {
-            return res.status(404).send();
+            return res.redirect('/404');
         }
         req.foundGame = result;
         // Find the player profile for the user for this team

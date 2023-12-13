@@ -36,7 +36,7 @@ teamRouter.post('/new', (req, res) => {
 teamRouter.use(['/join/:code', '/:code'], (req, res, next) => {
     Team.findOne({code: req.params.code}).populate('coach').then(result => {
         if (result == null) {
-            return res.status(404).send();
+            return res.redirect('/404');
         }
 
         // Save data for later so we don't have to query for it again

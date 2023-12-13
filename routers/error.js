@@ -30,7 +30,7 @@ errorRouter.get('/404', (req, res) => {
     })
 })
 
-// Catch 404 errors
+// Catch all unhandled requests as 404 errors
 errorRouter.use((req, res, next) => {
     res.redirect('/404');
 })
