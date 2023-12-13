@@ -45,6 +45,8 @@ app.use('/', (req, res, next) => {
 // ROUTES
 
 app.get('/', (req, res) => {
+    // Send already logged in users to their dashboard
+    if (req.session.authenticated) { return res.redirect('/dashboard'); }
     res.render('index');
 })
 
