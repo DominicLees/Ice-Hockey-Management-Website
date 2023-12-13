@@ -1,0 +1,8 @@
+head
+    title Error
+    link(rel="stylesheet", href="/public/css/error.css")
+body
+    include partials/navbar.pug
+    h1 #{code} Error
+    if stack
+        p= stack 

@@ -24,7 +24,7 @@ app.use(session({
 }))
 
 // Connect to MongoDB
-const dbName = process.env.NODE_ENV === 'production' ? 'production' : 'development';
+const dbName = enviroment === 'production' ? 'production' : 'development';
 mongoose.connect(`mongodb+srv://${config.mongoLogin}/?retryWrites=true&w=majority`, {dbName})
 .then((result) => console.log(`Connected to database: ${result.connections[0].name}`))
 .catch((error) => console.log(error));
@@ -49,7 +49,7 @@ const authRouter = require('./routers/auth.js');
 app.use('/', authRouter);
 
 // Users need to be logged in to access routes below this point
-app.use('/', (req, res, next) => {
+app.use(['/dashboard', '/team'], (req, res, next) => {
     if (!req.session.authenticated) {
         return res.redirect('/');
     }
@@ -64,6 +64,21 @@ app.use('/team', teamRouter);
 
 const gameRouter = require('./routers/game.js');
 app.use('/team/:code/game', gameRouter);
+
+// ERROR HANDLING
+
+// Handles 404s and provides test routes for the server to intentionally throw errors
+const errorRouter = require('./routers/error.js');
+app.use('/', errorRouter);
+
+// Catch errors thrown by all route handlers
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.render('error', {
+        code: err.status,
+        stack: enviroment == "dev" ? err.stack : null
+    })
+})
 
 app.listen(port, () => {
     console.log(`Server is listening on port ${port} in ${enviroment} mode`);

@@ -9,8 +9,7 @@ dashRouter.get('/', (req, res) => {
             teams: result.map(player => player.team) 
         })
     }).catch(error => {
-        console.log(error);
-        res.status(500).send();
+        next(error);
     })
 })
 

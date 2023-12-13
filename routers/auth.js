@@ -18,8 +18,7 @@ authRouter.use(['/login', '/signup'], (req, res, next) => {
         req.foundUser = result;
         next();
     }).catch(error => {
-        console.log(error);
-        res.status(500).send();
+        next(error);
     })
 })
 
@@ -48,8 +47,7 @@ authRouter.post('/signup', (req, res) => {
         req.session.responses.successfulSignUp = true;
         res.redirect('/');
     }).catch(error => {
-        console.log(error);
-        res.status(500).send();
+        next(error);
     })
 })
 

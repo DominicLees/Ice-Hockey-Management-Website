@@ -37,8 +37,7 @@ gameRouter.post('/new', (req, res) => {
     newGame.save().then(result => {
         res.redirect('/dashboard');
     }).catch(error => {
-        console.log(error);
-        res.status(500).send();
+        next(error);
     })
 })
 
@@ -60,8 +59,7 @@ gameRouter.use(['/:gameId'], (req, res, next) => {
         req.foundPlayer = result;
         next();
     }).catch(error => {
-        console.log(error);
-        res.status(500).send();
+        next(error);
     })
 })
 
