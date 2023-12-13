@@ -2,10 +2,12 @@ link(rel="stylesheet", href="/public/css/master.css")
 
 nav
     div.left
-        h3 Hockey
+        h3 
+            a(href="/") Hockey
     div.right
-        ul
-            li
-                a(href="/dashboard") Dashboard
-            li
-                a(href="/logout") Logout
+        if account
+            ul
+                li
+                    a(href="/dashboard") Dashboard
+                li
+                    a(href="/logout") Logout
