@@ -8,7 +8,7 @@ gameRouter.get('/new', (req, res) => {
     res.render('pages/game/new');
 })
 
-gameRouter.post('/new', (req, res) => {
+gameRouter.post('/new', (req, res, next) => {
     // Validate Input
     if (req.body.opponent.length == 0) {
         req.session.responses.noOpponent = true;
@@ -71,19 +71,23 @@ gameRouter.get('/:gameId', (req, res) => {
     })
 })
 
-gameRouter.get('/:gameId/signup', (req, res) => {
+gameRouter.get('/:gameId/signup', (req, res, next) => {
     // If user is already signed up, do not add them to the list again
     if (req.foundGame.playersSignedUp.some(e => e._id.toString() == req.foundPlayer._id.toString())) { return res.redirect('./') }
     req.foundGame.playersSignedUp.push(req.foundPlayer._id);
     req.foundGame.save().then(result => {
-        res.redirect('./');
+        res.redirect('back');
+    }).catch(error => {
+        next(error);
     })
 })
 
-gameRouter.get('/:gameId/leave', (req, res) => {
+gameRouter.get('/:gameId/leave', (req, res, next) => {
     req.foundGame.playersSignedUp = req.foundGame.playersSignedUp.filter(e => e._id.toString() != req.foundPlayer._id.toString());
     req.foundGame.save().then(result => {
-        res.redirect('./');
+        res.redirect('back');
+    }).catch(error => {
+        next(error);
     })
 })
 
