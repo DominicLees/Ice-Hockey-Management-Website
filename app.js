@@ -3,12 +3,15 @@ const session = require('express-session');
 const mongoose = require('mongoose');
 const path = require('path');
 
-const app = express();
+// CONFIGURATION
 const port = 8000;
 const config = require('./config.json');
 const enviroment = process.env.NODE_ENV || config.enviroment || "dev";
 
+// SETUP
+
 // Setup Express
+const app = express();
 app.set('view engine', "pug");
 app.locals.basedir = path.join(__dirname, 'views');
 app.use(express.json());
@@ -45,6 +48,7 @@ app.get('/', (req, res) => {
     res.render('index');
 })
 
+// Handles signing up, logging in and logging out
 const authRouter = require('./routers/auth.js');
 app.use('/', authRouter);
 
@@ -59,9 +63,11 @@ app.use(['/dashboard', '/team'], (req, res, next) => {
 const dashRouter = require('./routers/dashboard');
 app.use('/dashboard', dashRouter);
 
+// Handles creating and joining teams
 const teamRouter = require('./routers/team.js');
 app.use('/team', teamRouter);
 
+// Handles creating and signing up to games
 const gameRouter = require('./routers/game.js');
 app.use('/team/:code/game', gameRouter);
 
