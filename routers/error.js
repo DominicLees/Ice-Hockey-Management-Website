@@ -7,7 +7,7 @@ const enviroment = process.env.NODE_ENV || config.enviroment || "dev";
 // Testing routes only accessible during development
 errorRouter.use('/test', (req, res, next) => {
     if (enviroment == "dev") { return next(); }
-    res.redirect('/404')
+    res.redirect('/404');
 });
 
 // Routes that always throw errors to test error handling
@@ -39,7 +39,8 @@ errorRouter.use((req, res, next) => {
 errorRouter.use((err, req, res, next) => {
     console.error(err.stack);
     res.render('error', {
-        code: err.status
+        code: err.status,
+        stack: enviroment == "dev" ? err.stack : null
     })
 })
 
