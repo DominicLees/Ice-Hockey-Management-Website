@@ -9,7 +9,7 @@ teamRouter.get('/new', (req, res) => {
     res.render('pages/team/new');
 })
 
-teamRouter.post('/new', (req, res) => {
+teamRouter.post('/new', (req, res, next) => {
     // Validate input
     if (req.body.name.length == 0) {
         req.session.responses.noTeamName = true;
@@ -53,7 +53,7 @@ teamRouter.get('/join/:code', (req, res) => {
     })
 })
 
-teamRouter.post('/join/:code', (req, res) => {
+teamRouter.post('/join/:code', (req, res, next) => {
     // Validate user input
     if (req.body.positions == null) {
         req.session.responses.noPositionsSelected = true;
@@ -75,7 +75,7 @@ teamRouter.post('/join/:code', (req, res) => {
 
 })
 
-teamRouter.get('/:code', (req, res) => {
+teamRouter.get('/:code', (req, res, next) => {
     let players;
     Player.find({team: req.foundTeam._id}).populate('user').then(result => {
         // If the user is the coach of the team or is a player on the team, show them the normal team profile

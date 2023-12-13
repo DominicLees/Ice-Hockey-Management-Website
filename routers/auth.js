@@ -22,7 +22,7 @@ authRouter.use(['/login', '/signup'], (req, res, next) => {
     })
 })
 
-authRouter.post('/signup', (req, res) => {
+authRouter.post('/signup', (req, res, next) => {
     // Validate input
     if (req.foundUser) {
         req.session.responses.emailInUse = true;
