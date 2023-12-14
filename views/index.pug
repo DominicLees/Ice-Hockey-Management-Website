@@ -2,6 +2,7 @@ head
     title Hockey
     link(rel="stylesheet", href="public/css/master.css")
     link(rel="stylesheet", href="public/css/index.css")
+    script(src="public/js/index-min.js" defer) 
 body
     h1 Hockey
 
@@ -10,7 +11,7 @@ body
             h2 Sign Up
             form(action="/signup", method="post") 
                 label(for="email") Email: 
-                input(type="text" id="email" name="email")
+                input(type="text" id="signupEmail" name="email")
                 br
                 br
                 label(for="name") Name: 
@@ -32,7 +33,7 @@ body
             h2 Login
             form(action="/login", method="post") 
                 label(for="email") Email: 
-                input(type="text" id="email" name="email")
+                input(type="text" id="loginEmail" name="email")
                 br
                 br
                 input(type="submit", value="Login")
