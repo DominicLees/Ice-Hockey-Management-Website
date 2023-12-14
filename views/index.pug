@@ -33,5 +33,7 @@ body
         br
         input(type="submit", value="Login")
 
+    if responses.invalidLoginEmail 
+        h3 Please enter a valid email
     if responses.authEmailSent
         h3 if an account with that email exists, we have sent a login link to that email

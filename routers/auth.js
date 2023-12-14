@@ -1,7 +1,7 @@
 const express = require('express');
-const User = require('./../schemas/user');
-const validateEmail = require("email-validator").validate;
 const authRouter = express.Router();
+const validateEmail = require("email-validator").validate;
+const User = require('./../schemas/user');
 
 const config = require('./../config.json');
 const enviroment = process.env.NODE_ENV || config.enviroment || "dev";
@@ -52,7 +52,10 @@ authRouter.post('/signup', (req, res, next) => {
 })
 
 authRouter.post('/login', (req, res) => {
-    req.session.responses.authEmailSent = true;
+    if (!req.validEmail) {
+        req.session.responses.invalidLoginEmail = true;
+        return res.redirect('/');
+    }
 
     if (!req.foundUser) {
         return res.redirect('/');
@@ -65,6 +68,7 @@ authRouter.post('/login', (req, res) => {
     }
 
     // Send login email
+    req.session.responses.authEmailSent = true;
 })
 
 authRouter.get('/logout', (req, res) => {
