@@ -100,7 +100,8 @@ teamRouter.get('/:code', (req, res) => {
     res.render('pages/team/teamProfile', {
         team: req.foundTeam,
         players: req.foundPlayers,
-        games: req.foundTeam.games
+        games: req.foundTeam.games,
+        isCoach: req.isCoach
     })
 })
 
@@ -109,7 +110,7 @@ teamRouter.get('/:code/delete', (req, res, next) => {
     if (!req.isCoach) {
         const error = new Error('Forbidden');
         error.status = 403;
-        return next(error);
+        return next(error);  
     }
 
     Team.deleteOne({_id: req.foundTeam._id}).then(() => {
