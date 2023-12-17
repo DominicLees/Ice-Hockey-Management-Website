@@ -67,7 +67,9 @@ gameRouter.get('/:gameId', (req, res) => {
     res.render('pages/game/gamePage', {
         game: req.foundGame,
         team: req.foundTeam,
-        player: req.foundPlayer
+        player: req.foundPlayer,
+        isCoach: req.isCoach,
+        isPlayer: req.isPlayer
     })
 })
 
