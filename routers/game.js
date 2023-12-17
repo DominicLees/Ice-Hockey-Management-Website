@@ -73,6 +73,18 @@ gameRouter.get('/:gameId', (req, res) => {
     })
 })
 
+gameRouter.get('/:gameId/line-builder', (req, res) => {
+    if (!req.isCoach) {
+        // Change this to throw a 403 error later
+        return res.redirect('back');
+    }
+
+    res.render('pages/game/lineBuilder', {
+        team: req.foundTeam,
+        game: req.foundGame
+    })
+})
+
 gameRouter.get('/:gameId/signup', (req, res, next) => {
     // If user is already signed up, do not add them to the list again
     if (req.foundGame.playersSignedUp.some(e => e._id.toString() == req.foundPlayer._id.toString())) { return res.redirect('./') }
