@@ -75,24 +75,50 @@ teamRouter.post('/join/:code', (req, res, next) => {
 
 })
 
-teamRouter.get('/:code', (req, res, next) => {
-    let players;
-    Player.find({team: req.foundTeam._id}).populate('user').then(result => {
-        // If the user is the coach of the team or is a player on the team, show them the normal team profile
-        if (req.foundTeam.coach._id == req.session.account._id || result.filter(player => player.user._id == req.session.account._id).length > 0) {
-            players = result;
+teamRouter.use('/:code', (req, res, next) => {
+    Player.find({team: req.foundTeam._id}).lean().populate('user').then(result => {
+        if (req.foundTeam.coach._id == req.session.account._id) { 
+            req.isCoach = true; 
+        } if (result.filter(player => player.user._id == req.session.account._id).length > 0) {
+            req.isPlayer = true; 
         }
+        
+        // Hide players from users who are not apart of the team
+        req.foundPlayers = req.isCoach == true || req.isPlayer == true ? result : [];
 
         // Next find all the games this team is playing
-        return Game.find({team: req.foundTeam._id})
+        return Game.find({team: req.foundTeam._id}).lean()
     }).then(result => {
-        res.render('pages/team/teamProfile', {
-            team: req.foundTeam,
-            players: players,
-            games: result
-        })
+        req.foundTeam.games = result;
+        next();
     }).catch(error => {
         next(error);
     })
 })
+
+teamRouter.get('/:code', (req, res) => {
+    res.render('pages/team/teamProfile', {
+        team: req.foundTeam,
+        players: req.foundPlayers,
+        games: req.foundTeam.games,
+        isCoach: req.isCoach
+    })
+})
+
+teamRouter.get('/:code/delete', (req, res, next) => {
+    // Only the head coach can delete a team
+    if (!req.isCoach) {
+        const error = new Error('Forbidden');
+        error.status = 403;
+        return next(error);  
+    }
+
+    Team.deleteOne({_id: req.foundTeam._id}).then(() => {
+        req.session.responses.teamDeleteSuccessful = true;
+        res.redirect('/dashboard');
+    }).catch(error => {
+        next(error);
+    })
+})
+
 module.exports = teamRouter;
