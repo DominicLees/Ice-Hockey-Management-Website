@@ -13,6 +13,8 @@ dashRouter.get('/', (req, res, next) => {
     }).then(result => {
         // Combine the 2 list of teams
         teams = teams.concat(result);
+        // Remove duplicates
+        teams = teams.filter((v,i,a)=>a.findIndex(v2=>(v2.code===v.code))===i)
         // Sort the lists alphabetically
         teams.sort((a, b) => a.name - b.name);
         res.render('dashboard', {
