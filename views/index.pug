@@ -7,10 +7,10 @@ body
     h1 Hockey
 
     div.container
-        div.form-box#left
+        div.form-box
             h2 Sign Up
             form(action="/signup", method="post") 
-                label(for="email") Email: 
+                label(for="signupEmail") Email: 
                 input(type="text" id="signupEmail" name="email")
                 br
                 br
@@ -29,10 +29,10 @@ body
             if responses.successfulSignUp
                 h3 Account created successfully
 
-        div.form-box#right
+        div.form-box
             h2 Login
             form(action="/login", method="post") 
-                label(for="email") Email: 
+                label(for="loginEmail") Email: 
                 input(type="text" id="loginEmail" name="email")
                 br
                 br
