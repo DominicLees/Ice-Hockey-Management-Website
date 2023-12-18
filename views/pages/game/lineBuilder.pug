@@ -9,6 +9,9 @@ body
     include ../../partials/navbar.pug
     h1 Build lines for #{gameTitle}
 
+    if responses.linesSaved
+        h3 Lines saved successfully
+
     form(action="./line-builder/save", method="post")
         input(type="submit", value="Save")
         br

@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const gameRouter = express.Router();
 const Game = require('../schemas/game');
 const Player = require('../schemas/player');
+const game = require('../schemas/game');
 
 gameRouter.get('/new', (req, res) => {
     res.render('pages/game/new');
@@ -82,12 +83,27 @@ gameRouter.get('/:gameId/line-builder', (req, res) => {
     // Filter signed up players into skaters and goalies
     const goalies = req.foundGame.playersSignedUp.filter(x => x.positions.includes('G'));
     const players = req.foundGame.playersSignedUp.filter(x => x.positions.length > 1 || !x.positions.includes('G'));
-    console.log(goalies)
+
     res.render('pages/game/lineBuilder', {
         team: req.foundTeam,
         game: req.foundGame,
         goalies,
         players
+    })
+})
+
+gameRouter.post('/:gameId/line-builder/save', (req, res, next) => {
+    let lines = {
+        startingGoalie: req.body.startingGoalie,
+        backupGoalie: req.body.backupGoalie == "noneSelected" ? null : req.body.backupGoalie
+    }
+
+    req.foundGame.lines = lines;
+    req.foundGame.save().then(result => {
+        req.session.responses.linesSaved = true;
+        res.redirect('back');
+    }).catch(error => {
+        next(error);
     })
 })
 
