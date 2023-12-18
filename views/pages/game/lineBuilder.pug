@@ -8,5 +8,9 @@ head
 body
     include ../../partials/navbar.pug
     h1 Build lines for #{gameTitle}
+    p You have #{game.playersSignedUp.length} players to pick from
 
-    
+    include ../../partials/line.pug
+    - for (var i = 1; i <= Math.ceil(game.playersSignedUp.length / 5); ++i) {
+        +line(i)
+    - }

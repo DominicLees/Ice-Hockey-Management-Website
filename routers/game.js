@@ -79,6 +79,8 @@ gameRouter.get('/:gameId/line-builder', (req, res) => {
         return res.redirect('back');
     }
 
+    // TODO: Filter signed up players into skaters and goalies
+    
     res.render('pages/game/lineBuilder', {
         team: req.foundTeam,
         game: req.foundGame
