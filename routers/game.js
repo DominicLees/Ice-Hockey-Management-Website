@@ -79,11 +79,15 @@ gameRouter.get('/:gameId/line-builder', (req, res) => {
         return res.redirect('back');
     }
 
-    // TODO: Filter signed up players into skaters and goalies
-    
+    // Filter signed up players into skaters and goalies
+    const goalies = req.foundGame.playersSignedUp.filter(x => x.positions.includes('G'));
+    const players = req.foundGame.playersSignedUp.filter(x => x.positions.length > 1 || !x.positions.includes('G'));
+    console.log(goalies)
     res.render('pages/game/lineBuilder', {
         team: req.foundTeam,
-        game: req.foundGame
+        game: req.foundGame,
+        goalies,
+        players
     })
 })
 
