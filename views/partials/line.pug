@@ -1,3 +1,10 @@
+mixin positionSelection(number, position)
+    select(name="line"+ number + position)
+        option(value="noneSelected") None selected
+        for player in players
+            if player.positions.includes(position)
+                option(value=player._id)= player.user.name
+
 mixin line(number)
     h3 Line #{number}
     table
@@ -7,18 +14,18 @@ mixin line(number)
             td RW
         tr
             td
-                select(name="LW")
+                +positionSelection(number, 'LW')
             td
-                select(name="C") 
+                +positionSelection(number, 'C')
             td
-                select(name="RW")
+                +positionSelection(number, 'RW')
         tr
             td LD
             td
             td RD
         tr
             td
-                select(name="LD")
+                +positionSelection(number, 'LD')
             td
             td
-                select(name="RD")
+                +positionSelection(number, 'RD')
