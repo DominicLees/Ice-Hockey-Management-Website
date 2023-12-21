@@ -1,8 +1,8 @@
-mixin positionSelection(number, position)
+mixin positionSelection(number, selectablePositions)
     select(name="line"+ number + position)
         option(value="noneSelected") None selected
         for player in players
-            if player.positions.includes(position)
+            if player.positions.some(item => selectablePositions.includes(item))
                 option(value=player._id)= player.user.name
 
 mixin line(number)
@@ -14,18 +14,18 @@ mixin line(number)
             td RW
         tr
             td
-                +positionSelection(number, 'LW')
+                +positionSelection(number, ['LW'])
             td
-                +positionSelection(number, 'C')
+                +positionSelection(number, ['C'])
             td
-                +positionSelection(number, 'RW')
+                +positionSelection(number, ['RW'])
         tr
             td LD
             td
             td RD
         tr
             td
-                +positionSelection(number, 'LD')
+                +positionSelection(number, ['LD'])
             td
             td
-                +positionSelection(number, 'RD')
+                +positionSelection(number, ['RD'])
