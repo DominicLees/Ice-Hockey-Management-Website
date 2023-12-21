@@ -14,13 +14,13 @@ body
 
     form(action="./line-builder", method="get")
         label(for="numOfLines") Number of 5 on 5 lines:
-        input(type="number", name="numOfFSLines" value=numOfFSLines)
+        input(type="number", name="numOfFSLines" value=numOfFSLines min="1" max="4")
         br
-        label(for="numOfLines") Number of powerplay lines:
-        input(type="number", name="numOfPPLines" value=numOfPPLines)
+        label(for="numOfPPLines") Number of powerplay lines:
+        input(type="number", name="numOfPPLines" value=numOfPPLines min="1" max="4")
         br
-        label(for="numOfLines") Number of penalty kill lines:
-        input(type="number", name="numOfPKLines" value=numOfPKLines)
+        label(for="numOfPKLines") Number of penalty kill lines:
+        input(type="number", name="numOfPKLines" value=numOfPKLines min="1" max="4")
         br
         input(type="submit", value="Update")
 

@@ -3,7 +3,8 @@ const crypto = require('crypto');
 const gameRouter = express.Router();
 const Game = require('../schemas/game');
 const Player = require('../schemas/player');
-const game = require('../schemas/game');
+
+const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 
 gameRouter.get('/new', (req, res) => {
     res.render('pages/game/new');
@@ -84,14 +85,19 @@ gameRouter.get('/:gameId/line-builder', (req, res) => {
     const goalies = req.foundGame.playersSignedUp.filter(x => x.positions.includes('G'));
     const players = req.foundGame.playersSignedUp.filter(x => x.positions.length > 1 || !x.positions.includes('G'));
 
+    // Validate user input
+    const numOfFSLines = req.query.numOfFSLines == null ? 3 : clamp(req.query.numOfFSLines, 1, 4);
+    const numOfPPLines = req.query.numOfPPLines == null ? 2 : clamp(req.query.numOfPPLines, 1, 4);
+    const numOfPKLines = req.query.numOfPKLines == null ? 2 : clamp(req.query.numOfPKLines, 1, 4);
+
     res.render('pages/game/lineBuilder', {
         team: req.foundTeam,
         game: req.foundGame,
         goalies,
         players,
-        numOfFSLines: req.query.numOfFSLines || 3,
-        numOfPPLines: req.query.numOfPPLines || 2,
-        numOfPKLines: req.query.numOfPKLines || 2
+        numOfFSLines,
+        numOfPPLines,
+        numOfPKLines,
     })
 })
 
