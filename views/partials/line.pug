@@ -6,7 +6,7 @@ mixin positionSelection(number, selectablePositions)
                 option(value=player._id)= player.user.name
 
 mixin line(number)
-    h3 Line #{number}
+    h4 Line #{number}
     table
         tr
             td LW
@@ -29,3 +29,48 @@ mixin line(number)
             td
             td
                 +positionSelection(number, ['RD'])
+
+mixin powerplayLine(number)
+    h4 Unit #{number}
+    table
+        tr
+            td LW
+            td C
+            td RW
+        tr
+            td
+                +positionSelection(number, ['LW', 'C', 'RW'])
+            td
+                +positionSelection(number, ['LW', 'C', 'RW'])
+            td
+                +positionSelection(number, ['LW', 'C', 'RW'])
+        tr
+            td LD
+            td
+            td RD
+        tr
+            td
+                +positionSelection(number, ['LD', 'RD', 'LW', 'C', 'RW'])
+            td
+            td
+                +positionSelection(number, ['LD', 'RD', 'LW', 'C', 'RW'])
+
+mixin penaltyKillLine(number)
+    h4 Unit #{number}
+    table
+        tr
+            td Winger
+            td C
+        tr
+            td
+                +positionSelection(number, ['LW', 'C', 'RW'])
+            td
+                +positionSelection(number, ['LW', 'C', 'RW'])
+        tr
+            td LD
+            td RD
+        tr
+            td
+                +positionSelection(number, ['LD', 'RD'])
+            td
+                +positionSelection(number, ['LD', 'RD'])

@@ -12,6 +12,18 @@ body
     if responses.linesSaved
         h3 Lines saved successfully
 
+    form(action="./line-builder", method="get")
+        label(for="numOfLines") Number of 5 on 5 lines:
+        input(type="number", name="numOfFSLines" value=numOfFSLines)
+        br
+        label(for="numOfLines") Number of powerplay lines:
+        input(type="number", name="numOfPPLines" value=numOfPPLines)
+        br
+        label(for="numOfLines") Number of penalty kill lines:
+        input(type="number", name="numOfPKLines" value=numOfPKLines)
+        br
+        input(type="submit", value="Update")
+
     form(action="./line-builder/save", method="post")
         input(type="submit", value="Save")
         br
@@ -35,6 +47,18 @@ body
         h2 Skaters
         p You have #{players.length} skaters to pick from
         include ../../partials/line.pug
-        - for (var i = 1; i <= Math.ceil(game.playersSignedUp.length / 5); ++i) {
+
+        h3 5 on 5
+        - for (var i = 1; i <= numOfFSLines; ++i) {
             +line(i)
+        - }
+
+        h3 Power Play
+        - for (var i = 1; i <= numOfPPLines; ++i) {
+            +powerplayLine(i)
+        - }
+
+        h3 Penalty Kill
+        - for (var i = 1; i <= numOfPKLines; ++i) {
+            +penaltyKillLine(i)
         - }

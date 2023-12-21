@@ -88,7 +88,10 @@ gameRouter.get('/:gameId/line-builder', (req, res) => {
         team: req.foundTeam,
         game: req.foundGame,
         goalies,
-        players
+        players,
+        numOfFSLines: req.query.numOfFSLines || 3,
+        numOfPPLines: req.query.numOfPPLines || 2,
+        numOfPKLines: req.query.numOfPKLines || 2
     })
 })
 
