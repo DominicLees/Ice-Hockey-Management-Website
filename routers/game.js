@@ -6,11 +6,29 @@ const Player = require('../schemas/player');
 
 const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 
-gameRouter.get('/new', (req, res) => {
+function coachOnly(req, res, next) {
+    if (!req.isCoach) {
+        const error = new Error('Forbidden');
+        error.status = 403;
+        next(error);
+    }
+    next();
+}
+
+function playersOnly(req, res, next) {
+    if (!req.isPlayer) {
+        const error = new Error('Forbidden');
+        error.status = 403;
+        next(error);
+    }
+    next();
+}
+
+gameRouter.get('/new', coachOnly, (req, res) => {
     res.render('pages/game/new');
 })
 
-gameRouter.post('/new', (req, res, next) => {
+gameRouter.post('/new', coachOnly, (req, res, next) => {
     // Validate Input
     if (req.body.opponent.length == 0) {
         req.session.responses.noOpponent = true;
@@ -75,7 +93,7 @@ gameRouter.get('/:gameId', (req, res) => {
     })
 })
 
-gameRouter.get('/:gameId/line-builder', (req, res) => {
+gameRouter.get('/:gameId/line-builder', coachOnly, (req, res) => {
     if (!req.isCoach) {
         // Change this to throw a 403 error later
         return res.redirect('back');
@@ -101,7 +119,7 @@ gameRouter.get('/:gameId/line-builder', (req, res) => {
     })
 })
 
-gameRouter.post('/:gameId/line-builder/save', (req, res, next) => {
+gameRouter.post('/:gameId/line-builder/save', coachOnly, (req, res, next) => {
     let lines = {
         startingGoalie: req.body.startingGoalie,
         backupGoalie: req.body.backupGoalie == "noneSelected" ? null : req.body.backupGoalie
@@ -116,7 +134,7 @@ gameRouter.post('/:gameId/line-builder/save', (req, res, next) => {
     })
 })
 
-gameRouter.get('/:gameId/signup', (req, res, next) => {
+gameRouter.get('/:gameId/signup', playersOnly, (req, res, next) => {
     // If user is already signed up, do not add them to the list again
     if (req.foundGame.playersSignedUp.some(e => e._id.toString() == req.foundPlayer._id.toString())) { return res.redirect('./') }
     req.foundGame.playersSignedUp.push(req.foundPlayer._id);
@@ -127,7 +145,7 @@ gameRouter.get('/:gameId/signup', (req, res, next) => {
     })
 })
 
-gameRouter.get('/:gameId/leave', (req, res, next) => {
+gameRouter.get('/:gameId/leave', playersOnly, (req, res, next) => {
     req.foundGame.playersSignedUp = req.foundGame.playersSignedUp.filter(e => e._id.toString() != req.foundPlayer._id.toString());
     req.foundGame.save().then(result => {
         res.redirect('back');
