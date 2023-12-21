@@ -11,6 +11,10 @@ body
 
     if responses.linesSaved
         h3 Lines saved successfully
+    if responses.sameGoalie
+        h3 You picked the same goalie to start and backup
+    if responses.samePlayerMultipleTimes
+        h3 You picked the same player in multiple 5 on 5 lines
 
     form(action="./line-builder", method="get")
         label(for="numOfLines") Number of 5 on 5 lines:

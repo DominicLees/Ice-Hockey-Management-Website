@@ -8,8 +8,12 @@ const gameSchema = new mongoose.Schema({
     playersSignedUp: {type: [mongoose.Schema.Types.ObjectId], ref: 'Player'},
     gameId: {type: String, required: true},
     lines: {
-        startingGoalie: {type: [mongoose.Schema.Types.ObjectId], required: true, ref: 'Player'},
-        backupGoalie: {type: [mongoose.Schema.Types.ObjectId], ref: 'Player'}
+        startingGoalie: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Player'},
+        backupGoalie: {type: mongoose.Schema.Types.ObjectId, ref: 'Player'},
+        skaters: [{
+            linePosition: {type: String, required: true},
+            playerId: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Player'}
+        }]
     }
 })
 

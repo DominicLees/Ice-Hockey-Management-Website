@@ -44,7 +44,6 @@ gameRouter.post('/new', coachOnly, (req, res, next) => {
         return res.redirect(req.originalUrl);
     }
 
-
     // Add game to database
     const newGame = new Game({
         team: req.foundTeam._id,
@@ -120,12 +119,45 @@ gameRouter.get('/:gameId/line-builder', coachOnly, (req, res) => {
 })
 
 gameRouter.post('/:gameId/line-builder/save', coachOnly, (req, res, next) => {
-    let lines = {
-        startingGoalie: req.body.startingGoalie,
-        backupGoalie: req.body.backupGoalie == "noneSelected" ? null : req.body.backupGoalie
+    // Check if the 2 goalies picked are different
+    if (req.body.startingGoalie == req.body.backupGoalie) {
+        req.session.responses.sameGoalie = true;
+    } 
+    // Remove all the 'noneSelected' values from the lines
+    const pickedPlayers = Object.keys(req.body).reduce((acc, key) => (req.body[key] !== 'noneSelected' && (acc[key] = req.body[key]), acc), {});
+    // Get all the players picked for 5 on 5
+    const pickedSkaters = Object.fromEntries(Object.entries(pickedPlayers).filter(([key]) => key.includes('line')));
+    // Check if any players have been picked multiple times
+    if (new Set(Object.values(pickedSkaters)).size !== Object.keys(pickedSkaters).length) {
+        req.session.responses.samePlayerMultipleTimes = true;
     }
 
-    req.foundGame.lines = lines;
+    if (Object.keys(req.session.responses).length > 0) {
+        return res.redirect('back');
+    }
+    
+    // Get the goalies selected, then remove them
+    const startingGoalie = pickedPlayers.startingGoalie;
+    delete pickedPlayers.startingGoalie;
+    const backupGoalie = pickedPlayers.backupGoalie == "noneSelected" ? null : pickedPlayers.backupGoalie;
+    delete pickedPlayers.backupGoalie;
+    
+    // Convert List of picked skaters into postion and player object Id pairs
+    let skaters = [];
+    for (const [key, value] of Object.entries(pickedPlayers)) {
+        skaters.push({
+            linePosition: key,
+            playerId: value
+        })
+    }
+
+    // Save the lines to the database
+    req.foundGame.lines = {
+        startingGoalie,
+        backupGoalie,
+        skaters
+    }
+    
     req.foundGame.save().then(result => {
         req.session.responses.linesSaved = true;
         res.redirect('back');
@@ -136,7 +168,7 @@ gameRouter.post('/:gameId/line-builder/save', coachOnly, (req, res, next) => {
 
 gameRouter.get('/:gameId/signup', playersOnly, (req, res, next) => {
     // If user is already signed up, do not add them to the list again
-    if (req.foundGame.playersSignedUp.some(e => e._id.toString() == req.foundPlayer._id.toString())) { return res.redirect('./') }
+    if (req.foundGame.playersSignedUp.some(e => e._id.toString() == req.foundPlayer._id.toString())) { return res.redirect('back') }
     req.foundGame.playersSignedUp.push(req.foundPlayer._id);
     req.foundGame.save().then(result => {
         res.redirect('back');

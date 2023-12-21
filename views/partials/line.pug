@@ -1,5 +1,5 @@
-mixin positionSelection(number, selectablePositions, noneSelectable)
-    select(name="line"+ number + position)
+mixin positionSelection(positionName, selectablePositions, noneSelectable)
+    select(name=positionName)
         if noneSelectable
             option(value="noneSelected") None selected
         for player in players
@@ -15,21 +15,21 @@ mixin line(number)
             td RW
         tr
             td
-                +positionSelection(number, ['LW'], true)
+                +positionSelection('line' + number + 'LW', ['LW'], true)
             td
-                +positionSelection(number, ['C'], true)
+                +positionSelection('line' + number + 'C', ['C'], true)
             td
-                +positionSelection(number, ['RW'], true)
+                +positionSelection('line' + number + 'RW', ['RW'], true)
         tr
             td LD
             td
             td RD
         tr
             td
-                +positionSelection(number, ['LD'], true)
+                +positionSelection('line' + number + 'LD', ['LD'], true)
             td
             td
-                +positionSelection(number, ['RD'], true)
+                +positionSelection('line' + number + 'RD', ['RD'], true)
 
 mixin powerplayLine(number)
     h4 Unit #{number}
@@ -40,21 +40,21 @@ mixin powerplayLine(number)
             td RW
         tr
             td
-                +positionSelection(number, ['LW', 'C', 'RW'])
+                +positionSelection('PP' + number + 'LW', ['LW', 'C', 'RW'])
             td
-                +positionSelection(number, ['LW', 'C', 'RW'])
+                +positionSelection('PP' + number + 'C', ['LW', 'C', 'RW'])
             td
-                +positionSelection(number, ['LW', 'C', 'RW'])
+                +positionSelection('PP' + number + 'RW', ['LW', 'C', 'RW'])
         tr
             td LD
             td
             td RD
         tr
             td
-                +positionSelection(number, ['LD', 'RD', 'LW', 'C', 'RW'])
+                +positionSelection('PP' + number + 'LD', ['LD', 'RD', 'LW', 'C', 'RW'])
             td
             td
-                +positionSelection(number, ['LD', 'RD', 'LW', 'C', 'RW'])
+                +positionSelection('PP' + number + 'RD', ['LD', 'RD', 'LW', 'C', 'RW'])
 
 mixin penaltyKillLine(number)
     h4 Unit #{number}
@@ -64,14 +64,14 @@ mixin penaltyKillLine(number)
             td C
         tr
             td
-                +positionSelection(number, ['LW', 'C', 'RW'])
+                +positionSelection('PK' + number + 'W', ['LW', 'C', 'RW'])
             td
-                +positionSelection(number, ['LW', 'C', 'RW'])
+                +positionSelection('PK' + number + 'C', ['LW', 'C', 'RW'])
         tr
             td LD
             td RD
         tr
             td
-                +positionSelection(number, ['LD', 'RD'])
+                +positionSelection('PK' + number + 'LD', ['LD', 'RD'])
             td
-                +positionSelection(number, ['LD', 'RD'])
+                +positionSelection('PK' + number + 'RD', ['LD', 'RD'])
