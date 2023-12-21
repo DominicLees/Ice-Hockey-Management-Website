@@ -8,6 +8,7 @@ head
 body
     include ../../partials/navbar.pug
     h1= gameTitle
+    h2 #{game.atHome ? "Home" : "Away"} at #{game.date}
 
     div#buttons
         if isPlayer
@@ -18,9 +19,18 @@ body
                 button.green
                     a(href=game.gameId+"/signup") Sign Up
 
+        if game.lines && (isPlayer || isCoach)
+            button 
+                a(href=game.gameId+"/lines") View Lines
+
         if isCoach
             button 
-                a(href=game.gameId+"/line-builder") Build Lines
+                a(href=game.gameId+"/line-builder")
+                    if game.lines 
+                        span Update Lines
+                    else 
+                        span Build Lines
+
 
     h2 Players Signed Up
     ul
