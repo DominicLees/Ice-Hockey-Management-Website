@@ -23,6 +23,10 @@ errorRouter.get('/test/500', (req, res, next) => {
     next(err);
 })
 
+errorRouter.get('/test/style-testing', (req, res) => {
+    res.render('partials/style-testing');
+})
+
 // 404 Route
 errorRouter.get('/404', (req, res) => {
     res.render('error', {

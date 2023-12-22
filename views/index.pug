@@ -21,13 +21,13 @@ body
                 input(type="submit", value="Sign Up")
 
             if responses.emailInUse
-                h3 An account with that email already exists
+                h3.error An account with that email already exists
             if responses.invalidSignUpEmail
-                h3 Please enter a valid email
+                h3.error Please enter a valid email
             if responses.invalidName
-                h3 Please enter a name
+                h3.error Please enter a name
             if responses.successfulSignUp
-                h3 Account created successfully
+                h3.error Account created successfully
 
         div.form-box
             h2 Login
@@ -39,6 +39,6 @@ body
                 input(type="submit", value="Login")
 
             if responses.invalidLoginEmail 
-                h3 Please enter a valid email
+                h3.error Please enter a valid email
             if responses.authEmailSent
-                h3 if an account with that email exists, we have sent a login link to that email
+                h3.error if an account with that email exists, we have sent a login link to that email
