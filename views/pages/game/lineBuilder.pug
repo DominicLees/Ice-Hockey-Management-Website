@@ -1,0 +1,68 @@
+head
+    if game.atHome
+        - var gameTitle = team.name + " vs " + game.opponent
+    else
+        - var gameTitle = game.opponent + " vs " + team.name
+    
+    title Build lines for #{gameTitle}
+body
+    include ../../partials/navbar.pug
+    h1 Build lines for #{gameTitle}
+
+    if responses.linesSaved
+        h3 Lines saved successfully
+    if responses.sameGoalie
+        h3 You picked the same goalie to start and backup
+    if responses.samePlayerMultipleTimes
+        h3 You picked the same player in multiple 5 on 5 lines
+
+    form(action="./line-builder", method="get")
+        label(for="numOfLines") Number of 5 on 5 lines:
+        input(type="number", name="numOfFSLines" value=numOfFSLines min="1" max="4")
+        br
+        label(for="numOfPPLines") Number of powerplay lines:
+        input(type="number", name="numOfPPLines" value=numOfPPLines min="1" max="4")
+        br
+        label(for="numOfPKLines") Number of penalty kill lines:
+        input(type="number", name="numOfPKLines" value=numOfPKLines min="1" max="4")
+        br
+        input(type="submit", value="Update")
+
+    form(action="./line-builder/save", method="post")
+        input(type="submit", value="Save")
+        br
+
+        h2 Goalies
+        if goalies.length == 0
+            h3 No goalies have signed up for this game!
+        else
+            p You have #{goalies.length + (goalies.length > 1 ? ' goalies' : ' goalie')} to pick from
+            label(for="startingGoalie") Starting Goalie:  
+            select(name="startingGoalie" id="startingGoalie") 
+                for goalie in goalies
+                    option(value=goalie._id)= goalie.user.name
+            br
+            label(for="backupGoalie") Backup Goalie: 
+            select(name="backupGoalie" id="backupGoalie")
+                option(value="noneSelected") None selected
+                for goalie in goalies
+                    option(value=goalie._id)= goalie.user.name
+
+        h2 Skaters
+        p You have #{players.length} skaters to pick from
+        include ../../partials/line.pug
+
+        h3 5 on 5
+        - for (var i = 1; i <= numOfFSLines; ++i) {
+            +line(i)
+        - }
+
+        h3 Power Play
+        - for (var i = 1; i <= numOfPPLines; ++i) {
+            +powerplayLine(i)
+        - }
+
+        h3 Penalty Kill
+        - for (var i = 1; i <= numOfPKLines; ++i) {
+            +penaltyKillLine(i)
+        - }

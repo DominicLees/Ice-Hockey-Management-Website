@@ -26,12 +26,14 @@ errorRouter.get('/test/500', (req, res, next) => {
 // 404 Route
 errorRouter.get('/404', (req, res) => {
     res.render('error', {
-        code: 404
+        code: 404,
+        path: req.session.oldPath
     })
 })
 
 // Catch all unhandled requests as 404 errors
 errorRouter.use((req, res, next) => {
+    req.session.oldPath = req.path;
     res.redirect('/404');
 })
 
