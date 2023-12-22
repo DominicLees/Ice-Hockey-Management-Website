@@ -22,10 +22,13 @@ body
 
             if responses.emailInUse
                 h3.error An account with that email already exists
+                br
             if responses.invalidSignUpEmail
                 h3.error Please enter a valid email
+                br
             if responses.invalidName
                 h3.error Please enter a name
+                br
             if responses.successfulSignUp
                 h3.error Account created successfully
 
