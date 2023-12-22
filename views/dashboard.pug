@@ -6,6 +6,10 @@ body
     h2 Your Teams
     button
         a(href="/team/new") Create New Team
+
+    if responses.teamDeleteSuccessful
+        h3 Team deleted successfully
+
     table
         thead 
             tr
@@ -21,3 +25,17 @@ body
                             span Coach
                         else
                             span Player
+
+    h2 Upcoming Games
+    div
+        for game in games
+            a(href="/team/" + game.team.code + "/game/" + game.gameId) 
+                if game.atHome
+                    h3 #{game.team.name} vs #{game.opponent}
+                else
+                    h3 #{game.opponent} vs #{game.team.name}
+            p= game.date
+            if game.lines
+                a(href="/team/" + game.team.code + "/game/" + game.gameId + "/lines") View lines
+            else
+                p Waiting for lines

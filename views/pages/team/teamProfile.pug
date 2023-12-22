@@ -1,15 +1,19 @@
 head
     title= team.name
     link(rel="stylesheet", href="/public/css/teamProfile.css")
+    script(src="/public/js/teamProfile-min.js" defer) 
 body
     include /partials/navbar.pug
     h1= team.name
-    if team.coach._id == account._id
+    h2 Head Coach: #{team.coach.name}
+    if isCoach
         span Share this link with your players: 
         a(href="join/"+team.code) join/#{team.code}
         br
         button
             a(href=team.code+"/game/new") Create Game +
+        br
+        button#delete-team Delete Team
         br
 
     div.container

@@ -6,7 +6,15 @@ const gameSchema = new mongoose.Schema({
     atHome: {type: Boolean, required: true},
     date: {type: Date, required: true},
     playersSignedUp: {type: [mongoose.Schema.Types.ObjectId], ref: 'Player'},
-    gameId: {type: String, required: true}
+    gameId: {type: String, required: true},
+    lines: {
+        startingGoalie: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Player'},
+        backupGoalie: {type: mongoose.Schema.Types.ObjectId, ref: 'Player'},
+        skaters: [{
+            linePosition: {type: String, required: true},
+            playerId: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Player'}
+        }]
+    }
 })
 
 module.exports = mongoose.model('Game', gameSchema);

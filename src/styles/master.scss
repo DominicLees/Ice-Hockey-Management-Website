@@ -8,6 +8,7 @@ a {
     color: black;
 }
 
+// Utility Classes
 .error {
     padding: 10px;
     margin: 10px;
@@ -17,6 +18,15 @@ a {
     display: inline-block;
 }
 
+.red {
+    background-color: red;
+}
+
+.green {
+    background-color: lightgreen;
+}
+
+// Navbar
 nav {
     display: flex;
     justify-content: space-between;

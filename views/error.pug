@@ -5,4 +5,7 @@ body
     include partials/navbar.pug
     h1 #{code} Error
     if stack
-        p= stack 
+        p= stack
+
+    if path
+        p The path '#{path}' does not exist 
