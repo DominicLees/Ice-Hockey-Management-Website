@@ -9,6 +9,15 @@ a {
 }
 
 // Utility Classes
+.error {
+    padding: 10px;
+    margin: 10px;
+    border-radius: 10px;
+    background-color: lightcoral;
+    width: fit-content;
+    display: inline-block;
+}
+
 .red {
     background-color: red;
 }

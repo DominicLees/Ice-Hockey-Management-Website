@@ -1,39 +1,44 @@
 head
     title Hockey
+    link(rel="stylesheet", href="public/css/master.css")
+    link(rel="stylesheet", href="public/css/index.css")
+    script(src="public/js/index-min.js" defer) 
 body
     h1 Hockey
 
-    h2 Sign Up
-    form(action="/signup", method="post") 
-        label(for="email") Email: 
-        input(type="text" id="email" name="email")
-        br
-        br
-        label(for="name") Name: 
-        input(type="text" id="name" name="name")
-        br
-        br
-        input(type="submit", value="Sign Up")
+    div.container
+        div.form-box
+            h2 Sign Up
+            form(action="/signup", method="post") 
+                label(for="signupEmail") Email: 
+                input(type="text" id="signupEmail" name="email")
+                br
+                br
+                label(for="name") Name: 
+                input(type="text" id="name" name="name")
+                br
+                br
+                input(type="submit", value="Sign Up")
 
-    if responses.emailInUse
-        h3 An account with that email already exists
-    if responses.invalidSignUpEmail
-        h3 Please enter a valid email
-    if responses.invalidName
-        h3 Please enter a name
-    if responses.successfulSignUp
-        h3 Account created successfully
+            if responses.emailInUse
+                h3.error An account with that email already exists
+            if responses.invalidSignUpEmail
+                h3.error Please enter a valid email
+            if responses.invalidName
+                h3.error Please enter a name
+            if responses.successfulSignUp
+                h3.error Account created successfully
 
+        div.form-box
+            h2 Login
+            form(action="/login", method="post") 
+                label(for="loginEmail") Email: 
+                input(type="text" id="loginEmail" name="email")
+                br
+                br
+                input(type="submit", value="Login")
 
-    h2 Login
-    form(action="/login", method="post") 
-        label(for="email") Email: 
-        input(type="text" id="email" name="email")
-        br
-        br
-        input(type="submit", value="Login")
-
-    if responses.invalidLoginEmail 
-        h3 Please enter a valid email
-    if responses.authEmailSent
-        h3 if an account with that email exists, we have sent a login link to that email
+            if responses.invalidLoginEmail 
+                h3.error Please enter a valid email
+            if responses.authEmailSent
+                h3.error if an account with that email exists, we have sent a login link to that email
