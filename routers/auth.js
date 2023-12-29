@@ -1,6 +1,7 @@
 const express = require('express');
 const authRouter = express.Router();
 const validateEmail = require("email-validator").validate;
+const returnLoggedInUsersToDash = require('./../middleware/returnLoggedInUsersToDash.js');
 const User = require('./../schemas/user');
 
 const config = require('./../config.json');
@@ -11,7 +12,7 @@ const unverifiedLogin = enviroment == "dev" && config.unverifiedLogin == "true";
 if (unverifiedLogin) { console.log('Unverified login is enabled') }
 
 // Check if the email given by the user already has an account
-authRouter.use(['/login', '/signup'], (req, res, next) => {
+authRouter.use(['/login', '/signup'], returnLoggedInUsersToDash, (req, res, next) => {
     req.validEmail = validateEmail(req.body.email);
     if (!req.validEmail) {return next()}
     User.findOne({email: req.body.email}).then(result => {

@@ -2,6 +2,7 @@ const express = require('express');
 const session = require('express-session');
 const mongoose = require('mongoose');
 const path = require('path');
+const returnLoggedInUsersToDash = require('./middleware/returnLoggedInUsersToDash.js');
 
 // CONFIGURATION
 const port = 8000;
@@ -44,9 +45,7 @@ app.use('/', (req, res, next) => {
 
 // ROUTES
 
-app.get('/', (req, res) => {
-    // Send already logged in users to their dashboard
-    if (req.session.authenticated) { return res.redirect('/dashboard'); }
+app.get('/', returnLoggedInUsersToDash, (req, res) => {
     res.render('index');
 })
 
