@@ -2,7 +2,9 @@ const express = require('express');
 const session = require('express-session');
 const mongoose = require('mongoose');
 const path = require('path');
+
 const returnLoggedInUsersToDash = require('./middleware/returnLoggedInUsersToDash.js');
+const returnUnauthenticatedUsersToIndex = require('./middleware/returnUnauthenticatedUsersToIndex.js');
 
 // CONFIGURATION
 const port = 8000;
@@ -17,7 +19,7 @@ app.set('view engine', "pug");
 app.locals.basedir = path.join(__dirname, 'views');
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
-app.use('/public', express.static('./public'))
+app.use('/public', express.static('./public'));
 
 // Setup Express-Session
 app.use(session({
@@ -53,20 +55,12 @@ app.get('/', returnLoggedInUsersToDash, (req, res) => {
 const authRouter = require('./routers/auth.js');
 app.use('/', authRouter);
 
-// Users need to be logged in to access routes below this point
-app.use(['/dashboard', '/team'], (req, res, next) => {
-    if (!req.session.authenticated) {
-        return res.redirect('/');
-    }
-    next();
-})
-
 const dashRouter = require('./routers/dashboard');
-app.use('/dashboard', dashRouter);
+app.use('/dashboard', returnUnauthenticatedUsersToIndex, dashRouter);
 
 // Handles creating and joining teams
 const teamRouter = require('./routers/team.js');
-app.use('/team', teamRouter);
+app.use('/team', returnUnauthenticatedUsersToIndex, teamRouter);
 
 // Handles creating and signing up to games
 const gameRouter = require('./routers/game.js');
