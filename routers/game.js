@@ -24,6 +24,15 @@ function playersOnly(req, res, next) {
     next();
 }
 
+function playerOrCoachOnly(req, res, next) {
+    if (!(req.isPlayer || req.isCoach)) {
+        const error = new Error('Forbidden');
+        error.status = 403;
+        next(error);
+    }
+    next();
+}
+
 gameRouter.get('/new', coachOnly, (req, res) => {
     res.render('pages/game/new');
 })
