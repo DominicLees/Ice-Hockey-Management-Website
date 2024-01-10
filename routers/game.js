@@ -1,37 +1,43 @@
 const express = require('express');
-const crypto = require('crypto');
 const gameRouter = express.Router();
+const crypto = require('crypto');
 const Game = require('../schemas/game');
 const Player = require('../schemas/player');
 
+// UTILITY FUNCTIONS
+
 const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
+
+function ForbiddenError() {
+    const error = new Error('Forbidden');
+    error.status = 403;
+    return error;
+}
+
+// MIDDLEWARE
 
 function coachOnly(req, res, next) {
     if (!req.isCoach) {
-        const error = new Error('Forbidden');
-        error.status = 403;
-        next(error);
+        next(ForbiddenError());
     }
     next();
 }
 
 function playersOnly(req, res, next) {
     if (!req.isPlayer) {
-        const error = new Error('Forbidden');
-        error.status = 403;
-        next(error);
+        next(ForbiddenError());
     }
     next();
 }
 
 function playerOrCoachOnly(req, res, next) {
     if (!(req.isPlayer || req.isCoach)) {
-        const error = new Error('Forbidden');
-        error.status = 403;
-        next(error);
+        next(ForbiddenError());
     }
     next();
 }
+
+// ROUTES
 
 gameRouter.get('/new', coachOnly, (req, res) => {
     res.render('pages/game/new');
@@ -44,6 +50,7 @@ gameRouter.post('/new', coachOnly, (req, res, next) => {
     } if (req.body.homeOrAway == null) {
         req.session.responses.noHomeOrAway = true;
     }
+    // Check date given is in the future
     const inputDate = new Date(req.body.date);
     if (isNaN(inputDate) || inputDate < new Date()) {
         req.session.responses.pastDate = true;
@@ -69,6 +76,7 @@ gameRouter.post('/new', coachOnly, (req, res, next) => {
     })
 })
 
+// Check that the game for the gameId provided exists
 gameRouter.use(['/:gameId'], (req, res, next) => {
     // Find the user data for all of the players that have signed up
     Game.findOne({gameId: req.params.gameId}).populate({
@@ -105,7 +113,8 @@ gameRouter.get('/:gameId', (req, res) => {
 
 gameRouter.get('/:gameId/signup', playersOnly, (req, res, next) => {
     // If user is already signed up, do not add them to the list again
-    if (req.foundGame.playersSignedUp.some(e => e._id.toString() == req.foundPlayer._id.toString())) { return res.redirect('back') }
+    if (req.foundGame.playersSignedUp.some(e => e._id.toString() == req.foundPlayer._id.toString())) { return res.redirect('back'); }
+
     req.foundGame.playersSignedUp.push(req.foundPlayer._id);
     req.foundGame.save().then(result => {
         res.redirect('back');
@@ -115,6 +124,7 @@ gameRouter.get('/:gameId/signup', playersOnly, (req, res, next) => {
 })
 
 gameRouter.get('/:gameId/leave', playersOnly, (req, res, next) => {
+    // Remove the user from the list of players signed up
     req.foundGame.playersSignedUp = req.foundGame.playersSignedUp.filter(e => e._id.toString() != req.foundPlayer._id.toString());
     req.foundGame.save().then(result => {
         res.redirect('back');
