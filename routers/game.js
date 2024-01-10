@@ -101,6 +101,26 @@ gameRouter.get('/:gameId', (req, res) => {
     })
 })
 
+gameRouter.get('/:gameId/signup', playersOnly, (req, res, next) => {
+    // If user is already signed up, do not add them to the list again
+    if (req.foundGame.playersSignedUp.some(e => e._id.toString() == req.foundPlayer._id.toString())) { return res.redirect('back') }
+    req.foundGame.playersSignedUp.push(req.foundPlayer._id);
+    req.foundGame.save().then(result => {
+        res.redirect('back');
+    }).catch(error => {
+        next(error);
+    })
+})
+
+gameRouter.get('/:gameId/leave', playersOnly, (req, res, next) => {
+    req.foundGame.playersSignedUp = req.foundGame.playersSignedUp.filter(e => e._id.toString() != req.foundPlayer._id.toString());
+    req.foundGame.save().then(result => {
+        res.redirect('back');
+    }).catch(error => {
+        next(error);
+    })
+})
+
 gameRouter.get('/:gameId/line-builder', coachOnly, (req, res) => {
     if (!req.isCoach) {
         // Change this to throw a 403 error later
@@ -169,26 +189,6 @@ gameRouter.post('/:gameId/line-builder/save', coachOnly, (req, res, next) => {
     
     req.foundGame.save().then(result => {
         req.session.responses.linesSaved = true;
-        res.redirect('back');
-    }).catch(error => {
-        next(error);
-    })
-})
-
-gameRouter.get('/:gameId/signup', playersOnly, (req, res, next) => {
-    // If user is already signed up, do not add them to the list again
-    if (req.foundGame.playersSignedUp.some(e => e._id.toString() == req.foundPlayer._id.toString())) { return res.redirect('back') }
-    req.foundGame.playersSignedUp.push(req.foundPlayer._id);
-    req.foundGame.save().then(result => {
-        res.redirect('back');
-    }).catch(error => {
-        next(error);
-    })
-})
-
-gameRouter.get('/:gameId/leave', playersOnly, (req, res, next) => {
-    req.foundGame.playersSignedUp = req.foundGame.playersSignedUp.filter(e => e._id.toString() != req.foundPlayer._id.toString());
-    req.foundGame.save().then(result => {
         res.redirect('back');
     }).catch(error => {
         next(error);
