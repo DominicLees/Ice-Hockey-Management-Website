@@ -1,0 +1,15 @@
+head
+    title Lines for #{game.title}
+body
+    include ../../partials/navbar.pug
+    h1 Lines for #{game.title}
+
+    h2 Goalies
+    p Starting Goalie: #{game.lines.startingGoalie.user.name}
+    if game.lines.backupGoalie
+        p Backup Goalie: #{game.lines.backupGoalie.user.name}
+
+    h2 Skaters
+    ul
+        for skater in game.lines.skaters
+            li= skater

@@ -81,6 +81,8 @@ gameRouter.use(['/:gameId'], (req, res, next) => {
             return res.redirect('/404');
         }
         req.foundGame = result;
+        // Add Game title to found game
+        req.foundGame.title = result.atHome ? `${req.foundTeam.name} vs ${req.foundGame.opponent}` : `${req.foundGame.opponent} vs ${req.foundTeam.name}`;
         // Find the player profile for the user for this team
         return Player.findOne({user: req.session.account._id, team: result.team})
     }).then(result => {
@@ -122,11 +124,6 @@ gameRouter.get('/:gameId/leave', playersOnly, (req, res, next) => {
 })
 
 gameRouter.get('/:gameId/line-builder', coachOnly, (req, res) => {
-    if (!req.isCoach) {
-        // Change this to throw a 403 error later
-        return res.redirect('back');
-    }
-
     // Filter signed up players into skaters and goalies
     const goalies = req.foundGame.playersSignedUp.filter(x => x.positions.includes('G'));
     const players = req.foundGame.playersSignedUp.filter(x => x.positions.length > 1 || !x.positions.includes('G'));
@@ -193,6 +190,17 @@ gameRouter.post('/:gameId/line-builder/save', coachOnly, (req, res, next) => {
     }).catch(error => {
         next(error);
     })
+})
+
+gameRouter.get('/:gameId/lines', playerOrCoachOnly, (req, res, next) => {
+    // Check lines have been submitted
+    if (req.foundGame.lines == null) {
+        return res.redirect(`/team/${req.params.code}/game/${req.params.gameId}`);
+    }
+
+    res.render('pages/game/lineViewer', {
+        game: req.foundGame
+    });
 })
 
 module.exports = gameRouter;
