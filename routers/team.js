@@ -5,6 +5,8 @@ const Team = require('./../schemas/team');
 const Player = require('./../schemas/player');
 const Game = require('./../schemas/game');
 
+const coachOnly = require('./../middleware/coachOnly');
+
 teamRouter.get('/new', (req, res) => {
     res.render('pages/team/new');
 })
@@ -102,14 +104,7 @@ teamRouter.get('/:code', (req, res) => {
     })
 })
 
-teamRouter.get('/:code/delete', (req, res, next) => {
-    // Only the head coach can delete a team
-    if (!req.isCoach) {
-        const error = new Error('Forbidden');
-        error.status = 403;
-        return next(error);  
-    }
-
+teamRouter.get('/:code/delete', coachOnly, (req, res, next) => {
     Team.deleteOne({_id: req.foundTeam._id}).then(() => {
         req.session.responses.teamDeleteSuccessful = true;
         res.redirect('/dashboard');

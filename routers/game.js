@@ -8,31 +8,22 @@ const Player = require('../schemas/player');
 
 const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 
-function ForbiddenError() {
-    const error = new Error('Forbidden');
-    error.status = 403;
-    return error;
-}
+const forbiddenError = require('./../functions/forbiddenError');
 
 // MIDDLEWARE
 
-function coachOnly(req, res, next) {
-    if (!req.isCoach) {
-        next(ForbiddenError());
-    }
-    next();
-}
+const coachOnly = require('./../middleware/coachOnly');
 
 function playersOnly(req, res, next) {
     if (!req.isPlayer) {
-        next(ForbiddenError());
+        next(forbiddenError());
     }
     next();
 }
 
 function playerOrCoachOnly(req, res, next) {
     if (!(req.isPlayer || req.isCoach)) {
-        next(ForbiddenError());
+        next(forbiddenError());
     }
     next();
 }
