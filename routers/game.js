@@ -197,8 +197,20 @@ gameRouter.post('/:gameId/line-builder/save', coachOnly, (req, res, next) => {
     })
 })
 
+gameRouter.use(['/:gameId/lines', '/:gameId/summary'], linesRequired, (req, res, next) => {
+    // Take the list of skaters and convert it into line position : name pairs
+    res.locals.skaters = req.foundGame.toObject().lines.skaters.reduce((accumulator, currentValue) => {
+        // Get the line position and set it as the key
+        const { linePosition, ...rest } = currentValue;
+        // Only and the name of the player as all the other data is redundant
+        accumulator[linePosition] = rest.playerId.user.name;
+        return accumulator;
+    }, {});
+    next();
+})
+
 // Shows the user the lines in full
-gameRouter.get('/:gameId/lines', playerOrCoachOnly, linesRequired, (req, res, next) => {
+gameRouter.get('/:gameId/lines', playerOrCoachOnly, (req, res, next) => {
     res.render('pages/game/lineViewer');
 })
 
