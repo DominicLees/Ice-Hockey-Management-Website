@@ -89,8 +89,7 @@ gameRouter.use(['/:gameId'], (req, res, next) => {
             return res.redirect('/404');
         }
         req.foundGame = result;
-        // Add Game title to found game
-        req.foundGame.title = result.atHome ? `${req.foundTeam.name} vs ${req.foundGame.opponent}` : `${req.foundGame.opponent} vs ${req.foundTeam.name}`;
+        res.locals.game = result;
         // Find the player profile for the user for this team
         return Player.findOne({user: req.session.account._id, team: result.team})
     }).then(result => {
@@ -101,9 +100,8 @@ gameRouter.use(['/:gameId'], (req, res, next) => {
     })
 })
 
-gameRouter.get('/:gameId', (req, res) => {
+gameRouter.get('/:gameId', playerOrCoachOnly, (req, res) => {
     res.render('pages/game/gamePage', {
-        game: req.foundGame,
         team: req.foundTeam,
         player: req.foundPlayer,
         isCoach: req.isCoach,
@@ -111,6 +109,7 @@ gameRouter.get('/:gameId', (req, res) => {
     })
 })
 
+// Handles the user signing up to a game
 gameRouter.get('/:gameId/signup', playersOnly, (req, res, next) => {
     // If user is already signed up, do not add them to the list again
     if (req.foundGame.playersSignedUp.some(e => e._id.toString() == req.foundPlayer._id.toString())) { return res.redirect('back'); }
@@ -123,6 +122,7 @@ gameRouter.get('/:gameId/signup', playersOnly, (req, res, next) => {
     })
 })
 
+// Handles the user removing themselves from a game
 gameRouter.get('/:gameId/leave', playersOnly, (req, res, next) => {
     // Remove the user from the list of players signed up
     req.foundGame.playersSignedUp = req.foundGame.playersSignedUp.filter(e => e._id.toString() != req.foundPlayer._id.toString());
@@ -145,7 +145,6 @@ gameRouter.get('/:gameId/line-builder', coachOnly, (req, res) => {
 
     res.render('pages/game/lineBuilder', {
         team: req.foundTeam,
-        game: req.foundGame,
         goalies,
         players,
         numOfFSLines,
@@ -202,15 +201,14 @@ gameRouter.post('/:gameId/line-builder/save', coachOnly, (req, res, next) => {
     })
 })
 
+// Shows the user the lines in full
 gameRouter.get('/:gameId/lines', playerOrCoachOnly, (req, res, next) => {
-    // Check lines have been submitted
+    // Check lines have been submitted, if they haven't, return user to game page
     if (req.foundGame.lines == null) {
         return res.redirect(`/team/${req.params.code}/game/${req.params.gameId}`);
     }
 
-    res.render('pages/game/lineViewer', {
-        game: req.foundGame
-    });
+    res.render('pages/game/lineViewer');
 })
 
 module.exports = gameRouter;

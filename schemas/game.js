@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const gameSchema = new mongoose.Schema({
-    team: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Team'},
+    team: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Team', autopopulate: true},
     opponent: {type: String, required: true},
     atHome: {type: Boolean, required: true},
     date: {type: Date, required: true},
@@ -17,6 +17,11 @@ const gameSchema = new mongoose.Schema({
     }
 })
 
+gameSchema.virtual('title').get(function() {
+    return this.atHome ? `${this.team.name} vs ${this.opponent}` : `${this.opponent} vs ${this.team.name}`
+});
+
 gameSchema.plugin(require('mongoose-autopopulate'));
+gameSchema.plugin(require('mongoose-lean-virtuals'));
 
 module.exports = mongoose.model('Game', gameSchema);
