@@ -9,7 +9,19 @@ body
     if game.lines.backupGoalie
         p Backup Goalie: #{game.lines.backupGoalie.user.name}
 
+    include ../../partials/lineViewerLines.pug
+
     h2 Skaters
-    ul
-        for skater in game.lines.skaters
-            li= skater
+    h3 5 v 5
+    +line(skaters, 1)
+    +line(skaters, 2)
+    +line(skaters, 3)
+    +line(skaters, 4)
+
+    h3 Special Teams
+    +powerplayLine(skaters, 1)
+    +powerplayLine(skaters, 2)
+    +powerplayLine(skaters, 3)
+    +penaltyKillLine(skaters, 1)
+    +penaltyKillLine(skaters, 2)
+    +penaltyKillLine(skaters, 3)
