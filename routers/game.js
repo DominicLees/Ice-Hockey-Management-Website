@@ -109,7 +109,6 @@ gameRouter.use(['/:gameId'], (req, res, next) => {
 
 gameRouter.get('/:gameId', playerOrCoachOnly, (req, res) => {
     res.render('pages/game/gamePage', {
-        team: req.foundTeam,
         player: req.foundPlayer,
         isCoach: req.isCoach,
         isPlayer: req.isPlayer
@@ -151,7 +150,6 @@ gameRouter.get('/:gameId/line-builder', coachOnly, (req, res) => {
     const numOfPKLines = req.query.numOfPKLines == null ? 2 : clamp(req.query.numOfPKLines, 1, 4);
 
     res.render('pages/game/lineBuilder', {
-        team: req.foundTeam,
         goalies,
         players,
         numOfFSLines,
