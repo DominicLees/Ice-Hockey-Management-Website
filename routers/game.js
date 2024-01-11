@@ -37,6 +37,13 @@ function playerOrCoachOnly(req, res, next) {
     next();
 }
 
+function linesRequired(req, res, next) {
+    if (req.foundGame.lines == null) {
+        return res.redirect(`/team/${req.params.code}/game/${req.params.gameId}`);
+    }
+    next();
+}
+
 // ROUTES
 
 gameRouter.get('/new', coachOnly, (req, res) => {
@@ -202,12 +209,7 @@ gameRouter.post('/:gameId/line-builder/save', coachOnly, (req, res, next) => {
 })
 
 // Shows the user the lines in full
-gameRouter.get('/:gameId/lines', playerOrCoachOnly, (req, res, next) => {
-    // Check lines have been submitted, if they haven't, return user to game page
-    if (req.foundGame.lines == null) {
-        return res.redirect(`/team/${req.params.code}/game/${req.params.gameId}`);
-    }
-
+gameRouter.get('/:gameId/lines', playerOrCoachOnly, linesRequired, (req, res, next) => {
     res.render('pages/game/lineViewer');
 })
 
