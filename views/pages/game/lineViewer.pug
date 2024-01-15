@@ -4,6 +4,10 @@ body
     include ../../partials/navbar.pug
     h1 Lines for #{game.title}
 
+    if isPlayer
+        a(href="summary")
+            button View Animated Summary Of Lines
+
     h2 Goalies
     p Starting Goalie: #{game.lines.startingGoalie.user.name}
     if game.lines.backupGoalie

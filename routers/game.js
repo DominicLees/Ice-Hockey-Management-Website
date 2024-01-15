@@ -197,6 +197,7 @@ gameRouter.post('/:gameId/line-builder/save', coachOnly, (req, res, next) => {
     })
 })
 
+// Break the lines down into an easier to use format for displaying
 gameRouter.use(['/:gameId/lines', '/:gameId/summary'], linesRequired, (req, res, next) => {
     // Take the list of skaters and convert it into line position : name pairs
     res.locals.skaters = req.foundGame.toObject().lines.skaters.reduce((accumulator, currentValue) => {
@@ -210,8 +211,13 @@ gameRouter.use(['/:gameId/lines', '/:gameId/summary'], linesRequired, (req, res,
 })
 
 // Shows the user the lines in full
-gameRouter.get('/:gameId/lines', playerOrCoachOnly, (req, res, next) => {
-    res.render('pages/game/lineViewer');
+gameRouter.get('/:gameId/lines', playerOrCoachOnly, (req, res) => {
+    res.render('pages/game/lineViewer', {isPlayer: req.isPlayer});
+})
+
+// Shows the user a summary of the lines, where they are playing, who they are playing with etc
+gameRouter.get('/:gameId/summary', playersOnly, (req, res) => {
+    res.render('pages/game/summary');
 })
 
 module.exports = gameRouter;
