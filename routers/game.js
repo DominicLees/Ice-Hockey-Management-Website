@@ -217,7 +217,14 @@ gameRouter.get('/:gameId/lines', playerOrCoachOnly, (req, res) => {
 
 // Shows the user a summary of the lines, where they are playing, who they are playing with etc
 gameRouter.get('/:gameId/summary', playersOnly, (req, res) => {
-    res.render('pages/game/summary');
+    let positions = Object.entries(res.locals.skaters)
+    .filter(([position, name]) => name === req.session.account.name)
+    .map(([position]) => position);
+
+    res.render('pages/game/summary', {
+        isGoalie: req.foundGame.lines.startingGoalie.user.name == req.session.account.name || (req.foundGame.lines.backupGoalie && req.foundGame.lines.backupGoalie.user.name == req.session.account.name),
+        positions,
+    });
 })
 
 module.exports = gameRouter;

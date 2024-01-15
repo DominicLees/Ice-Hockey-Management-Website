@@ -1,0 +1,14 @@
+head
+    title Game Information for #{game.title}
+body
+    include ../../partials/navbar.pug
+
+    div
+        if isGoalie
+            p You are the #{game.lines.startingGoalie.user._id == account._id ? 'starting' : 'backup'} goalie
+        else if positions.length == 0
+            p You have not been picked for this game
+        else
+            p You are playing
+    
+    p= positions
