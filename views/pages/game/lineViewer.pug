@@ -17,15 +17,15 @@ body
 
     h2 Skaters
     h3 5 v 5
-    +line(skaters, 1)
-    +line(skaters, 2)
-    +line(skaters, 3)
-    +line(skaters, 4)
+    - for (var i = 1; i <= numOfFSLines; ++i) {
+        +line(skaters, i)
+    - }
 
     h3 Special Teams
-    +powerplayLine(skaters, 1)
-    +powerplayLine(skaters, 2)
-    +powerplayLine(skaters, 3)
-    +penaltyKillLine(skaters, 1)
-    +penaltyKillLine(skaters, 2)
-    +penaltyKillLine(skaters, 3)
+    - for (var i = 1; i <= numOfPPLines; ++i) {
+        +powerplayLine(skaters, i)
+    - }
+    
+    - for (var i = 1; i <= numOfPKLines; ++i) {
+        +penaltyKillLine(skaters, i)
+    - }

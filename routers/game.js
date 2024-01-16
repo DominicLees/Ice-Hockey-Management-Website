@@ -10,6 +10,12 @@ const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 
 const forbiddenError = require('./../functions/forbiddenError');
 
+const updateLinesCount = (prefix, skaters) => {
+    let count = 0;
+    while (Object.keys(skaters).some(key => key.startsWith(prefix + (++count)))) {}
+    return count;
+};
+
 // MIDDLEWARE
 
 const coachOnly = require('./../middleware/coachOnly');
@@ -204,6 +210,11 @@ gameRouter.use(['/:gameId/lines', '/:gameId/summary'], linesRequired, (req, res,
         accumulator[linePosition] = rest.playerId.user.name;
         return accumulator;
     }, {});
+
+    // Calculate how many of each type of line there is
+    res.locals.numOfFSLines = updateLinesCount('line', res.locals.skaters);
+    res.locals.numOfPPLines = updateLinesCount('PP', res.locals.skaters);
+    res.locals.numOfPKLines = updateLinesCount('PK', res.locals.skaters);
     next();
 })
 
