@@ -28,3 +28,18 @@ mixin expandPositionCode(code)
         result += positionCodes[code];
 
     span= result
+
+-
+    function incrementNumberInCode(code, maxValue) {
+        return code.replace(/\d/, match => {
+            let incrementedNumber = Number(match) + 1;
+            return incrementedNumber > maxValue ? '1' : String(incrementedNumber);
+        });
+    }
+
+    function decrementNumberInCode(code, loopValue) {
+        return code.replace(/\d/, match => {
+            let decrementedNumber = Number(match) - 1;
+            return decrementedNumber >= 1 ? String(decrementedNumber) : String(loopValue);
+        });
+    }
