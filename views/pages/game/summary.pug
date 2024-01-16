@@ -9,6 +9,9 @@ body
         else if positions.length == 0
             p You have not been picked for this game
         else
-            p You are playing
-    
-    p= positions
+            include ../../partials/expandPositionCode.pug
+            p You are playing in these positions:
+            ul
+                for position in positions
+                    li
+                        +expandPositionCode(position)

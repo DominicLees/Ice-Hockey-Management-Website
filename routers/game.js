@@ -174,13 +174,10 @@ gameRouter.post('/:gameId/line-builder/save', coachOnly, (req, res, next) => {
     delete pickedPlayers.backupGoalie;
     
     // Convert List of picked skaters into postion and player object Id pairs
-    let skaters = [];
-    for (const [key, value] of Object.entries(pickedPlayers)) {
-        skaters.push({
-            linePosition: key,
-            playerId: value
-        })
-    }
+    let skaters = Object.entries(pickedPlayers).map(([key, value]) => ({
+        linePosition: key,
+        playerId: value
+    }));
 
     // Save the lines to the database
     req.foundGame.lines = {
@@ -217,6 +214,7 @@ gameRouter.get('/:gameId/lines', playerOrCoachOnly, (req, res) => {
 
 // Shows the user a summary of the lines, where they are playing, who they are playing with etc
 gameRouter.get('/:gameId/summary', playersOnly, (req, res) => {
+    // Get the list of positions the player is playing in
     let positions = Object.entries(res.locals.skaters)
     .filter(([position, name]) => name === req.session.account.name)
     .map(([position]) => position);
