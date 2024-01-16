@@ -1,31 +1,30 @@
 mixin expandPositionCode(code)
     -
         let result = '';
-        if (code.startsWith('line')) {
-            result += 'line ';
-            code = code.slice(4);
-        } else if (code.startsWith('PP')) {
-            result += 'powerplay ';
-            code = code.slice(2);
-        } else if (code.startsWith('PK')) {
-            result += 'penalty kill ';
-            code = code.slice(2);
-        }
 
+        // Get the type of line the player is on
+        const lineCodes = {
+            'line': 'line ',
+            'PP': 'powerplay ',
+            'PK': 'penalty kill '
+        }
+        const lineCode = code.split(/\d/)[0]; // Splits the string up to the first number
+        result += lineCodes[lineCode];
+        code = code.slice(lineCode.length); // Remove the first part of the string 
+
+        // Get the line number from the position code
         result += code.slice(0, 1);
         code = code.slice(1);
-        if (code == "W") {
-            result += ' winger';
-        } else if (code == "LW") {
-            result += ' left winger';
-        } else if (code == "C") {
-            result += ' centre';
-        } else if (code == "RW") {
-            result += ' right winger';
-        } else if (code == "LD") {
-            result += ' left defenceman';
-        } else if (code == "RD") {
-            result += ' right defenceman';
+
+        // Expand the appreviation of the player's position
+        const positionCodes = {
+            'W': ' winger',
+            'LW': ' left winger',
+            'C': ' centre',
+            'RW': ' right winger',
+            'LD': ' left defenceman',
+            'RD': ' right defenceman'
         }
+        result += positionCodes[code];
 
     span= result
