@@ -1,0 +1,22 @@
+head
+    title #{player.user.name}'s Profile
+    link(rel="stylesheet", href="/public/css/playerProfile.css")
+body
+    include partials/navbar.pug
+    include partials/expandPositionCode.pug
+
+    h1 #{player.user.name} - #{getPositionFullName(player.positions[0])} for #{player.team.name}
+
+    div.stats
+        div
+            h3 Games
+            p= player.totalGames
+        div
+            h3 Goals
+            p= player.totalGoals
+        div
+            h3 Assists
+            p= player.totalAssists
+        div
+            h3 Points
+            p= player.totalGoals + player.totalAssists
