@@ -24,7 +24,7 @@ body
                         if team.coach == account._id
                             span Coach
                         else
-                            span Player
+                            a(href="/player/" + playerProfiles.find((profile => profile.team._id == team._id))._id) Player 
 
     h2 Upcoming Games
     div
