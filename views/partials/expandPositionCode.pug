@@ -1,5 +1,18 @@
+-
+    const positionCodes = {
+            'W': ' winger',
+            'LW': ' left winger',
+            'C': ' centre',
+            'RW': ' right winger',
+            'LD': ' left defenceman',
+            'RD': ' right defenceman'   
+    }
+    function getPositionFullName(abbrevation) {
+        return positionCodes[abbrevation];
+    }
+
 //-
-    All the functions in this file take a position code as input, a position code is made up of 3 parts:
+    All the functions below take a position code as input, a position code is made up of 3 parts:
     - The type of line (line/PP/PK)
     - The line number
     - The position of the player
@@ -24,15 +37,7 @@
         code = code.slice(1);
 
         // Expand the appreviation of the player's position
-        const positionCodes = {
-            'W': ' winger',
-            'LW': ' left winger',
-            'C': ' centre',
-            'RW': ' right winger',
-            'LD': ' left defenceman',
-            'RD': ' right defenceman'
-        }
-        return result += positionCodes[code];
+        return result += getPositionFullName(code);
     }
 
     // Takes a position code and increments the number in it, if it would exceed the maximum value, the number loops back around to 1 
