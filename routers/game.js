@@ -10,9 +10,11 @@ const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 
 const forbiddenError = require('./../functions/forbiddenError');
 
-const updateLinesCount = (prefix, skaters) => {
+const calcLineCount = (prefix, skaters) => {
     let count = 0;
-    while (Object.keys(skaters).some(key => key.startsWith(prefix + (++count)))) {}
+    while (Object.keys(skaters).some(key => key.startsWith(prefix + (count + 1)))) {
+        count++;
+    }
     return count;
 };
 
@@ -212,9 +214,9 @@ gameRouter.use(['/:gameId/lines', '/:gameId/summary'], linesRequired, (req, res,
     }, {});
 
     // Calculate how many of each type of line there is
-    res.locals.numOfFSLines = updateLinesCount('line', res.locals.skaters);
-    res.locals.numOfPPLines = updateLinesCount('PP', res.locals.skaters);
-    res.locals.numOfPKLines = updateLinesCount('PK', res.locals.skaters);
+    res.locals.numOfFSLines = calcLineCount('line', res.locals.skaters);
+    res.locals.numOfPPLines = calcLineCount('PP', res.locals.skaters);
+    res.locals.numOfPKLines = calcLineCount('PK', res.locals.skaters);
     next();
 })
 
