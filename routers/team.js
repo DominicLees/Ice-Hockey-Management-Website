@@ -5,6 +5,8 @@ const Team = require('./../schemas/team');
 const Player = require('./../schemas/player');
 const Game = require('./../schemas/game');
 
+const coachOnly = require('./../middleware/coachOnly');
+
 teamRouter.get('/new', (req, res) => {
     res.render('pages/team/new');
 })
@@ -41,6 +43,7 @@ teamRouter.use(['/join/:code', '/:code'], (req, res, next) => {
 
         // Save data for later so we don't have to query for it again
         req.foundTeam = result;
+        res.locals.team = result;
         next();
     }).catch(error => {
         next(error);
@@ -48,9 +51,7 @@ teamRouter.use(['/join/:code', '/:code'], (req, res, next) => {
 })
 
 teamRouter.get('/join/:code', (req, res) => {
-    res.render('pages/team/join', {
-        team: req.foundTeam
-    })
+    res.render('pages/team/join');
 })
 
 teamRouter.post('/join/:code', (req, res, next) => {
@@ -89,7 +90,7 @@ teamRouter.use('/:code', (req, res, next) => {
         // Next find all the games this team is playing
         return Game.find({team: req.foundTeam._id}).lean()
     }).then(result => {
-        req.foundTeam.games = result;
+        res.locals.games = result;
         next();
     }).catch(error => {
         next(error);
@@ -98,21 +99,12 @@ teamRouter.use('/:code', (req, res, next) => {
 
 teamRouter.get('/:code', (req, res) => {
     res.render('pages/team/teamProfile', {
-        team: req.foundTeam,
         players: req.foundPlayers,
-        games: req.foundTeam.games,
         isCoach: req.isCoach
     })
 })
 
-teamRouter.get('/:code/delete', (req, res, next) => {
-    // Only the head coach can delete a team
-    if (!req.isCoach) {
-        const error = new Error('Forbidden');
-        error.status = 403;
-        return next(error);  
-    }
-
+teamRouter.get('/:code/delete', coachOnly, (req, res, next) => {
     Team.deleteOne({_id: req.foundTeam._id}).then(() => {
         req.session.responses.teamDeleteSuccessful = true;
         res.redirect('/dashboard');
