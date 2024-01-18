@@ -4,6 +4,7 @@ const playerSchema = new mongoose.Schema({
     user: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User', autopopulate: true},
     team: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Team'},
     positions: {type: [String], required: true},
+    privacy: {type: String, enum: ['public', 'teamOnly', 'coachOnly'], default: 'teamOnly'},
     games: [{
         game: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Game'},
         goals: {type: Number, default: 0},

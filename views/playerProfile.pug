@@ -7,6 +7,22 @@ body
 
     h1 #{player.user.name} - #{getPositionFullName(player.positions[0])} for #{player.team.name}
 
+    if player.user._id == account._id
+        form(action="update", method="post") 
+            h3 Settings
+            p Profile privacy setting
+            input#public(type="radio", name="privacy" value="public" checked=(player.privacy == 'public'))
+            label(for="public") Public
+            br
+            input#teamOnly(type="radio", name="privacy" value="teamOnly" checked=(player.privacy == 'teamOnly'))
+            label(for="teamOnly") Team members only
+            br
+            input#coachOnly(type="radio", name="privacy" value="coachOnly" checked=(player.privacy == 'coachOnly'))
+            label(for="coachOnly") Coach only
+            br
+            br
+            input(type="submit", value="Update Settings")
+
     div.stats
         div
             h3 Games
