@@ -5,7 +5,8 @@ body
     include partials/navbar.pug
     include partials/expandPositionCode.pug
 
-    h1 #{player.user.name} - #{getPositionFullName(player.positions[0])} for #{player.team.name}
+    h1 #{player.user.name} - #{getPositionFullName(player.positions[0])} for 
+        a(href="/team/"+player.team.code)=player.team.name
 
     if player.user._id == account._id
         form(action=player._id+"/update", method="post") 
