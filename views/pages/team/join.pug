@@ -1,9 +1,11 @@
 head
     title Join the #{team.name}
 body
-    h1 Create your player profile for the #{team.name}
+    include ../../partials/navbar.pug
+
+    h2 Create your player profile for the #{team.name}
     form(action="./"+team.code, method="post") 
-        h2 Positions
+        h3 Positions
         fieldset 
             input(type="checkbox", value="LW", name="positions")
             label LW
