@@ -251,7 +251,11 @@ gameRouter.get('/:gameId/result', coachOnly, (req, res) => {
             players.push(player);
         }
     })
-    res.send(players);
+    res.render('pages/game/result', {players})
+})
+
+gameRouter.post('/:gameId/result', coachOnly, (req, res, next) => {
+    res.send(req.body)
 })
 
 module.exports = gameRouter;
