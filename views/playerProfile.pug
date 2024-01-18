@@ -8,7 +8,7 @@ body
     h1 #{player.user.name} - #{getPositionFullName(player.positions[0])} for #{player.team.name}
 
     if player.user._id == account._id
-        form(action="update", method="post") 
+        form(action=player._id+"/update", method="post") 
             h3 Settings
             p Profile privacy setting
             input#public(type="radio", name="privacy" value="public" checked=(player.privacy == 'public'))
