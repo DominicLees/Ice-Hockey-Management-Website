@@ -10,7 +10,7 @@ function buildCSS() {
 
 function buildJS() {
     return src('./src/js/**/*.js')
-    .pipe(minify({noSource: true}))
+    .pipe(minify())
     .pipe(dest('./public/js'));
 }
 

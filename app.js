@@ -55,7 +55,7 @@ const authRouter = require('./routers/auth.js');
 app.use('/', authRouter);
 
 // Users need to be logged in to access routes below this point
-app.use(['/dashboard', '/team'], (req, res, next) => {
+app.use(['/dashboard', '/team', '/player'], (req, res, next) => {
     if (!req.session.authenticated) {
         return res.redirect('/');
     }
@@ -72,6 +72,9 @@ app.use('/team', teamRouter);
 // Handles creating and signing up to games
 const gameRouter = require('./routers/game.js');
 app.use('/team/:code/game', gameRouter);
+
+const playerRouter = require('./routers/player.js');
+app.use('/player', playerRouter);
 
 // ERROR HANDLING
 

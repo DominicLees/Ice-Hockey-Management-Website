@@ -10,29 +10,36 @@ body
     if responses.teamDeleteSuccessful
         h3 Team deleted successfully
 
-    table
-        thead 
-            tr
-                th Team Name
-                th Role
-        tbody
-            each team in teams
+    if teams.length > 0
+        table
+            thead 
                 tr
-                    td
-                        a(href="/team/" + team.code)= team.name
-                    td
-                        if team.coach == account._id
-                            span Coach
-                        else
-                            span Player
+                    th Team Name
+                    th Role
+            tbody
+                each team in teams
+                    tr
+                        td
+                            a(href="/team/" + team.code)= team.name
+                        td
+                            if team.coach == account._id
+                                span Coach
+                            else
+                                a(href="/player/" + playerProfiles.find((profile => profile.team._id == team._id))._id) Player 
+    else 
+        p You are not currently part of any teams. Create one or join an existing one using their team code
 
     h2 Upcoming Games
     div
-        for game in games
-            a(href="/team/" + game.team.code + "/game/" + game.gameId)
-                h3= game.title
-            p= game.date
-            if game.lines
-                a(href="/team/" + game.team.code + "/game/" + game.gameId + "/lines") View lines
-            else
-                p Waiting for lines
+        if games.length > 0
+            for game in games
+                a(href="/team/" + game.team.code + "/game/" + game.gameId)
+                    h3= game.title
+                - const date = new Date(game.date)
+                p= date.toJSON().slice(0,10).split('-').reverse().join('/') + " at " + date.toLocaleTimeString()   
+                if game.lines
+                    a(href="/team/" + game.team.code + "/game/" + game.gameId + "/lines") View lines
+                else
+                    p Waiting for lines
+        else
+            p You currently have no upcoming games

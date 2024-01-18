@@ -1,6 +1,12 @@
 body {
-    font-family: arial;
+    font-family: verdana, arial;
     margin: 0px;
+}
+
+h1 {
+    font-size: 72px;
+    margin: 20px;
+    text-align: center;
 }
 
 a {
@@ -24,6 +30,10 @@ a {
 
 .green {
     background-color: lightgreen;
+}
+
+.hidden {
+    display: none;
 }
 
 // Navbar
