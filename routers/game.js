@@ -212,8 +212,11 @@ gameRouter.use(['/:gameId/lines', '/:gameId/summary', '/:gameId/result'], linesR
         accumulator[linePosition] = rest.playerId.user.name;
         return accumulator;
     }, {});
+    next();
+})
 
-    // Calculate how many of each type of line there is
+// Calculate how many of each type of line there is
+gameRouter.use(['/:gameId/lines', '/:gameId/summary'], (req, res, next) => {
     res.locals.numOfFSLines = calcLineCount('line', res.locals.skaters);
     res.locals.numOfPPLines = calcLineCount('PP', res.locals.skaters);
     res.locals.numOfPKLines = calcLineCount('PK', res.locals.skaters);
@@ -239,8 +242,10 @@ gameRouter.get('/:gameId/summary', playersOnly, (req, res) => {
 })
 
 gameRouter.get('/:gameId/result', coachOnly, (req, res) => {
+    // Get a list of all the players who played, starting with the goalies
     const players = [req.foundGame.lines.startingGoalie];
     if (req.foundGame.lines.backupGoalie) players.push(req.foundGame.lines.backupGoalie);
+    // Find all player profiles of all the skaters who played by comparing the lines to the list of players who initially signed up to the game
     req.foundGame.playersSignedUp.forEach((player) => {
         if (Object.values(res.locals.skaters).includes(player.user.name)) {
             players.push(player);
