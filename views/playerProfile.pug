@@ -1,6 +1,7 @@
 head
     title #{player.user.name}'s Profile
     link(rel="stylesheet", href="/public/css/playerProfile.css")
+    script(src="/public/js/playerProfile.js" defer) 
 body
     include partials/navbar.pug
     include partials/expandPositionCode.pug
@@ -9,8 +10,8 @@ body
         a(href="/team/"+player.team.code)=player.team.name
 
     if player.user._id == account._id
-        form(action=player._id+"/update", method="post") 
-            h3 Settings
+        h3#settingsToggle Settings +
+        form#settingsForm.hidden(action=player._id+"/update", method="post") 
             p Profile privacy setting
             input#public(type="radio", name="privacy" value="public" checked=(player.privacy == 'public'))
             label(for="public") Public
