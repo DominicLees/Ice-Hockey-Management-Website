@@ -50,7 +50,7 @@ body
             tbody
                 for game in player.games
                     tr
-                        td= game.game.date
+                        td= game.game.date.toJSON().slice(0,10).split('-').reverse().join('/')
                         td= game.game.opponent
                         td= game.goals
                         td= game.assists
