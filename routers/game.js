@@ -73,7 +73,7 @@ gameRouter.post('/new', coachOnly, (req, res, next) => {
         atHome: req.body.homeOrAway == "home",
         date: inputDate,
         gameId: crypto.randomBytes(3).toString('hex')
-    })
+    });
 
     newGame.save().then(result => {
         res.redirect('/dashboard');
@@ -97,7 +97,7 @@ gameRouter.use(['/:gameId'], (req, res, next) => {
         req.foundGame = result;
         res.locals.game = result;
         // Find the player profile for the user for this team
-        return Player.findOne({user: req.session.account._id, team: result.team})
+        return Player.findOne({user: req.session.account._id, team: result.team});
     }).then(result => {
         req.foundPlayer = result;
         next();
@@ -208,7 +208,7 @@ gameRouter.use(['/:gameId/lines', '/:gameId/summary', '/:gameId/result'], linesR
     res.locals.skaters = req.foundGame.toObject().lines.skaters.reduce((accumulator, currentValue) => {
         // Get the line position and set it as the key
         const { linePosition, ...rest } = currentValue;
-        // Only and the name of the player as all the other data is redundant
+        // Only get the name of the player as all the other data is redundant
         accumulator[linePosition] = rest.playerId.user.name;
         return accumulator;
     }, {});
@@ -241,21 +241,40 @@ gameRouter.get('/:gameId/summary', playersOnly, (req, res) => {
     });
 })
 
-gameRouter.get('/:gameId/result', coachOnly, (req, res) => {
+gameRouter.use('/:gameId/result', coachOnly, (req, res, next) => {
     // Get a list of all the players who played, starting with the goalies
-    const players = [req.foundGame.lines.startingGoalie];
-    if (req.foundGame.lines.backupGoalie) players.push(req.foundGame.lines.backupGoalie);
+    req.players = [req.foundGame.lines.startingGoalie];
+    if (req.foundGame.lines.backupGoalie) req.players.push(req.foundGame.lines.backupGoalie);
     // Find all player profiles of all the skaters who played by comparing the lines to the list of players who initially signed up to the game
-    req.foundGame.playersSignedUp.forEach((player) => {
+    req.foundGame.playersSignedUp.forEach(player => {
         if (Object.values(res.locals.skaters).includes(player.user.name)) {
-            players.push(player);
+            req.players.push(player);
         }
-    })
-    res.render('pages/game/result', {players})
+    });
+    next();
 })
 
-gameRouter.post('/:gameId/result', coachOnly, (req, res, next) => {
-    res.send(req.body)
+gameRouter.get('/:gameId/result', (req, res) => {
+    res.render('pages/game/result', {players: req.players});
+})
+
+gameRouter.post('/:gameId/result', (req, res, next) => {
+    req.players.forEach(player => {
+        player.games.push({
+            game: req.foundGame._id,
+            goals: req.body[player._id+'-goals'],
+            assists: req.body[player._id+'-assists']
+        })
+    })
+    Player.bulkSave(req.players).then(() => {
+        req.foundGame.result.teamGoals = req.body.teamGoals;
+        req.foundGame.result.opponentGoals = req.body.opponentGoals;
+        return req.foundGame.save();
+    }).then(() => {
+        return res.redirect(`/team/${req.params.code}/game/${req.params.gameId}`);
+    }).catch(error => {
+        next(error);
+    })
 })
 
 module.exports = gameRouter;
