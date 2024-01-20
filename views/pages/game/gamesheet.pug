@@ -1,0 +1,18 @@
+head
+    title Gamesheet for #{game.title}
+body 
+    include ../../partials/navbar.pug
+    h1= game.title
+    table
+        thead
+            tr
+                th Name
+                th Goals
+                th Assists
+        tbody
+            for player in players
+                - const stats = player.games.find(gameStats => gameStats.game.toString() == game._id.toString())
+                tr
+                    td= player.user.name
+                    td= stats.goals
+                    td= stats.assists

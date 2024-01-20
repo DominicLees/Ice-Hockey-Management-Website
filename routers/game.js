@@ -203,7 +203,7 @@ gameRouter.post('/:gameId/line-builder/save', coachOnly, (req, res, next) => {
 })
 
 // Break the lines down into an easier to use format for displaying
-gameRouter.use(['/:gameId/lines', '/:gameId/summary', '/:gameId/result'], linesRequired, (req, res, next) => {
+gameRouter.use(['/:gameId/lines', '/:gameId/summary', '/:gameId/result', '/:gameId/gamesheet'], linesRequired, (req, res, next) => {
     // Take the list of skaters and convert it into line position : name pairs
     res.locals.skaters = req.foundGame.toObject().lines.skaters.reduce((accumulator, currentValue) => {
         // Get the line position and set it as the key
@@ -237,11 +237,13 @@ gameRouter.get('/:gameId/summary', playersOnly, (req, res) => {
 
     res.render('pages/game/summary', {
         isGoalie: req.foundGame.lines.startingGoalie.user.name == req.session.account.name || (req.foundGame.lines.backupGoalie && req.foundGame.lines.backupGoalie.user.name == req.session.account.name),
-        positions,
+        positions
     });
 })
 
-gameRouter.use('/:gameId/result', coachOnly, (req, res, next) => {
+gameRouter.use('/:gameId/result', coachOnly);
+
+gameRouter.use(['/:gameId/result', '/:gameId/gamesheet'], (req, res, next) => {
     // Get a list of all the players who played, starting with the goalies
     req.players = [req.foundGame.lines.startingGoalie];
     if (req.foundGame.lines.backupGoalie) req.players.push(req.foundGame.lines.backupGoalie);
@@ -275,6 +277,13 @@ gameRouter.post('/:gameId/result', (req, res, next) => {
     }).catch(error => {
         next(error);
     })
+})
+
+gameRouter.get('/:gameId/gamesheet', (req, res) => {
+    if (!req.foundGame.result) {
+        return res.redirect(`/team/${req.params.code}/game/${req.params.gameId}`);
+    }
+    res.render('pages/game/gamesheet', {players: req.players});
 })
 
 module.exports = gameRouter;

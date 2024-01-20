@@ -9,7 +9,7 @@ body
     div#buttons
         if game.result
             button
-                a(href="./gamesheet") View Game Sheet
+                a(href=game.gameId+"/gamesheet") View Game Sheet
         else
             if isPlayer
                 if game.playersSignedUp.some(e => e.user._id == account._id)
