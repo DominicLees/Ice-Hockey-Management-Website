@@ -265,7 +265,8 @@ gameRouter.post('/:gameId/result', (req, res, next) => {
         player.games.push({
             game: req.foundGame._id,
             goals: req.body[player._id+'-goals'],
-            assists: req.body[player._id+'-assists']
+            assists: req.body[player._id+'-assists'],
+            pims: req.body[player._id+'-pims']
         })
     })
     Player.bulkSave(req.players).then(() => {

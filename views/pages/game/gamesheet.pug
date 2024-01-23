@@ -9,6 +9,7 @@ body
                 th Name
                 th Goals
                 th Assists
+                th Penalty Minutes
         tbody
             for player in players
                 - const stats = player.games.find(gameStats => gameStats.game.toString() == game._id.toString())
@@ -16,3 +17,4 @@ body
                     td= player.user.name
                     td= stats.goals
                     td= stats.assists
+                    td= stats.pims

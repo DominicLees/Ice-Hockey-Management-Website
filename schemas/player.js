@@ -8,7 +8,8 @@ const playerSchema = new mongoose.Schema({
     games: [{
         game: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Game'},
         goals: {type: Number, default: 0, min: 0},
-        assists: {type: Number, default: 0, min: 0}
+        assists: {type: Number, default: 0, min: 0},
+        pims: {type: Number, default: 0, min: 0}
     }]
 })
 

@@ -17,6 +17,7 @@ body
                     th Name
                     th Goals
                     th Assists
+                    th Penalty Minutes
 
             tbody
                 for player in players
@@ -26,5 +27,7 @@ body
                             input(type="number", name=player._id + '-goals' value=0)
                         td
                             input(type="number", name=player._id + '-assists' value=0)
+                        td
+                            input(type="number", name=player._id + '-pims' value=0)
 
         input(type="submit", value="Submit")
