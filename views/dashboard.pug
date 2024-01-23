@@ -1,6 +1,7 @@
 head
     title Dashboard
     link(rel="stylesheet", href="/public/css/dashboard.css")
+    script(src="/public/js/dashboard.js" defer) 
 body
     include partials/navbar.pug
     h1 Welcome #{account.name}
@@ -8,6 +9,9 @@ body
     main
         div
             h2 Your Teams
+
+            input#teamCode(type="text" placeholder="Enter Team Code")
+            button#joinTeamButton Join Team
             button
                 a(href="/team/new") Create New Team
 
