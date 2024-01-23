@@ -26,7 +26,7 @@ gameSchema.virtual('title').get(function() {
 });
 
 gameSchema.virtual('score').get(function() {
-    return this.atHome ? this.result.teamGoals + '-' + this.result.opponentGoals : this.result.opponentGoalsGoals + '-' + this.result.teamGoals;
+    return this.atHome ? this.result.teamGoals + '-' + this.result.opponentGoals : this.result.opponentGoals + '-' + this.result.teamGoals;
 });
 
 gameSchema.set('toObject', { virtuals: true });
