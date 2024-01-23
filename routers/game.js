@@ -1,5 +1,5 @@
 const express = require('express');
-const gameRouter = express.Router();
+const gameRouter = express.Router({ mergeParams: true });
 const crypto = require('crypto');
 const Game = require('../schemas/game');
 const Player = require('../schemas/player');
@@ -241,10 +241,18 @@ gameRouter.get('/:gameId/summary', playersOnly, (req, res) => {
     });
 })
 
-gameRouter.use('/:gameId/result', coachOnly);
+// The player is checked if they are the coach for this route here, to save getting the list of skaters if they are not
+gameRouter.use('/:gameId/result', coachOnly, (req, res, next) => {
+    // If the result for this game ahs already been submitted, prevent the user from submitting another
+    if (req.foundGame.result) {
+        return res.redirect(`/team/${req.params.code}/game/${req.params.gameId}/gamesheet`);
+    }
+    next();
+});
 
+// Gets the list of player document objects for those who player
 gameRouter.use(['/:gameId/result', '/:gameId/gamesheet'], (req, res, next) => {
-    // Get a list of all the players who played, starting with the goalies
+    // Get the goalies
     req.players = [req.foundGame.lines.startingGoalie];
     if (req.foundGame.lines.backupGoalie) req.players.push(req.foundGame.lines.backupGoalie);
     // Find all player profiles of all the skaters who played by comparing the lines to the list of players who initially signed up to the game
@@ -260,7 +268,9 @@ gameRouter.get('/:gameId/result', (req, res) => {
     res.render('pages/game/result', {players: req.players});
 })
 
+// Save the game result to the database
 gameRouter.post('/:gameId/result', (req, res, next) => {
+    // Add each player's stats for that game to their list of game results
     req.players.forEach(player => {
         player.games.push({
             game: req.foundGame._id,
@@ -270,6 +280,7 @@ gameRouter.post('/:gameId/result', (req, res, next) => {
         })
     })
     Player.bulkSave(req.players).then(() => {
+        // Save the score for the game
         req.foundGame.result.teamGoals = req.body.teamGoals;
         req.foundGame.result.opponentGoals = req.body.opponentGoals;
         return req.foundGame.save();
