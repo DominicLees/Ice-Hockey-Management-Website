@@ -1,50 +1,55 @@
 head
     title Dashboard
+    link(rel="stylesheet", href="/public/css/dashboard.css")
 body
     include partials/navbar.pug
     h1 Welcome #{account.name}
-    h2 Your Teams
-    button
-        a(href="/team/new") Create New Team
 
-    if responses.teamDeleteSuccessful
-        h3 Team deleted successfully
+    main
+        div
+            h2 Your Teams
+            button
+                a(href="/team/new") Create New Team
 
-    if teams.length > 0
-        table
-            thead 
-                tr
-                    th Team Name
-                    th Role
-            tbody
-                each team in teams
-                    tr
-                        td
-                            a(href="/team/" + team.code)= team.name
-                        td
-                            - const playerProfile = playerProfiles.find((profile => profile.team._id == team._id));
-                            if playerProfile
-                                a(href="/player/" + playerProfile._id)
-                                    if team.coach == account._id
-                                        span Player/Coach
-                                    else 
-                                        span Player 
-                            else
-                                span Coach
-    else 
-        p You are not currently part of any teams. Create one or join an existing one using their team code
+            if responses.teamDeleteSuccessful
+                h3 Team deleted successfully
 
-    h2 Upcoming Games
-    div
-        if games.length > 0
-            for game in games
-                a(href="/team/" + game.team.code + "/game/" + game.gameId)
-                    h3= game.title
-                - const date = new Date(game.date)
-                p= date.toJSON().slice(0,10).split('-').reverse().join('/') + " at " + date.toLocaleTimeString()   
-                if game.lines
-                    a(href="/team/" + game.team.code + "/game/" + game.gameId + "/lines") View lines
-                else
-                    p Waiting for lines
-        else
-            p You currently have no upcoming games
+            if teams.length > 0
+                table
+                    thead 
+                        tr
+                            th Team Name
+                            th Role
+                    tbody
+                        each team in teams
+                            tr
+                                td
+                                    a(href="/team/" + team.code)= team.name
+                                td
+                                    - const playerProfile = playerProfiles.find((profile => profile.team._id == team._id));
+                                    if playerProfile
+                                        a(href="/player/" + playerProfile._id)
+                                            if team.coach == account._id
+                                                span Player/Coach
+                                            else 
+                                                span Player 
+                                    else
+                                        span Coach
+            else 
+                p You are not currently part of any teams. Create one or join an existing one using their team code
+
+        div
+            if games.length > 0
+                h2 Upcoming Games
+                for game in games
+                    div.game-card
+                        a(href="/team/" + game.team.code + "/game/" + game.gameId)
+                            h3= game.title
+                        - const date = new Date(game.date)
+                        p= date.toJSON().slice(0,10).split('-').reverse().join('/') + " at " + date.toLocaleTimeString()   
+                        if game.lines
+                            a(href="/team/" + game.team.code + "/game/" + game.gameId + "/lines") View lines
+                        else
+                            p Waiting for lines
+            else
+                p You currently have no upcoming games
