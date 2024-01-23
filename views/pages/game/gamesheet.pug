@@ -2,13 +2,19 @@ head
     title Gamesheet for #{game.title}
 body 
     include ../../partials/navbar.pug
-    h1= game.title
+    
+    if game.atHome
+        h1= `${game.team.name} ${game.result.teamGoals} - ${game.result.opponentGoals} ${game.opponent}`
+    else
+        h1= `${game.opponent} ${game.result.opponentGoals} - ${game.result.teamGoals} ${game.team.name}`
+
     table
         thead
             tr
                 th Name
                 th Goals
                 th Assists
+                th Points
                 th Penalty Minutes
         tbody
             for player in players
@@ -17,4 +23,5 @@ body
                     td= player.user.name
                     td= stats.goals
                     td= stats.assists
+                    td= stats.goals + stats.assists
                     td= stats.pims
