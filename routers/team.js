@@ -44,9 +44,6 @@ teamRouter.use(['/join/:code', '/:code'], (req, res, next) => {
         // Save data for later so we don't have to query for it again
         req.foundTeam = result;
         res.locals.team = result;
-        return Player.find({team: req.foundTeam._id}).lean().populate('user');
-    }).then(result => {
-        req.foundPlayers = result;
         next();
     }).catch(error => {
         next(error);
@@ -55,10 +52,15 @@ teamRouter.use(['/join/:code', '/:code'], (req, res, next) => {
 
 // Prevent users from joining team they are already apart of
 teamRouter.use('/join/:code', (req, res, next) => {
-    if (req.foundPlayers.some(player => {return player.user._id.equals(req.session.account._id)})) {
-        return res.redirect('/dashboard');
-    }
-    next();
+    Player.find({team: req.foundTeam._id}).lean().populate('user').then(result => {
+        req.foundPlayers = result;
+        if (req.foundPlayers.some(player => {return player.user._id.equals(req.session.account._id)})) {
+            return res.redirect('/dashboard');
+        }
+        next();
+    }).catch(error => {
+        next(error);
+    })
 })
 
 teamRouter.get('/join/:code', (req, res) => {
@@ -90,7 +92,7 @@ teamRouter.post('/join/:code', (req, res, next) => {
 teamRouter.use('/:code', (req, res, next) => {
     if (req.foundTeam.coach._id == req.session.account._id) { 
         req.isCoach = true; 
-    } if (req.foundPlayers.filter(player => player.user._id == req.session.account._id).length > 0) {
+    } if (req.foundPlayers && req.foundPlayers.filter(player => player.user._id == req.session.account._id).length > 0) {
         req.isPlayer = true; 
     }
     

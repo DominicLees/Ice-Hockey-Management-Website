@@ -10,7 +10,7 @@ body
         a(href="/team/"+player.team.code)=player.team.name
 
     if player.user._id == account._id
-        h3#settingsToggle Settings +
+        h2#settingsToggle Settings +
         form#settingsForm.hidden(action=player._id+"/update", method="post") 
             p Profile privacy setting
             input#public(type="radio", name="privacy" value="public" checked=(player.privacy == 'public'))
@@ -40,17 +40,22 @@ body
             p= player.totalGoals + player.totalAssists
 
     if player.totalGames > 0
+        h2 Game History
         table
             thead
                 tr
                     th Date
                     th Opponent
+                    th Score
                     th Goals
                     th Assists
+                    th Penalty Minutes
             tbody
                 for game in player.games
                     tr
-                        td= game.game.date
-                        td= game.game.opponent
+                        td= game.game.date.toJSON().slice(0,10).split('-').reverse().join('/')
+                        td= `${game.game.opponent} (${game.game.atHome ? 'H' : 'A'})`
+                        th= game.game.score
                         td= game.goals
                         td= game.assists
+                        td= game.pims

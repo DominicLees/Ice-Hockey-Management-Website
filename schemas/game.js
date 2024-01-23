@@ -14,12 +14,22 @@ const gameSchema = new mongoose.Schema({
             linePosition: {type: String, required: true},
             playerId: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Player', autopopulate: true}
         }]
+    },
+    result: {
+        teamGoals: {type: Number, min: 0},
+        opponentGoals: {type: Number, min: 0}
     }
 })
 
 gameSchema.virtual('title').get(function() {
-    return this.atHome ? `${this.team.name} vs ${this.opponent}` : `${this.opponent} vs ${this.team.name}`
+    return this.atHome ? `${this.team.name} vs ${this.opponent}` : `${this.opponent} vs ${this.team.name}`;
 });
+
+gameSchema.virtual('score').get(function() {
+    return this.atHome ? this.result.teamGoals + '-' + this.result.opponentGoals : this.result.opponentGoals + '-' + this.result.teamGoals;
+});
+
+gameSchema.set('toObject', { virtuals: true });
 
 gameSchema.plugin(require('mongoose-autopopulate'));
 gameSchema.plugin(require('mongoose-lean-virtuals'));

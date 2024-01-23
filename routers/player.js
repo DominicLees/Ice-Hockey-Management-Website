@@ -9,7 +9,12 @@ playerRouter.use('/:id', (req, res, next) => {
         return res.redirect('/404');
     }
 
-    Player.findById(req.params.id).populate('team').then(result => {
+    Player.findById(req.params.id).populate('team').populate({
+        path: 'games',
+        populate: {
+            path: 'game'
+        }
+    }).then(result => {
         if (result == null) {
             return res.redirect('/404');
         }

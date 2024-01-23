@@ -7,8 +7,9 @@ const playerSchema = new mongoose.Schema({
     privacy: {type: String, enum: ['public', 'teamOnly', 'coachOnly'], default: 'teamOnly'},
     games: [{
         game: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Game'},
-        goals: {type: Number, default: 0},
-        assists: {type: Number, default: 0}
+        goals: {type: Number, default: 0, min: 0},
+        assists: {type: Number, default: 0, min: 0},
+        pims: {type: Number, default: 0, min: 0}
     }]
 })
 
