@@ -22,15 +22,10 @@ const calcLineCount = (prefix, skaters) => {
 
 const coachOnly = require('./../middleware/coachOnly');
 
+const playerOrCoachOnly = require('./../middleware/playerOrCoachOnly');
+
 function playersOnly(req, res, next) {
     if (!req.isPlayer) {
-        next(forbiddenError());
-    }
-    next();
-}
-
-function playerOrCoachOnly(req, res, next) {
-    if (!(req.isPlayer || req.isCoach)) {
         next(forbiddenError());
     }
     next();
