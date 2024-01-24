@@ -30,6 +30,10 @@ table {
         margin-left: 0px;
     }
 
+    td, td a, td span, th {
+        padding: 5px;
+    }
+
     td, th {
         border: 1px solid black;
     }

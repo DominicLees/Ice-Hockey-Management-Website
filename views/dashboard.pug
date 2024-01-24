@@ -32,11 +32,7 @@ body
                                 td
                                     - const playerProfile = playerProfiles.find((profile => profile.team._id == team._id));
                                     if playerProfile
-                                        a(href=`/player/${playerProfile._id}`)
-                                            if team.coach == account._id
-                                                span Player/Coach
-                                            else 
-                                                span Player 
+                                        a(href=`/player/${playerProfile._id}`)= team.coach == account._id ? 'Player/Coach' : 'Player'
                                     else
                                         span Coach
             else 
