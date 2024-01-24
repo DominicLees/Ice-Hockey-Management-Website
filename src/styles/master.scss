@@ -21,13 +21,20 @@ button {
 }
 
 // Utility Classes
-.error {
+.error, .success {
     padding: 10px;
     margin: 10px;
     border-radius: 10px;
-    background-color: lightcoral;
     width: fit-content;
     display: inline-block;
+}
+
+.error {
+    background-color: lightcoral;
+}
+
+.success {
+    background-color: lightgreen;
 }
 
 .red {
