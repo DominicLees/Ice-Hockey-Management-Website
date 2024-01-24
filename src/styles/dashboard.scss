@@ -16,6 +16,7 @@ main {
         h2 {
             text-align: center;
             margin: 10px;
+            font-size: 32px;
         }
     }
 }
@@ -28,6 +29,10 @@ table {
 
     @media (max-width: 600px) {
         margin-left: 0px;
+    }
+
+    td, td a, td span, th {
+        padding: 5px;
     }
 
     td, th {
