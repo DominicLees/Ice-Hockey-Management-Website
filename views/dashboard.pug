@@ -28,11 +28,11 @@ body
                         each team in teams
                             tr
                                 td
-                                    a(href="/team/" + team.code)= team.name
+                                    a(href=`/team/${team.code}`)= team.name
                                 td
                                     - const playerProfile = playerProfiles.find((profile => profile.team._id == team._id));
                                     if playerProfile
-                                        a(href="/player/" + playerProfile._id)
+                                        a(href=`/player/${playerProfile._id}`)
                                             if team.coach == account._id
                                                 span Player/Coach
                                             else 
@@ -47,12 +47,12 @@ body
                 h2 Upcoming Games
                 for game in games
                     div.game-card
-                        a(href="/team/" + game.team.code + "/game/" + game.gameId)
+                        a(href=`/team/${game.team.code}/game/${game.gameId}`)
                             h3= game.title
                         - const date = new Date(game.date)
                         p= date.toJSON().slice(0,10).split('-').reverse().join('/') + " at " + date.toLocaleTimeString()   
                         if game.lines
-                            a(href="/team/" + game.team.code + "/game/" + game.gameId + "/lines") View lines
+                            a(href=`/team/${game.team.code}/game/${game.gameId}/lines`) View lines
                         else
                             p Waiting for lines
             else

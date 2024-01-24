@@ -1,11 +1,12 @@
 const express = require('express');
-const crypto = require('crypto');
 const teamRouter = express.Router();
+const crypto = require('crypto');
 const Team = require('./../schemas/team');
 const Player = require('./../schemas/player');
 const Game = require('./../schemas/game');
 
 const coachOnly = require('./../middleware/coachOnly');
+const playerOrCoachOnly = require('./../middleware/playerOrCoachOnly');
 
 teamRouter.get('/new', (req, res) => {
     res.render('pages/team/new');
@@ -44,6 +45,9 @@ teamRouter.use(['/join/:code', '/:code'], (req, res, next) => {
         // Save data for later so we don't have to query for it again
         req.foundTeam = result;
         res.locals.team = result;
+        return Player.find({team: req.foundTeam._id}).lean().populate('user');
+    }).then(result => {
+        req.foundPlayers = result;
         next();
     }).catch(error => {
         next(error);
@@ -52,15 +56,10 @@ teamRouter.use(['/join/:code', '/:code'], (req, res, next) => {
 
 // Prevent users from joining team they are already apart of
 teamRouter.use('/join/:code', (req, res, next) => {
-    Player.find({team: req.foundTeam._id}).lean().populate('user').then(result => {
-        req.foundPlayers = result;
-        if (req.foundPlayers.some(player => {return player.user._id.equals(req.session.account._id)})) {
-            return res.redirect('/dashboard');
-        }
-        next();
-    }).catch(error => {
-        next(error);
-    })
+    if (req.foundPlayers.some(player => {return player.user._id.equals(req.session.account._id)})) {
+        return res.redirect('/dashboard');
+    }
+    next();
 })
 
 teamRouter.get('/join/:code', (req, res) => {
@@ -96,9 +95,6 @@ teamRouter.use('/:code', (req, res, next) => {
         req.isPlayer = true; 
     }
     
-    // Hide players from users who are not apart of the team
-    req.foundPlayers = req.isCoach == true || req.isPlayer == true ? req.foundPlayers : [];
-
     // Next find all the games this team is playing
     Game.find({team: req.foundTeam._id}).lean().then(result => {
         res.locals.games = result;
@@ -108,7 +104,7 @@ teamRouter.use('/:code', (req, res, next) => {
     })
 })
 
-teamRouter.get('/:code', (req, res) => {
+teamRouter.get('/:code', playerOrCoachOnly, (req, res) => {
     res.render('pages/team/teamProfile', {
         players: req.foundPlayers,
         isCoach: req.isCoach
