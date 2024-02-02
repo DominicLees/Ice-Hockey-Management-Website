@@ -1,5 +1,6 @@
 const express = require('express');
 const authRouter = express.Router();
+const crypto = require('crypto');
 const validateEmail = require("email-validator").validate;
 const returnLoggedInUsersToDash = require('./../middleware/returnLoggedInUsersToDash.js');
 const User = require('./../schemas/user');
@@ -10,6 +11,10 @@ const autoVerify = enviroment == "dev" && config.autoVerify == "true";
 if (autoVerify) { console.log('Auto verify new accounts is enabled') }
 const unverifiedLogin = enviroment == "dev" && config.unverifiedLogin == "true";
 if (unverifiedLogin) { console.log('Unverified login is enabled') }
+
+authRouter.get('/challenge', (req, res) => {
+    res.send(crypto.randomBytes(8).toString('hex'));
+})
 
 // Check if the email given by the user already has an account
 authRouter.use(['/login', '/signup'], returnLoggedInUsersToDash, (req, res, next) => {
