@@ -43,15 +43,17 @@ const pubKeyCredParams = [{
     }
 ]
 
-signupForm.addEventListener('submit', (e) => {
+async function signup(e) {
     e.preventDefault();
 
     // Add input validation here
 
     // Get challenge string from server
+    const response = await fetch('/challenge');
+    const challenge = await response.text();
 
     const publicKeyCredentialCreationOptions = {
-        challenge: Uint8Array.from("UZSL85T9AFC", c => c.charCodeAt(0)),
+        challenge: Uint8Array.from(challenge, c => c.charCodeAt(0)),
         rp: {
             name: "Hockey",
         },
@@ -74,4 +76,6 @@ signupForm.addEventListener('submit', (e) => {
         console.error(error);
         alert('Something went wrong, try again.');
     })
-})
+}
+
+signupForm.addEventListener('submit', signup);
