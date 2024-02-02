@@ -13,7 +13,9 @@ const unverifiedLogin = enviroment == "dev" && config.unverifiedLogin == "true";
 if (unverifiedLogin) { console.log('Unverified login is enabled') }
 
 authRouter.get('/challenge', (req, res) => {
-    res.send(crypto.randomBytes(8).toString('hex'));
+    const challenge = crypto.randomBytes(8).toString('hex');
+    req.session.challenge = challenge;
+    res.send(challenge);
 })
 
 // Check if the email given by the user already has an account
