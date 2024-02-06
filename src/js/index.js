@@ -51,14 +51,14 @@ async function signup(e) {
     // Get challenge string from server
     const response = await fetch('/challenge');
     const challenge = await response.text();
-
+    const textEncoder = new TextEncoder();
     const publicKeyCredentialCreationOptions = {
-        challenge: Uint8Array.from(challenge, c => c.charCodeAt(0)),
+        challenge: textEncoder.encode(challenge),
         rp: {
             name: "Hockey",
         },
         user: {
-            id: Uint8Array.from("HUEFRDFVHJFV", c => c.charCodeAt(0)),
+            id: Uint8Array.from(Math.random().toString(20).substring(2, 20), c => c.charCodeAt(0)),
             name: signupEmail.value,
             displayName: nameInput.value,
         },
@@ -71,7 +71,25 @@ async function signup(e) {
     };
 
     navigator.credentials.create({publicKey: publicKeyCredentialCreationOptions}).then(credentials => {
-        console.log(credentials);
+        const textDecoder = new TextDecoder();
+        // Send credentials to the server
+        return fetch('/signup', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email: signupEmail.value,
+                name: nameInput.value,
+                clientData: JSON.parse(textDecoder.decode(credentials.response.clientDataJSON))
+            })
+        })
+    }).then(response => {
+        if (response.status == 200) {
+            window.location.reload();
+        } else {
+            alert(`Error code ${response.status}. Please ensure all details are complete.`);
+        }
     }).catch(error => {
         console.error(error);
         alert('Something went wrong, try again.');
