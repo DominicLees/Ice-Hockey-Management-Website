@@ -75,7 +75,7 @@ app.use('/', errorRouter);
 // Catch errors thrown by all route handlers
 app.use((err, req, res, next) => {
     console.error(err.stack);
-    res.render('error', {
+    res.status(500).render('error', {
         code: err.status,
         stack: enviroment == "dev" ? err.stack : null
     })

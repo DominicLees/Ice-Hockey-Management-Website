@@ -8,8 +8,6 @@ const User = require('./../schemas/user');
 
 const config = require('./../config.json');
 const enviroment = process.env.NODE_ENV || config.enviroment || "dev";
-const autoVerify = enviroment == "dev" && config.autoVerify == "true";
-if (autoVerify) { console.log('Auto verify new accounts is enabled') }
 const unverifiedLogin = enviroment == "dev" && config.unverifiedLogin == "true";
 if (unverifiedLogin) { console.log('Unverified login is enabled') }
 
@@ -65,7 +63,6 @@ authRouter.post('/signup', (req, res, next) => {
     
     // Convert the authData from CBOR to an Object
     const authData = cbor.decodeAllSync(new Uint8Array(Object.values(req.body.attestationObject)))[0].authData;
-    console.log(authData)
     // Get the length of the credential ID
     const dataView = new DataView(new ArrayBuffer(2));
     const idLenBytes = authData.slice(53, 55);
@@ -82,11 +79,18 @@ authRouter.post('/signup', (req, res, next) => {
     const newUser = new User({
         email: req.body.email,
         name: req.body.name,
-        verified: autoVerify
+        credentialId,
+        publicKey: {
+            1: publicKeyObject.get(1),
+            3: publicKeyObject.get(3),
+            neg1: publicKeyObject.get(-1),
+            neg2: publicKeyObject.get(-2).toString(),
+            neg3: publicKeyObject.get(-3).toString()
+        }
     })
     newUser.save().then(result => {
         req.session.responses.successfulSignUp = true;
-        res.redirect('/');
+        res.status(200).send();
     }).catch(error => {
         next(error);
     })

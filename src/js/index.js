@@ -87,8 +87,7 @@ async function signup(e) {
         })
     }).then(response => {
         if (response.status == 200) {
-            console.log('success')
-            //window.location.reload();
+            window.location.reload();
         } else {
             alert(`Error code ${response.status}. Please ensure all details are complete.`);
         }
