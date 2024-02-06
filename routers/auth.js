@@ -46,8 +46,7 @@ authRouter.post('/signup', (req, res, next) => {
         return res.redirect('/');
     }
 
-    // Decode data sent by the client
-    const {authData} = cbor.decodeAllSync(new Uint8Array(Object.values(req.body.attestationObject)));
+    // Convert the challenge sent back by the client from base64 to utf-8
     const decodedChallengeFromClient = Buffer.from(req.body.clientData.challenge, 'base64').toString('utf-8');
 
     // Validate credentials
@@ -62,7 +61,22 @@ authRouter.post('/signup', (req, res, next) => {
     // Registration must have been done on our site
     if (req.body.clientData.crossOrigin) {
         return res.status(400).send('Cross origin auth attempt');
-    } 
+    }
+    
+    // Convert the authData from CBOR to an Object
+    const authData = cbor.decodeAllSync(new Uint8Array(Object.values(req.body.attestationObject)))[0].authData;
+    console.log(authData)
+    // Get the length of the credential ID
+    const dataView = new DataView(new ArrayBuffer(2));
+    const idLenBytes = authData.slice(53, 55);
+    idLenBytes.forEach((value, index) => dataView.setUint8(index, value));
+    const credentialIdLength = dataView.getUint16();
+    // Get the credential ID
+    const credentialId = authData.slice(55, 55 + credentialIdLength).toString();
+    // Get the bytes for the public key object
+    const publicKeyBytes = authData.slice(55 + credentialIdLength);
+    // The public key bytes are encoded as CBOR
+    const publicKeyObject = cbor.decodeAllSync(publicKeyBytes)[0];
 
     // Add new user to database
     const newUser = new User({
