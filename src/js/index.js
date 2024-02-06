@@ -81,12 +81,14 @@ async function signup(e) {
             body: JSON.stringify({
                 email: signupEmail.value,
                 name: nameInput.value,
-                clientData: JSON.parse(textDecoder.decode(credentials.response.clientDataJSON))
+                clientData: JSON.parse(textDecoder.decode(credentials.response.clientDataJSON)),
+                attestationObject: new Uint8Array(credentials.response.attestationObject)
             })
         })
     }).then(response => {
         if (response.status == 200) {
-            window.location.reload();
+            console.log('success')
+            //window.location.reload();
         } else {
             alert(`Error code ${response.status}. Please ensure all details are complete.`);
         }

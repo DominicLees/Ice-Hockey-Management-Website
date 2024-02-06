@@ -1,6 +1,7 @@
 const express = require('express');
 const authRouter = express.Router();
 const crypto = require('crypto');
+const cbor = require('cbor');
 const validateEmail = require("email-validator").validate;
 const returnLoggedInUsersToDash = require('./../middleware/returnLoggedInUsersToDash.js');
 const User = require('./../schemas/user');
@@ -45,6 +46,8 @@ authRouter.post('/signup', (req, res, next) => {
         return res.redirect('/');
     }
 
+    // Decode data sent by the client
+    const {authData} = cbor.decodeAllSync(new Uint8Array(Object.values(req.body.attestationObject)));
     const decodedChallengeFromClient = Buffer.from(req.body.clientData.challenge, 'base64').toString('utf-8');
 
     // Validate credentials
