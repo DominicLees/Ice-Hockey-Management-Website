@@ -9,7 +9,7 @@ body
     div.container
         div.form-box
             h2 Sign Up
-            form(action="/signup", method="post" id="signupForm") 
+            form#signupForm
                 label(for="signupEmail") Email: 
                 input(type="text" id="signupEmail" name="email")
                 br
@@ -30,11 +30,11 @@ body
                 h3.error Please enter a name
                 br
             if responses.successfulSignUp
-                h3.error Account created successfully
+                h3.success Account created successfully
 
         div.form-box
             h2 Login
-            form(action="/login", method="post") 
+            form#loginForm
                 label(for="loginEmail") Email: 
                 input(type="text" id="loginEmail" name="email")
                 br

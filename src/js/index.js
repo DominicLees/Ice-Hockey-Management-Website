@@ -1,6 +1,9 @@
 const nameInput = document.getElementById('name');
 const signupEmail = document.getElementById('signupEmail');
 const signupForm = document.getElementById('signupForm');
+const loginEmail = document.getElementById('loginEmail');
+const loginForm = document.getElementById('loginForm');
+const textEncoder = new TextEncoder();
 
 nameInput.addEventListener('focusout', () => {
     nameInput.style.backgroundColor = nameInput.value.length > 0 ? 'lightgreen' : 'red';
@@ -51,7 +54,7 @@ async function signup(e) {
     // Get challenge string from server
     const response = await fetch('/challenge');
     const challenge = await response.text();
-    const textEncoder = new TextEncoder();
+    
     const publicKeyCredentialCreationOptions = {
         challenge: textEncoder.encode(challenge),
         rp: {
@@ -97,4 +100,31 @@ async function signup(e) {
     })
 }
 
+async function login(e) {
+    e.preventDefault();
+
+    // Add input validation here
+
+    // Get challenge string from server
+    const challengeResponse = await fetch('/challenge');
+    const challenge = await challengeResponse.text();
+    // Get credential Id from server
+    const credentialIdResponse = await fetch(`/credentialId/${loginEmail.value}`);
+    const credentailId = await credentialIdResponse.arrayBuffer();
+
+    const publicKeyCredentialRequestOptions = {
+        challenge: textEncoder.encode(challenge),
+        allowCredentials: [{
+            id: credentailId,
+            type: 'public-key',
+        }],
+        timeout: 60000,
+    }
+
+    const assertion = await navigator.credentials.get({publicKey: publicKeyCredentialRequestOptions});
+    console.log(assertion)
+
+}
+
 signupForm.addEventListener('submit', signup);
+loginForm.addEventListener('submit', login);
