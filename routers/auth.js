@@ -96,6 +96,18 @@ authRouter.post('/signup', (req, res, next) => {
     })
 })
 
+authRouter.get('/credentialId/:email', (req, res, next) => {
+    User.findOne({email: req.params.email}).then(result => {
+        if (result) {
+            res.send(result.credentialId);
+        } else {
+            res.sendStatus(404);
+        }
+    }).catch(error => {
+        next(error);
+    })
+})
+
 authRouter.post('/login', (req, res) => {
     if (!req.validEmail) {
         req.session.responses.invalidLoginEmail = true;
