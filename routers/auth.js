@@ -69,7 +69,7 @@ authRouter.post('/signup', (req, res, next) => {
     idLenBytes.forEach((value, index) => dataView.setUint8(index, value));
     const credentialIdLength = dataView.getUint16();
     // Get the credential ID
-    const credentialId = authData.slice(55, 55 + credentialIdLength).toString();
+    const credentialId = authData.slice(55, 55 + credentialIdLength);
     // Get the bytes for the public key object
     const publicKeyBytes = authData.slice(55 + credentialIdLength);
     // The public key bytes are encoded as CBOR
@@ -84,8 +84,8 @@ authRouter.post('/signup', (req, res, next) => {
             1: publicKeyObject.get(1),
             3: publicKeyObject.get(3),
             neg1: publicKeyObject.get(-1),
-            neg2: publicKeyObject.get(-2).toString(),
-            neg3: publicKeyObject.get(-3).toString()
+            neg2: publicKeyObject.get(-2),
+            neg3: publicKeyObject.get(-3)
         }
     })
     newUser.save().then(result => {
