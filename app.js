@@ -39,8 +39,10 @@ mongoose.connect(`mongodb+srv://${config.mongoLogin}/?retryWrites=true&w=majorit
 
 // Pass any responses and account information to res.locals
 app.use('/', (req, res, next) => {
-    res.locals.responses = req.session.responses || {};
-    req.session.responses = {};
+    if (req.method == "GET") {
+        res.locals.responses = req.session.responses || {};
+        req.session.responses = {};
+    }
     res.locals.account = req.session.account;
     next();
 })
