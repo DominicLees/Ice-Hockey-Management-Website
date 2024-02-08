@@ -11,6 +11,31 @@ const enviroment = process.env.NODE_ENV || config.enviroment || "dev";
 const unverifiedLogin = enviroment == "dev" && config.unverifiedLogin == "true";
 if (unverifiedLogin) { console.log('Unverified login is enabled') }
 
+function verifyClientData(req, res, next) {
+    if (req.body.clientData == null) {
+        return res.status(400).send('No client data sent');
+    }
+
+    // Convert the challenge sent back by the client from base64 to utf-8
+    const decodedChallengeFromClient = Buffer.from(req.body.clientData.challenge, 'base64').toString('utf-8');
+
+    // Challenge from client must match the one sent by the server
+    if (req.session.challenge == null || req.session.challenge != decodedChallengeFromClient) {
+        req.session.challenge = null;
+        return res.status(400).send('Challenges did not match');
+    } 
+    // Client data must be from the correct authenticator method
+    const expectedType = req.path == '/signup' ? 'create' : 'get'
+    if (req.body.clientData.type != `webauthn.${expectedType}`) {
+        return res.status(400).send('Wrong type');
+    } 
+    // Authentication must have been done on our site
+    if (req.body.clientData.crossOrigin) {
+        return res.status(400).send('Cross origin auth attempt');
+    }
+    next();
+}
+
 authRouter.get('/challenge', (req, res) => {
     const challenge = crypto.randomBytes(32).toString();
     req.session.challenge = challenge;
@@ -29,7 +54,7 @@ authRouter.get('/challenge', (req, res) => {
 //     })
 // })
 
-authRouter.post('/signup', (req, res, next) => {
+authRouter.post('/signup', verifyClientData, (req, res, next) => {
     // Validate input
     // if (req.foundUser) {
     //     req.session.responses.emailInUse = true;
@@ -42,23 +67,6 @@ authRouter.post('/signup', (req, res, next) => {
     // Invalid details given, return user to homepage
     if (Object.keys(req.session.responses).length > 0) {
         return res.redirect('/');
-    }
-
-    // Convert the challenge sent back by the client from base64 to utf-8
-    const decodedChallengeFromClient = Buffer.from(req.body.clientData.challenge, 'base64').toString('utf-8');
-
-    // Validate credentials
-    // Challenge from client must match one sent by the server
-    if (req.session.challenge != decodedChallengeFromClient) {
-        return res.status(400).send('Challenges did not match');
-    } 
-    // Client data must be from an attempt to register a new auth pass
-    if (req.body.clientData.type != 'webauthn.create') {
-        return res.status(400).send('Wrong type');
-    } 
-    // Registration must have been done on our site
-    if (req.body.clientData.crossOrigin) {
-        return res.status(400).send('Cross origin auth attempt');
     }
     
     // Convert the authData from CBOR to an Object
@@ -108,24 +116,23 @@ authRouter.get('/credentialId/:email', (req, res, next) => {
     })
 })
 
-authRouter.post('/login', (req, res) => {
-    if (!req.validEmail) {
-        req.session.responses.invalidLoginEmail = true;
-        return res.redirect('/');
-    }
+authRouter.post('/login', verifyClientData, (req, res) => {
+    // if (!req.validEmail) {
+    //     req.session.responses.invalidLoginEmail = true;
+    //     return res.redirect('/');
+    // }
 
-    if (!req.foundUser) {
-        return res.redirect('/');
-    }
+    // if (!req.foundUser) {
+    //     return res.redirect('/');
+    // }
 
-    if (unverifiedLogin) {
-        req.session.account = req.foundUser;
-        req.session.authenticated = true;
-        return res.redirect('/dashboard');
-    }
+    // if (unverifiedLogin) {
+    //     req.session.account = req.foundUser;
+    //     req.session.authenticated = true;
+    //     return res.redirect('/dashboard');
+    // }
 
-    // Send login email
-    req.session.responses.authEmailSent = true;
+    console.log(req.body)
 })
 
 authRouter.get('/logout', (req, res) => {
