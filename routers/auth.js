@@ -2,14 +2,10 @@ const express = require('express');
 const authRouter = express.Router();
 const crypto = require('crypto');
 const cbor = require('cbor');
+const cosekey = require('parse-cosekey');
 const validateEmail = require("email-validator").validate;
 const returnLoggedInUsersToDash = require('./../middleware/returnLoggedInUsersToDash.js');
 const User = require('./../schemas/user');
-
-const config = require('./../config.json');
-const enviroment = process.env.NODE_ENV || config.enviroment || "dev";
-const unverifiedLogin = enviroment == "dev" && config.unverifiedLogin == "true";
-if (unverifiedLogin) { console.log('Unverified login is enabled') }
 
 function verifyClientData(req, res, next) {
     if (req.body.clientData == null) {
@@ -42,27 +38,27 @@ authRouter.get('/challenge', (req, res) => {
     res.send(challenge);
 })
 
-// // Check if the email given by the user already has an account
-// authRouter.use(['/login', '/signup'], returnLoggedInUsersToDash, (req, res, next) => {
-//     req.validEmail = validateEmail(req.body.email);
-//     if (!req.validEmail) {return next()}
-//     User.findOne({email: req.body.email}).then(result => {
-//         req.foundUser = result;
-//         next();
-//     }).catch(error => {
-//         next(error);
-//     })
-// })
+// Check if the email given by the user already has an account
+authRouter.use(['/login', '/signup'], returnLoggedInUsersToDash, (req, res, next) => {
+    req.validEmail = validateEmail(req.body.email);
+    if (!req.validEmail) {return next()}
+    User.findOne({email: req.body.email}).then(result => {
+        req.foundUser = result;
+        next();
+    }).catch(error => {
+        next(error);
+    })
+})
 
 authRouter.post('/signup', verifyClientData, (req, res, next) => {
     // Validate input
-    // if (req.foundUser) {
-    //     req.session.responses.emailInUse = true;
-    // } if (!req.validEmail) {
-    //     req.session.responses.invalidSignUpEmail = true;
-    // } if (req.body.name.length == 0) {
-    //     req.session.responses.invalidName = true;
-    // }
+    if (req.foundUser) {
+        req.session.responses.emailInUse = true;
+    } if (!req.validEmail) {
+        req.session.responses.invalidSignUpEmail = true;
+    } if (req.body.name.length == 0) {
+        req.session.responses.invalidName = true;
+    }
 
     // Invalid details given, return user to homepage
     if (Object.keys(req.session.responses).length > 0) {
@@ -117,22 +113,44 @@ authRouter.get('/credentialId/:email', (req, res, next) => {
 })
 
 authRouter.post('/login', verifyClientData, (req, res) => {
-    // if (!req.validEmail) {
-    //     req.session.responses.invalidLoginEmail = true;
-    //     return res.redirect('/');
-    // }
+    if (!req.validEmail) {
+        req.session.responses.invalidLoginEmail = true;
+        return res.redirect('/');
+    }
 
-    // if (!req.foundUser) {
-    //     return res.redirect('/');
-    // }
+    if (!req.foundUser) {
+        return res.redirect('/');
+    }
 
-    // if (unverifiedLogin) {
-    //     req.session.account = req.foundUser;
-    //     req.session.authenticated = true;
-    //     return res.redirect('/dashboard');
-    // }
+    // The signed data is made up of a sha256 hash of the client data and the raw bytes of the authenticator data
+    const clientDataBuffer = crypto.createHash('sha256').update(Buffer.from(Object.values(req.body.clientDataJSON))).digest();
+    const authenticatorDataBuffer = Buffer.from(new Uint8Array(Object.values(req.body.authenticatorData)), 'base64');
+    const dataBuffer = Buffer.concat([authenticatorDataBuffer, clientDataBuffer]);
+    const signature = Buffer.from(Object.values(req.body.signature));
 
-    console.log(req.body)
+    // Get User's public key
+    const coseMap = new Map()
+    .set(1, req.foundUser.publicKey['1'])
+    .set(3, req.foundUser.publicKey['3'])
+    .set(-1, req.foundUser.publicKey['neg1'])
+    .set(-2, Buffer.from(req.foundUser.publicKey['neg2']))
+    .set(-3, Buffer.from(req.foundUser.publicKey['neg3']))
+    // Key is converted from cose to jwk and crypto libary does not support cose
+    const parsedKey = cosekey.KeyParser.cose2jwk(coseMap);
+    const publicKey = crypto.createPublicKey({key: parsedKey, format: 'jwk'});
+
+    crypto.verify(null, dataBuffer, publicKey, signature, (error, result) => {
+        if (result == false) {
+            return res.status(403).send('Failed to verify signature');
+        } if (error) {
+            return res.status(500).send();
+        }
+        
+        // Authenticate User
+        req.session.account = req.foundUser;
+        req.session.authenticated = true;
+        res.sendStatus(200);
+    });
 })
 
 authRouter.get('/logout', (req, res) => {

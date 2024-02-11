@@ -4,6 +4,7 @@ const signupForm = document.getElementById('signupForm');
 const loginEmail = document.getElementById('loginEmail');
 const loginForm = document.getElementById('loginForm');
 const textEncoder = new TextEncoder();
+const textDecoder = new TextDecoder();
 
 nameInput.addEventListener('focusout', () => {
     nameInput.style.backgroundColor = nameInput.value.length > 0 ? 'lightgreen' : 'red';
@@ -74,7 +75,6 @@ async function signup(e) {
     };
 
     navigator.credentials.create({publicKey: publicKeyCredentialCreationOptions}).then(credentials => {
-        const textDecoder = new TextDecoder();
         // Send credentials to the server
         return fetch('/signup', {
             method: 'POST',
@@ -122,7 +122,26 @@ async function login(e) {
     }
 
     const assertion = await navigator.credentials.get({publicKey: publicKeyCredentialRequestOptions});
-    console.log(assertion)
+    const response = await fetch('/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            email: loginEmail.value,
+            clientData: JSON.parse(textDecoder.decode(assertion.response.clientDataJSON)),
+            clientDataJSON: new Uint8Array(assertion.response.clientDataJSON),
+            authenticatorData: new Uint8Array(assertion.response.authenticatorData),
+            signature: new Uint8Array(assertion.response.signature)
+        })
+    })
+
+    if (response.status == 200) {
+        window.location = '/dashboard';
+    } else {
+        const text = await response.text();
+        alert(`Error code ${response.status}. Error message: '${text}'. Please ensure all details are complete.`);
+    }
 
 }
 
