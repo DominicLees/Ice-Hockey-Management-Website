@@ -3,6 +3,9 @@ const session = require('express-session');
 const mongoose = require('mongoose');
 const path = require('path');
 
+const returnLoggedInUsersToDash = require('./middleware/returnLoggedInUsersToDash.js');
+const returnUnauthenticatedUsersToIndex = require('./middleware/returnUnauthenticatedUsersToIndex.js');
+
 // CONFIGURATION
 const port = 8000;
 const config = require('./config.json');
@@ -16,7 +19,7 @@ app.set('view engine', "pug");
 app.locals.basedir = path.join(__dirname, 'views');
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
-app.use('/public', express.static('./public'))
+app.use('/public', express.static('./public'));
 
 // Setup Express-Session
 app.use(session({
@@ -36,17 +39,17 @@ mongoose.connect(`mongodb+srv://${config.mongoLogin}/?retryWrites=true&w=majorit
 
 // Pass any responses and account information to res.locals
 app.use('/', (req, res, next) => {
-    res.locals.responses = req.session.responses || {};
-    req.session.responses = {};
+    if (req.method == "GET") {
+        res.locals.responses = req.session.responses || {};
+        req.session.responses = {};
+    }
     res.locals.account = req.session.account;
     next();
 })
 
 // ROUTES
 
-app.get('/', (req, res) => {
-    // Send already logged in users to their dashboard
-    if (req.session.authenticated) { return res.redirect('/dashboard'); }
+app.get('/', returnLoggedInUsersToDash, (req, res) => {
     res.render('index');
 })
 
@@ -54,20 +57,12 @@ app.get('/', (req, res) => {
 const authRouter = require('./routers/auth.js');
 app.use('/', authRouter);
 
-// Users need to be logged in to access routes below this point
-app.use(['/dashboard', '/team', '/player'], (req, res, next) => {
-    if (!req.session.authenticated) {
-        return res.redirect('/');
-    }
-    next();
-})
-
 const dashRouter = require('./routers/dashboard');
-app.use('/dashboard', dashRouter);
+app.use('/dashboard', returnUnauthenticatedUsersToIndex, dashRouter);
 
 // Handles creating and joining teams
 const teamRouter = require('./routers/team.js');
-app.use('/team', teamRouter);
+app.use('/team', returnUnauthenticatedUsersToIndex, teamRouter);
 
 // Handles creating and signing up to games
 const gameRouter = require('./routers/game.js');
@@ -85,7 +80,7 @@ app.use('/', errorRouter);
 // Catch errors thrown by all route handlers
 app.use((err, req, res, next) => {
     console.error(err.stack);
-    res.render('error', {
+    res.status(500).render('error', {
         code: err.status,
         stack: enviroment == "dev" ? err.stack : null
     })
