@@ -6,9 +6,28 @@ const loginForm = document.getElementById('loginForm');
 const textEncoder = new TextEncoder();
 const textDecoder = new TextDecoder();
 
-nameInput.addEventListener('focusout', () => {
-    nameInput.style.backgroundColor = nameInput.value.length > 0 ? 'lightgreen' : 'red';
-})
+const emailRegEx = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+function validateSignupEmail() {
+    const valid = emailRegEx.test(signupEmail.value);
+    signupEmail.style.backgroundColor = valid ? 'lightgreen' : 'lightcoral';
+    return valid;
+}
+signupEmail.addEventListener('focusout', validateSignupEmail);
+
+function validateName() {
+    const valid = nameInput.value.length > 0;
+    nameInput.style.backgroundColor = valid ? 'lightgreen' : 'lightcoral';
+    return valid;
+}
+nameInput.addEventListener('focusout', validateName);
+
+function validateLoginEmail() {
+    const valid = emailRegEx.test(loginEmail.value);
+    loginEmail.style.backgroundColor = valid ? 'lightgreen' : 'lightcoral';
+    return valid;
+}
+loginEmail.addEventListener('focusout', validateLoginEmail);
 
 if (window.PublicKeyCredential) {
     console.log('webAuth supported!');
@@ -50,7 +69,12 @@ const pubKeyCredParams = [{
 async function signup(e) {
     e.preventDefault();
 
-    // Add input validation here
+    // Input validation
+    const validName = validateName();
+    const validEmail = validateSignupEmail();
+    if (validName == false || validEmail == false) {
+        return;
+    }
 
     // Get challenge string from server
     const response = await fetch('/challenge');
@@ -100,10 +124,15 @@ async function signup(e) {
     })
 }
 
+signupForm.addEventListener('submit', signup);
+
 async function login(e) {
     e.preventDefault();
 
-    // Add input validation here
+    // Input validation
+    if (validateLoginEmail() == false) {
+        return;
+    }
 
     // Get challenge string from server
     const challengeResponse = await fetch('/challenge');
@@ -145,5 +174,4 @@ async function login(e) {
 
 }
 
-signupForm.addEventListener('submit', signup);
 loginForm.addEventListener('submit', login);
