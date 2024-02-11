@@ -1,13 +1,8 @@
 head
-    if game.atHome
-        - var gameTitle = team.name + " vs " + game.opponent
-    else
-        - var gameTitle = game.opponent + " vs " + team.name
-    
-    title Build lines for #{gameTitle}
+    title Build lines for #{game.title}
 body
     include ../../partials/navbar.pug
-    h1 Build lines for #{gameTitle}
+    h1 Build lines for #{game.title}
 
     if responses.linesSaved
         h3 Lines saved successfully
@@ -50,7 +45,7 @@ body
 
         h2 Skaters
         p You have #{players.length} skaters to pick from
-        include ../../partials/line.pug
+        include ../../partials/lineBuilderLines.pug
 
         h3 5 on 5
         - for (var i = 1; i <= numOfFSLines; ++i) {

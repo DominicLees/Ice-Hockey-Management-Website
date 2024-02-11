@@ -1,28 +1,44 @@
 const express = require('express');
+const gameRouter = express.Router({ mergeParams: true });
 const crypto = require('crypto');
-const gameRouter = express.Router();
 const Game = require('../schemas/game');
 const Player = require('../schemas/player');
 
+// UTILITY FUNCTIONS
+
 const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 
-function coachOnly(req, res, next) {
-    if (!req.isCoach) {
-        const error = new Error('Forbidden');
-        error.status = 403;
-        next(error);
+const forbiddenError = require('./../functions/forbiddenError');
+
+const calcLineCount = (prefix, skaters) => {
+    let count = 0;
+    while (Object.keys(skaters).some(key => key.startsWith(prefix + (count + 1)))) {
+        count++;
     }
-    next();
-}
+    return count;
+};
+
+// MIDDLEWARE
+
+const coachOnly = require('./../middleware/coachOnly');
+
+const playerOrCoachOnly = require('./../middleware/playerOrCoachOnly');
 
 function playersOnly(req, res, next) {
     if (!req.isPlayer) {
-        const error = new Error('Forbidden');
-        error.status = 403;
-        next(error);
+        next(forbiddenError());
     }
     next();
 }
+
+function linesRequired(req, res, next) {
+    if (req.foundGame.lines == null) {
+        return res.redirect(`/team/${req.params.code}/game/${req.params.gameId}`);
+    }
+    next();
+}
+
+// ROUTES
 
 gameRouter.get('/new', coachOnly, (req, res) => {
     res.render('pages/game/new');
@@ -35,6 +51,7 @@ gameRouter.post('/new', coachOnly, (req, res, next) => {
     } if (req.body.homeOrAway == null) {
         req.session.responses.noHomeOrAway = true;
     }
+    // Check date given is in the future
     const inputDate = new Date(req.body.date);
     if (isNaN(inputDate) || inputDate < new Date()) {
         req.session.responses.pastDate = true;
@@ -51,7 +68,7 @@ gameRouter.post('/new', coachOnly, (req, res, next) => {
         atHome: req.body.homeOrAway == "home",
         date: inputDate,
         gameId: crypto.randomBytes(3).toString('hex')
-    })
+    });
 
     newGame.save().then(result => {
         res.redirect('/dashboard');
@@ -60,6 +77,7 @@ gameRouter.post('/new', coachOnly, (req, res, next) => {
     })
 })
 
+// Check that the game for the gameId provided exists
 gameRouter.use(['/:gameId'], (req, res, next) => {
     // Find the user data for all of the players that have signed up
     Game.findOne({gameId: req.params.gameId}).populate({
@@ -72,8 +90,9 @@ gameRouter.use(['/:gameId'], (req, res, next) => {
             return res.redirect('/404');
         }
         req.foundGame = result;
+        res.locals.game = result;
         // Find the player profile for the user for this team
-        return Player.findOne({user: req.session.account._id, team: result.team})
+        return Player.findOne({user: req.session.account._id, team: result.team});
     }).then(result => {
         req.foundPlayer = result;
         next();
@@ -82,22 +101,39 @@ gameRouter.use(['/:gameId'], (req, res, next) => {
     })
 })
 
-gameRouter.get('/:gameId', (req, res) => {
+gameRouter.get('/:gameId', playerOrCoachOnly, (req, res) => {
     res.render('pages/game/gamePage', {
-        game: req.foundGame,
-        team: req.foundTeam,
         player: req.foundPlayer,
         isCoach: req.isCoach,
         isPlayer: req.isPlayer
     })
 })
 
-gameRouter.get('/:gameId/line-builder', coachOnly, (req, res) => {
-    if (!req.isCoach) {
-        // Change this to throw a 403 error later
-        return res.redirect('back');
-    }
+// Handles the user signing up to a game
+gameRouter.get('/:gameId/signup', playersOnly, (req, res, next) => {
+    // If user is already signed up, do not add them to the list again
+    if (req.foundGame.playersSignedUp.some(e => e._id.toString() == req.foundPlayer._id.toString())) { return res.redirect('back'); }
 
+    req.foundGame.playersSignedUp.push(req.foundPlayer._id);
+    req.foundGame.save().then(result => {
+        res.redirect('back');
+    }).catch(error => {
+        next(error);
+    })
+})
+
+// Handles the user removing themselves from a game
+gameRouter.get('/:gameId/leave', playersOnly, (req, res, next) => {
+    // Remove the user from the list of players signed up
+    req.foundGame.playersSignedUp = req.foundGame.playersSignedUp.filter(e => e._id.toString() != req.foundPlayer._id.toString());
+    req.foundGame.save().then(result => {
+        res.redirect('back');
+    }).catch(error => {
+        next(error);
+    })
+})
+
+gameRouter.get('/:gameId/line-builder', coachOnly, (req, res) => {
     // Filter signed up players into skaters and goalies
     const goalies = req.foundGame.playersSignedUp.filter(x => x.positions.includes('G'));
     const players = req.foundGame.playersSignedUp.filter(x => x.positions.length > 1 || !x.positions.includes('G'));
@@ -108,8 +144,6 @@ gameRouter.get('/:gameId/line-builder', coachOnly, (req, res) => {
     const numOfPKLines = req.query.numOfPKLines == null ? 2 : clamp(req.query.numOfPKLines, 1, 4);
 
     res.render('pages/game/lineBuilder', {
-        team: req.foundTeam,
-        game: req.foundGame,
         goalies,
         players,
         numOfFSLines,
@@ -143,13 +177,10 @@ gameRouter.post('/:gameId/line-builder/save', coachOnly, (req, res, next) => {
     delete pickedPlayers.backupGoalie;
     
     // Convert List of picked skaters into postion and player object Id pairs
-    let skaters = [];
-    for (const [key, value] of Object.entries(pickedPlayers)) {
-        skaters.push({
-            linePosition: key,
-            playerId: value
-        })
-    }
+    let skaters = Object.entries(pickedPlayers).map(([key, value]) => ({
+        linePosition: key,
+        playerId: value
+    }));
 
     // Save the lines to the database
     req.foundGame.lines = {
@@ -166,24 +197,100 @@ gameRouter.post('/:gameId/line-builder/save', coachOnly, (req, res, next) => {
     })
 })
 
-gameRouter.get('/:gameId/signup', playersOnly, (req, res, next) => {
-    // If user is already signed up, do not add them to the list again
-    if (req.foundGame.playersSignedUp.some(e => e._id.toString() == req.foundPlayer._id.toString())) { return res.redirect('back') }
-    req.foundGame.playersSignedUp.push(req.foundPlayer._id);
-    req.foundGame.save().then(result => {
-        res.redirect('back');
+// Break the lines down into an easier to use format for displaying
+gameRouter.use(['/:gameId/lines', '/:gameId/summary', '/:gameId/result', '/:gameId/gamesheet'], linesRequired, (req, res, next) => {
+    // Take the list of skaters and convert it into line position : name pairs
+    res.locals.skaters = req.foundGame.toObject().lines.skaters.reduce((accumulator, currentValue) => {
+        // Get the line position and set it as the key
+        const { linePosition, ...rest } = currentValue;
+        // Only get the name of the player as all the other data is redundant
+        accumulator[linePosition] = rest.playerId.user.name;
+        return accumulator;
+    }, {});
+    next();
+})
+
+// Calculate how many of each type of line there is
+gameRouter.use(['/:gameId/lines', '/:gameId/summary'], (req, res, next) => {
+    res.locals.numOfFSLines = calcLineCount('line', res.locals.skaters);
+    res.locals.numOfPPLines = calcLineCount('PP', res.locals.skaters);
+    res.locals.numOfPKLines = calcLineCount('PK', res.locals.skaters);
+    next();
+})
+
+// Shows the user the lines in full
+gameRouter.get('/:gameId/lines', playerOrCoachOnly, (req, res) => {
+    res.render('pages/game/lineViewer', {isPlayer: req.isPlayer});
+})
+
+// Shows the user a summary of the lines, where they are playing, who they are playing with etc
+gameRouter.get('/:gameId/summary', playersOnly, (req, res) => {
+    // Get the list of positions the player is playing in
+    let positions = Object.entries(res.locals.skaters)
+    .filter(([position, name]) => name === req.session.account.name)
+    .map(([position]) => position);
+
+    res.render('pages/game/summary', {
+        isGoalie: req.foundGame.lines.startingGoalie.user.name == req.session.account.name || (req.foundGame.lines.backupGoalie && req.foundGame.lines.backupGoalie.user.name == req.session.account.name),
+        positions
+    });
+})
+
+// The player is checked if they are the coach for this route here, to save getting the list of skaters if they are not
+gameRouter.use('/:gameId/result', coachOnly, (req, res, next) => {
+    // If the result for this game ahs already been submitted, prevent the user from submitting another
+    if (req.foundGame.result) {
+        return res.redirect(`/team/${req.params.code}/game/${req.params.gameId}/gamesheet`);
+    }
+    next();
+});
+
+// Gets the list of player document objects for those who player
+gameRouter.use(['/:gameId/result', '/:gameId/gamesheet'], (req, res, next) => {
+    // Get the goalies
+    req.players = [req.foundGame.lines.startingGoalie];
+    if (req.foundGame.lines.backupGoalie) req.players.push(req.foundGame.lines.backupGoalie);
+    // Find all player profiles of all the skaters who played by comparing the lines to the list of players who initially signed up to the game
+    req.foundGame.playersSignedUp.forEach(player => {
+        if (Object.values(res.locals.skaters).includes(player.user.name)) {
+            req.players.push(player);
+        }
+    });
+    next();
+})
+
+gameRouter.get('/:gameId/result', (req, res) => {
+    res.render('pages/game/result', {players: req.players});
+})
+
+// Save the game result to the database
+gameRouter.post('/:gameId/result', (req, res, next) => {
+    // Add each player's stats for that game to their list of game results
+    req.players.forEach(player => {
+        player.games.push({
+            game: req.foundGame._id,
+            goals: req.body[player._id+'-goals'],
+            assists: req.body[player._id+'-assists'],
+            pims: req.body[player._id+'-pims']
+        })
+    })
+    Player.bulkSave(req.players).then(() => {
+        // Save the score for the game
+        req.foundGame.result.teamGoals = req.body.teamGoals;
+        req.foundGame.result.opponentGoals = req.body.opponentGoals;
+        return req.foundGame.save();
+    }).then(() => {
+        return res.redirect(`/team/${req.params.code}/game/${req.params.gameId}`);
     }).catch(error => {
         next(error);
     })
 })
 
-gameRouter.get('/:gameId/leave', playersOnly, (req, res, next) => {
-    req.foundGame.playersSignedUp = req.foundGame.playersSignedUp.filter(e => e._id.toString() != req.foundPlayer._id.toString());
-    req.foundGame.save().then(result => {
-        res.redirect('back');
-    }).catch(error => {
-        next(error);
-    })
+gameRouter.get('/:gameId/gamesheet', (req, res) => {
+    if (!req.foundGame.result) {
+        return res.redirect(`/team/${req.params.code}/game/${req.params.gameId}`);
+    }
+    res.render('pages/game/gamesheet', {players: req.players});
 })
 
 module.exports = gameRouter;

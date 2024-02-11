@@ -1,9 +1,12 @@
 const express = require('express');
-const crypto = require('crypto');
 const teamRouter = express.Router();
+const crypto = require('crypto');
 const Team = require('./../schemas/team');
 const Player = require('./../schemas/player');
 const Game = require('./../schemas/game');
+
+const coachOnly = require('./../middleware/coachOnly');
+const playerOrCoachOnly = require('./../middleware/playerOrCoachOnly');
 
 teamRouter.get('/new', (req, res) => {
     res.render('pages/team/new');
@@ -41,16 +44,26 @@ teamRouter.use(['/join/:code', '/:code'], (req, res, next) => {
 
         // Save data for later so we don't have to query for it again
         req.foundTeam = result;
+        res.locals.team = result;
+        return Player.find({team: req.foundTeam._id}).lean().populate('user');
+    }).then(result => {
+        req.foundPlayers = result;
         next();
     }).catch(error => {
         next(error);
     })
 })
 
+// Prevent users from joining team they are already apart of
+teamRouter.use('/join/:code', (req, res, next) => {
+    if (req.foundPlayers.some(player => {return player.user._id.equals(req.session.account._id)})) {
+        return res.redirect('/dashboard');
+    }
+    next();
+})
+
 teamRouter.get('/join/:code', (req, res) => {
-    res.render('pages/team/join', {
-        team: req.foundTeam
-    })
+    res.render('pages/team/join');
 })
 
 teamRouter.post('/join/:code', (req, res, next) => {
@@ -76,43 +89,29 @@ teamRouter.post('/join/:code', (req, res, next) => {
 })
 
 teamRouter.use('/:code', (req, res, next) => {
-    Player.find({team: req.foundTeam._id}).lean().populate('user').then(result => {
-        if (req.foundTeam.coach._id == req.session.account._id) { 
-            req.isCoach = true; 
-        } if (result.filter(player => player.user._id == req.session.account._id).length > 0) {
-            req.isPlayer = true; 
-        }
-        
-        // Hide players from users who are not apart of the team
-        req.foundPlayers = req.isCoach == true || req.isPlayer == true ? result : [];
-
-        // Next find all the games this team is playing
-        return Game.find({team: req.foundTeam._id}).lean()
-    }).then(result => {
-        req.foundTeam.games = result;
+    if (req.foundTeam.coach._id == req.session.account._id) { 
+        req.isCoach = true; 
+    } if (req.foundPlayers && req.foundPlayers.filter(player => player.user._id == req.session.account._id).length > 0) {
+        req.isPlayer = true; 
+    }
+    
+    // Next find all the games this team is playing
+    Game.find({team: req.foundTeam._id}).lean().then(result => {
+        res.locals.games = result;
         next();
     }).catch(error => {
         next(error);
     })
 })
 
-teamRouter.get('/:code', (req, res) => {
+teamRouter.get('/:code', playerOrCoachOnly, (req, res) => {
     res.render('pages/team/teamProfile', {
-        team: req.foundTeam,
         players: req.foundPlayers,
-        games: req.foundTeam.games,
         isCoach: req.isCoach
     })
 })
 
-teamRouter.get('/:code/delete', (req, res, next) => {
-    // Only the head coach can delete a team
-    if (!req.isCoach) {
-        const error = new Error('Forbidden');
-        error.status = 403;
-        return next(error);  
-    }
-
+teamRouter.get('/:code/delete', coachOnly, (req, res, next) => {
     Team.deleteOne({_id: req.foundTeam._id}).then(() => {
         req.session.responses.teamDeleteSuccessful = true;
         res.redirect('/dashboard');

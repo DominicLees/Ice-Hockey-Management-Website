@@ -6,8 +6,10 @@ const Game = require('./../schemas/game');
 
 dashRouter.get('/', (req, res, next) => {
     let teams;
+    let playerProfiles;
     // Get list of teams user plays for from list of player profiles
     Player.find({user: req.session.account._id}).lean().populate('team').then(result => {
+        playerProfiles = result;
         teams = result.map(player => player.team);
         // Get list of teams the user is the coach for 
         return Team.find({coach: req.session.account._id}).lean();
@@ -21,10 +23,11 @@ dashRouter.get('/', (req, res, next) => {
         // Take the _ids from the teams and put them into an array
         const teamIds = teams.map(x => x._id);
         // Find all the future games for the teams the user is involved with
-        return Game.find({team: {$in: teamIds}, date: {$gt: new Date()}}).lean().populate('team');
+        return Game.find({team: {$in: teamIds}, date: {$gt: new Date()}}).populate('team');
     }).then(result => {
         res.render('dashboard', {
-            teams: teams,
+            teams,
+            playerProfiles,
             games: result
         })
     }).catch(error => {

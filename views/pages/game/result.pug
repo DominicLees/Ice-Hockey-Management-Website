@@ -1,0 +1,33 @@
+head
+    title Submit result for #{game.title}
+body
+    include ../../partials/navbar.pug
+    h1 Submit result for #{game.title}
+
+    form(action="./result", method="post")
+        label(for="teamGoals")= game.team.name
+        input#teamGoals(type="number", name="teamGoals" style="width: 5ch;")
+        span -
+        input#opponentGoals(type="number", name="opponentGoals" style="width: 5ch;")
+        label(for="opponentGoals")= game.opponent
+
+        table
+            thead
+                tr
+                    th Name
+                    th Goals
+                    th Assists
+                    th Penalty Minutes
+
+            tbody
+                for player in players
+                    tr
+                        td= player.user.name
+                        td
+                            input(type="number", name=player._id + '-goals' value=0)
+                        td
+                            input(type="number", name=player._id + '-assists' value=0)
+                        td
+                            input(type="number", name=player._id + '-pims' value=0)
+
+        input(type="submit", value="Submit")

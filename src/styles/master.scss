@@ -1,6 +1,12 @@
 body {
-    font-family: arial;
+    font-family: verdana, arial;
     margin: 0px;
+}
+
+h1 {
+    font-size: 72px;
+    margin: 20px;
+    text-align: center;
 }
 
 a {
@@ -8,14 +14,27 @@ a {
     color: black;
 }
 
+button {
+    margin: 5px;
+    padding: 5px;
+    font-size: 18px;
+}
+
 // Utility Classes
-.error {
+.error, .success {
     padding: 10px;
     margin: 10px;
     border-radius: 10px;
-    background-color: lightcoral;
     width: fit-content;
     display: inline-block;
+}
+
+.error {
+    background-color: lightcoral;
+}
+
+.success {
+    background-color: lightgreen;
 }
 
 .red {
@@ -24,6 +43,10 @@ a {
 
 .green {
     background-color: lightgreen;
+}
+
+.hidden {
+    display: none;
 }
 
 // Navbar

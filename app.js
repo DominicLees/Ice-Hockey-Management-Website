@@ -68,6 +68,9 @@ app.use('/team', returnUnauthenticatedUsersToIndex, teamRouter);
 const gameRouter = require('./routers/game.js');
 app.use('/team/:code/game', gameRouter);
 
+const playerRouter = require('./routers/player.js');
+app.use('/player', playerRouter);
+
 // ERROR HANDLING
 
 // Handles 404s and provides test routes for the server to intentionally throw errors

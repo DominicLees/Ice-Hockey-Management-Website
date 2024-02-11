@@ -28,7 +28,8 @@ body
                     tbody
                         for player in players
                             tr
-                                td= player.user.name
+                                td
+                                    a(href='/player/'+player._id)= player.user.name
                                 td= player.positions
 
         if games
@@ -42,7 +43,7 @@ body
                     tbody
                         for game in games
                             tr
-                                - var date = new Date(game.date)
+                                - const date = new Date(game.date)
                                 td= date.toJSON().slice(0,10).split('-').reverse().join('/') + " at " + date.toLocaleTimeString()
                                 td
                                     a(href="./" + team.code + "/game/" + game.gameId)= game.opponent
