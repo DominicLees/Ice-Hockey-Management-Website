@@ -39,8 +39,8 @@ body
                 p You are not currently part of any teams. Create one or join an existing one using their team code
 
         div
+            h2 Upcoming Games
             if games.length > 0
-                h2 Upcoming Games
                 for game in games
                     div.game-card
                         a(href=`/team/${game.team.code}/game/${game.gameId}`)
