@@ -9,6 +9,7 @@ body
     if isCoach
         span Share this link with your players: 
         a#teamCode(href="join/"+team.code) join/#{team.code}
+        button#copyTeamLinkButton Copy link to clipboard
         br
         button
             a(href=team.code+"/game/new") Create Game +
