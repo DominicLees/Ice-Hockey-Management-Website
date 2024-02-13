@@ -8,12 +8,15 @@ body
 
     main
         div
-            h2 Your Teams
+            div
+                button#teamMenuButton Show Menu
+                div#teamMenu
+                    input#teamCode(type="text" placeholder="Enter Team Code")
+                    button#joinTeamButton Join Team
+                    button
+                        a(href="/team/new") Create New Team
 
-            input#teamCode(type="text" placeholder="Enter Team Code")
-            button#joinTeamButton Join Team
-            button
-                a(href="/team/new") Create New Team
+            h2 Your Teams
 
             if responses.teamDeleteSuccessful
                 h3.success Team deleted successfully

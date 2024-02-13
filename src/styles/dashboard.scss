@@ -1,3 +1,5 @@
+$mobileScreenSize: 722px;
+
 main {
     display: flex;
     flex-direction: row;
@@ -6,15 +8,18 @@ main {
     margin-left: 20px;
     margin-right: 20px;
 
-    @media (max-width: 600px) {
+    @media (max-width: $mobileScreenSize) {
         flex-direction: column;
     }
 
     div {
         flex: 1 1 0px;
 
-        h2 {
+        h2, p {
             text-align: center;
+        }
+
+        h2 {
             margin: 10px;
             margin-top: 0px;
             font-size: 32px;
@@ -43,7 +48,7 @@ table {
     width: 100%;
     margin-top: 10px;
 
-    @media (max-width: 600px) {
+    @media (max-width: $mobileScreenSize) {
         margin-left: 0px;
     }
 
