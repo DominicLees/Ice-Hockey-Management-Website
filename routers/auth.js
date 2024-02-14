@@ -131,14 +131,15 @@ authRouter.post('/login', verifyClientData, (req, res) => {
     const authenticatorDataBuffer = Buffer.from(new Uint8Array(Object.values(req.body.authenticatorData)), 'base64');
     const dataBuffer = Buffer.concat([authenticatorDataBuffer, clientDataBuffer]);
     const signature = Buffer.from(Object.values(req.body.signature));
+    const credential = req.foundUser.credentials.find(credential => Buffer.compare(Buffer.from(credential.credentialId), Buffer.from(req.body.credentialId, 'base64')) == 0);
 
     // Get User's public key
     const coseMap = new Map()
-    .set(1, req.foundUser.publicKey['1'])
-    .set(3, req.foundUser.publicKey['3'])
-    .set(-1, req.foundUser.publicKey['neg1'])
-    .set(-2, Buffer.from(req.foundUser.publicKey['neg2']))
-    .set(-3, Buffer.from(req.foundUser.publicKey['neg3']))
+    .set(1, credential.publicKey['1'])
+    .set(3, credential.publicKey['3'])
+    .set(-1, credential.publicKey['neg1'])
+    .set(-2, Buffer.from(credential.publicKey['neg2']))
+    .set(-3, Buffer.from(credential.publicKey['neg3']))
     // Key is converted from cose to jwk and crypto libary does not support cose
     const parsedKey = cosekey.KeyParser.cose2jwk(coseMap);
     const publicKey = crypto.createPublicKey({key: parsedKey, format: 'jwk'});

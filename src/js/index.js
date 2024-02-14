@@ -139,15 +139,19 @@ async function login(e) {
     const challenge = await challengeResponse.text();
     // Get credential Id from server
     const credentialIdResponse = await fetch(`/credentialId/${loginEmail.value}`);
-    const credentailId = await credentialIdResponse.arrayBuffer();
+    const credentailIds = JSON.parse(await credentialIdResponse.text());
+    let allowCredentials = [];
+    credentailIds.forEach(credential => {
+        allowCredentials.push({
+            id: new Uint8Array(Object.values(credential.data)),
+            type: 'public-key'
+        })
+    });
 
     const publicKeyCredentialRequestOptions = {
         challenge: textEncoder.encode(challenge),
-        allowCredentials: [{
-            id: credentailId,
-            type: 'public-key',
-        }],
-        timeout: 60000,
+        allowCredentials,
+        timeout: 60000
     }
 
     const assertion = await navigator.credentials.get({publicKey: publicKeyCredentialRequestOptions});
@@ -158,6 +162,7 @@ async function login(e) {
         },
         body: JSON.stringify({
             email: loginEmail.value,
+            credentialId: assertion.id,
             clientData: JSON.parse(textDecoder.decode(assertion.response.clientDataJSON)),
             clientDataJSON: new Uint8Array(assertion.response.clientDataJSON),
             authenticatorData: new Uint8Array(assertion.response.authenticatorData),
