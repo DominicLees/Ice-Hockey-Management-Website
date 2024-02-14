@@ -83,14 +83,16 @@ authRouter.post('/signup', verifyClientData, (req, res, next) => {
     const newUser = new User({
         email: req.body.email,
         name: req.body.name,
-        credentialId,
-        publicKey: {
-            1: publicKeyObject.get(1),
-            3: publicKeyObject.get(3),
-            neg1: publicKeyObject.get(-1),
-            neg2: publicKeyObject.get(-2),
-            neg3: publicKeyObject.get(-3)
-        }
+        credentials:[{
+            credentialId,
+            publicKey: {
+                1: publicKeyObject.get(1),
+                3: publicKeyObject.get(3),
+                neg1: publicKeyObject.get(-1),
+                neg2: publicKeyObject.get(-2),
+                neg3: publicKeyObject.get(-3)
+            }
+        }]
     })
     newUser.save().then(result => {
         req.session.responses.successfulSignUp = true;
