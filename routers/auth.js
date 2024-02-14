@@ -3,8 +3,9 @@ const authRouter = express.Router();
 const crypto = require('crypto');
 const cbor = require('cbor');
 const cosekey = require('parse-cosekey');
-const validateEmail = require("email-validator").validate;
+const validateEmail = require('email-validator').validate;
 const returnLoggedInUsersToDash = require('./../middleware/returnLoggedInUsersToDash.js');
+const returnUnauthenticatedUsersToIndex = require('./../middleware/returnUnauthenticatedUsersToIndex.js');
 const User = require('./../schemas/user');
 
 function verifyClientData(req, res, next) {
@@ -31,6 +32,10 @@ function verifyClientData(req, res, next) {
     }
     next();
 }
+
+authRouter.get('/settings', returnUnauthenticatedUsersToIndex, (req, res) => {
+    res.render('settings');
+})
 
 authRouter.get('/challenge', (req, res) => {
     const challenge = crypto.randomBytes(32).toString();
