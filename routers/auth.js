@@ -105,7 +105,9 @@ authRouter.post('/signup', verifyClientData, (req, res, next) => {
 authRouter.get('/credentialId/:email', (req, res, next) => {
     User.findOne({email: req.params.email}).then(result => {
         if (result) {
-            res.send(result.credentialId);
+            let credentials = [];
+            result.credentials.forEach(credential => credentials.push(credential.credentialId));
+            res.send(credentials);
         } else {
             res.sendStatus(404);
         }
