@@ -8,12 +8,15 @@ body
 
     main
         div
-            h2 Your Teams
+            div
+                button#teamMenuButton Show Menu
+                div#teamMenu
+                    input#teamCode(type="text" placeholder="Enter Team Code")
+                    button#joinTeamButton Join Team
+                    button
+                        a(href="/team/new") Create New Team
 
-            input#teamCode(type="text" placeholder="Enter Team Code")
-            button#joinTeamButton Join Team
-            button
-                a(href="/team/new") Create New Team
+            h2 Your Teams
 
             if responses.teamDeleteSuccessful
                 h3.success Team deleted successfully
@@ -39,8 +42,8 @@ body
                 p You are not currently part of any teams. Create one or join an existing one using their team code
 
         div
+            h2 Upcoming Games
             if games.length > 0
-                h2 Upcoming Games
                 for game in games
                     div.game-card
                         a(href=`/team/${game.team.code}/game/${game.gameId}`)

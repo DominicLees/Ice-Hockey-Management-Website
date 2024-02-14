@@ -1,3 +1,5 @@
+$mobileScreenSize: 722px;
+
 body {
     font-family: verdana, arial;
     margin: 0px;
@@ -7,6 +9,11 @@ h1 {
     font-size: 72px;
     margin: 20px;
     text-align: center;
+
+    @media (max-width: $mobileScreenSize) {
+        font-size: 36px;
+        margin: 10px;
+    }
 }
 
 a {
@@ -14,10 +21,12 @@ a {
     color: black;
 }
 
-button {
-    margin: 5px;
-    padding: 5px;
+button, input[type=submit] {
+    padding: 10px 15px;
     font-size: 18px;
+    border-radius: 0;
+    border: 1px solid transparent;
+    background-color: aquamarine;
 }
 
 // Utility Classes

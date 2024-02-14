@@ -38,16 +38,17 @@ teamRouter.post('/new', (req, res, next) => {
 // Check for all routes that use a team code, that the team code is valid
 teamRouter.use(['/join/:code', '/:code'], (req, res, next) => {
     Team.findOne({code: req.params.code}).populate('coach').then(result => {
-        if (result == null) {
-            return res.redirect('/404');
-        }
-
+        if (result == null) { return; }
         // Save data for later so we don't have to query for it again
         req.foundTeam = result;
         res.locals.team = result;
         return Player.find({team: req.foundTeam._id}).lean().populate('user');
     }).then(result => {
         req.foundPlayers = result;
+    }).then(() => {
+        if (req.foundTeam == null) {
+            return res.redirect('/404');
+        }
         next();
     }).catch(error => {
         next(error);
@@ -81,7 +82,7 @@ teamRouter.post('/join/:code', (req, res, next) => {
     })
     
     newPlayer.save().then(result => {
-        res.redirect('/dashboard')
+        res.redirect('/dashboard');
     }).catch(error => {
         next(error);
     });

@@ -1,14 +1,15 @@
 head
     title= team.name
     link(rel="stylesheet", href="/public/css/teamProfile.css")
-    script(src="/public/js/teamProfile-min.js" defer) 
+    script(src="/public/js/teamProfile.js" defer) 
 body
     include /partials/navbar.pug
     h1= team.name
     h2 Head Coach: #{team.coach.name}
     if isCoach
         span Share this link with your players: 
-        a(href="join/"+team.code) join/#{team.code}
+        a#teamCode(href="join/"+team.code) join/#{team.code}
+        button#copyTeamLinkButton Copy link to clipboard
         br
         button
             a(href=team.code+"/game/new") Create Game +
@@ -20,30 +21,36 @@ body
         if players
             div.content#players
                 h2 Players
-                table
-                    thead
-                        tr
-                            th Name
-                            th Positions
-                    tbody
-                        for player in players
+                if players.length > 0
+                    table
+                        thead
                             tr
-                                td
-                                    a(href='/player/'+player._id)= player.user.name
-                                td= player.positions
+                                th Name
+                                th Positions
+                        tbody
+                            for player in players
+                                tr
+                                    td
+                                        a(href='/player/'+player._id)= player.user.name
+                                    td= player.positions
+                else
+                    p No players registered
 
         if games
             div.content#schedule
                 h2 Schedule
-                table
-                    thead
-                        tr
-                            th Date
-                            th Opponent
-                    tbody
-                        for game in games
+                if games.length > 0
+                    table
+                        thead
                             tr
-                                - const date = new Date(game.date)
-                                td= date.toJSON().slice(0,10).split('-').reverse().join('/') + " at " + date.toLocaleTimeString()
-                                td
-                                    a(href="./" + team.code + "/game/" + game.gameId)= game.opponent
+                                th Date
+                                th Opponent
+                        tbody
+                            for game in games
+                                tr
+                                    - const date = new Date(game.date)
+                                    td= date.toJSON().slice(0,10).split('-').reverse().join('/') + " at " + date.toLocaleTimeString()
+                                    td
+                                        a(href="./" + team.code + "/game/" + game.gameId)= game.opponent
+                else
+                    p No games scheduled
