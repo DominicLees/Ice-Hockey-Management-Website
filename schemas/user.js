@@ -12,7 +12,11 @@ const userSchema = new mongoose.Schema({
             neg2: Buffer,
             neg3: Buffer
         }
-    }]
+    }],
+    authCode: {
+        code: String,
+        timeout: Date
+    }
 })
 
 module.exports = mongoose.model('User', userSchema);
