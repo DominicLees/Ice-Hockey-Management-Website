@@ -43,7 +43,7 @@ authRouter.get('/challenge', (req, res) => {
     res.send(challenge);
 })
 
-authRouter.use(['/login', '/credentialId/:email', '/new-user-code'], (req, res, next) => {
+authRouter.use(['/login', '/credentialId/:email', '/new-user-code', '/valid-code'], (req, res, next) => {
     const email = req.method === "POST" ? req.body.email :
         req.baseUrl === '/new-user-code' && req.session.authenticated ? req.session.account.email :
         req.params.email || null;
@@ -67,6 +67,13 @@ authRouter.get('/new-user-code', returnUnauthenticatedUsersToIndex, (req, res, n
     }).catch(error => {
         next(error);
     })
+})
+
+authRouter.post('/valid-auth-code', (req, res) => {
+    if (req.foundUser == null || req.foundUser.authCode == null || req.foundUser.authCode.code != req.body.authCode || new Date() > req.foundUser.authCode.timeout) {
+        return res.send(false);
+    }
+    res.send(true);
 })
 
 authRouter.post('/signup', returnLoggedInUsersToDash, verifyClientData, (req, res, next) => {
