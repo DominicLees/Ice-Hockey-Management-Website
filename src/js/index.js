@@ -5,6 +5,7 @@ const loginEmail = document.getElementById('loginEmail');
 const loginForm = document.getElementById('loginForm');
 const newDeviceLoginToggle = document.getElementById('newDeviceLoginToggle');
 const newDeviceLoginForm = document.getElementById('newDeviceLoginForm');
+const authCode = document.getElementById('authCode');
 const textEncoder = new TextEncoder();
 const textDecoder = new TextDecoder();
 
@@ -39,6 +40,13 @@ function validateLoginEmail() {
     return valid;
 }
 loginEmail.addEventListener('focusout', validateLoginEmail);
+
+function validateAuthCode() {
+    const valid = authCode.value.length > 0;
+    authCode.style.backgroundColor = valid ? 'lightgreen' : 'lightcoral';
+    return valid;
+}
+authCode.addEventListener('focusout', validateAuthCode);
 
 newDeviceLoginToggle.addEventListener('click', () => {
     const loginHidden = loginForm.classList.toggle('hidden');
@@ -190,3 +198,77 @@ async function login(e) {
 }
 
 loginForm.addEventListener('submit', login);
+
+async function newDeviceLogin(e) {
+    e.preventDefault();
+
+    // Input validation
+    const validEmail = validateLoginEmail();
+    const validAuthCode = validateAuthCode();
+    if (!validEmail || !validAuthCode) {
+        return;
+    }
+    // Check that auth code is valid
+    const authCodeCheckResponse = await fetch('/valid-auth-code', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            email: loginEmail.value,
+            authCode: authCode.value
+        })
+    })
+    const authCodeCheck = await authCodeCheckResponse.text();
+    if (!authCodeCheck) {
+        return alert('Invalid code');
+    }
+
+    // Get challenge string from server
+    const challengeResponse = await fetch('/challenge');
+    const challenge = await challengeResponse.text();
+
+    const publicKeyCredentialCreationOptions = {
+        challenge: textEncoder.encode(challenge),
+        rp: {
+            name: "Hockey",
+        },
+        user: {
+            id: Uint8Array.from(Math.random().toString(20).substring(2, 20), c => c.charCodeAt(0)),
+            name: loginEmail.value,
+            displayName: loginEmail.value,
+        },
+        pubKeyCredParams,
+        authenticatorSelection: {
+            authenticatorAttachment: "platform",
+        },
+        timeout: 60000,
+        attestation: "direct"
+    };
+
+    navigator.credentials.create({publicKey: publicKeyCredentialCreationOptions}).then(credentials => {
+        // Send credentials to the server
+        return fetch('/new-credentials', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email: loginEmail.value,
+                clientData: JSON.parse(textDecoder.decode(credentials.response.clientDataJSON)),
+                attestationObject: new Uint8Array(credentials.response.attestationObject)
+            })
+        })
+    }).then(response => {
+        if (response.status == 200) {
+            window.location.reload();
+        } else {
+            alert(`Error code ${response.status}. Please ensure all details are complete.`);
+        }
+    }).catch(error => {
+        console.error(error);
+        alert('Something went wrong, try again.');
+    })
+}
+
+newDeviceLoginForm.addEventListener('submit', newDeviceLogin);

@@ -8,6 +8,32 @@ const returnLoggedInUsersToDash = require('./../middleware/returnLoggedInUsersTo
 const returnUnauthenticatedUsersToIndex = require('./../middleware/returnUnauthenticatedUsersToIndex.js');
 const User = require('./../schemas/user');
 
+function parseAuthData(attestationObject) {
+    // Convert the authData from CBOR to an Object
+    const authData = cbor.decodeAllSync(new Uint8Array(Object.values(attestationObject)))[0].authData;
+    // Get the length of the credential ID
+    const dataView = new DataView(new ArrayBuffer(2));
+    const idLenBytes = authData.slice(53, 55);
+    idLenBytes.forEach((value, index) => dataView.setUint8(index, value));
+    const credentialIdLength = dataView.getUint16();
+    // Get the credential ID
+    const credentialId = authData.slice(55, 55 + credentialIdLength);
+    // Get the bytes for the public key object
+    const publicKeyBytes = authData.slice(55 + credentialIdLength);
+    // The public key bytes are encoded as CBOR
+    const publicKeyObject = cbor.decodeAllSync(publicKeyBytes)[0];
+    return {
+        credentialId,
+        publicKey: {
+            1: publicKeyObject.get(1),
+            3: publicKeyObject.get(3),
+            neg1: publicKeyObject.get(-1),
+            neg2: publicKeyObject.get(-2),
+            neg3: publicKeyObject.get(-3)
+        }
+    };
+}
+
 function verifyClientData(req, res, next) {
     if (req.body.clientData == null) {
         return res.status(400).send('No client data sent');
@@ -22,7 +48,7 @@ function verifyClientData(req, res, next) {
         return res.status(400).send('Challenges did not match');
     } 
     // Client data must be from the correct authenticator method
-    const expectedType = req.path == '/signup' ? 'create' : 'get'
+    const expectedType = req.path == '/login' ? 'get' : 'create'
     if (req.body.clientData.type != `webauthn.${expectedType}`) {
         return res.status(400).send('Wrong type');
     } 
@@ -43,7 +69,7 @@ authRouter.get('/challenge', (req, res) => {
     res.send(challenge);
 })
 
-authRouter.use(['/login', '/credentialId/:email', '/new-user-code', '/valid-code'], (req, res, next) => {
+authRouter.use(['/login', '/credentialId/:email', '/new-user-code', '/valid-code', '/new-credentials'], (req, res, next) => {
     const email = req.method === "POST" ? req.body.email :
         req.baseUrl === '/new-user-code' && req.session.authenticated ? req.session.account.email :
         req.params.email || null;
@@ -91,19 +117,7 @@ authRouter.post('/signup', returnLoggedInUsersToDash, verifyClientData, (req, re
         return res.redirect('/');
     }
     
-    // Convert the authData from CBOR to an Object
-    const authData = cbor.decodeAllSync(new Uint8Array(Object.values(req.body.attestationObject)))[0].authData;
-    // Get the length of the credential ID
-    const dataView = new DataView(new ArrayBuffer(2));
-    const idLenBytes = authData.slice(53, 55);
-    idLenBytes.forEach((value, index) => dataView.setUint8(index, value));
-    const credentialIdLength = dataView.getUint16();
-    // Get the credential ID
-    const credentialId = authData.slice(55, 55 + credentialIdLength);
-    // Get the bytes for the public key object
-    const publicKeyBytes = authData.slice(55 + credentialIdLength);
-    // The public key bytes are encoded as CBOR
-    const publicKeyObject = cbor.decodeAllSync(publicKeyBytes)[0];
+    const {publicKey, credentialId} = parseAuthData(req.body.attestationObject);
 
     // Add new user to database
     const newUser = new User({
@@ -111,13 +125,7 @@ authRouter.post('/signup', returnLoggedInUsersToDash, verifyClientData, (req, re
         name: req.body.name,
         credentials:[{
             credentialId,
-            publicKey: {
-                1: publicKeyObject.get(1),
-                3: publicKeyObject.get(3),
-                neg1: publicKeyObject.get(-1),
-                neg2: publicKeyObject.get(-2),
-                neg3: publicKeyObject.get(-3)
-            }
+            publicKey
         }]
     })
     newUser.save().then(result => {
@@ -177,6 +185,24 @@ authRouter.post('/login', returnLoggedInUsersToDash, verifyClientData, (req, res
         req.session.authenticated = true;
         res.sendStatus(200);
     });
+})
+
+authRouter.post('/new-credentials', returnLoggedInUsersToDash, verifyClientData, (req, res, next) => {
+    if (!req.foundUser) {
+        return res.redirect('/');
+    }
+
+    const {publicKey, credentialId} = parseAuthData(req.body.attestationObject);
+    req.foundUser.credentials.push({
+        credentialId,
+        publicKey
+    })
+    req.foundUser.save().then(result => {
+        req.session.responses.successfullyAddedCredentials = true;
+        res.status(200).send();
+    }).catch(error => {
+        next(error);
+    })
 })
 
 authRouter.get('/logout', (req, res) => {
