@@ -150,7 +150,7 @@ authRouter.get('/credentialId/:email', (req, res, next) => {
 
 authRouter.post('/login', returnLoggedInUsersToDash, verifyClientData, (req, res) => {
     if (!req.foundUser) {
-        return res.redirect('/');
+        return res.status(400).send('Please check the email entered is correct');
     }
 
     // The signed data is made up of a sha256 hash of the client data and the raw bytes of the authenticator data
@@ -187,8 +187,8 @@ authRouter.post('/login', returnLoggedInUsersToDash, verifyClientData, (req, res
 })
 
 authRouter.post('/new-credentials', returnLoggedInUsersToDash, verifyClientData, (req, res, next) => {
-    if (!req.foundUser) {
-        return res.redirect('/');
+    if (!req.foundUser || req.body.authCode == null) {
+        return res.status(400).send('Please check the email and code are correct');
     }
 
     const {publicKey, credentialId} = parseAuthData(req.body.attestationObject);
