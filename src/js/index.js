@@ -158,6 +158,10 @@ async function login(e) {
     // Get credential Id from server
     const credentialIdResponse = await fetch(`/credentialId/${loginEmail.value}`);
     const credentailIds = JSON.parse(await credentialIdResponse.text());
+    // Check the server returned at least one credential, otherwise the account does not exist
+    if (credentailIds.length == 0) {
+        return alert('Please check that the email provided is valid');
+    }
     let allowCredentials = [];
     credentailIds.forEach(credential => {
         allowCredentials.push({

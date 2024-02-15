@@ -1,11 +1,13 @@
 head
     title Settings
+    link(rel="stylesheet", href="/public/css/settings.css")
     script(src="/public/js/settings.js" defer) 
 body
     include ./partials/navbar.pug
-    h1 Settings
+    main
+        h1 Settings
 
-    h2 Add New Login Credentials
-    p Press the button below to generate a new code. Use this code to log in to your account on a new device for the first time.
-    button#newCodeButton Generate new code
-    p#newCodeDisplay
+        h2 Add New Login Credentials
+        p Press the button below to generate a new code. Use this code to log in to your account on a new device for the first time.
+        button#newCodeButton Generate new code
+        p#newCodeDisplay
