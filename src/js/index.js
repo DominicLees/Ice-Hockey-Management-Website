@@ -3,10 +3,21 @@ const signupEmail = document.getElementById('signupEmail');
 const signupForm = document.getElementById('signupForm');
 const loginEmail = document.getElementById('loginEmail');
 const loginForm = document.getElementById('loginForm');
+const newDeviceLoginToggle = document.getElementById('newDeviceLoginToggle');
+const newDeviceLoginForm = document.getElementById('newDeviceLoginForm');
 const textEncoder = new TextEncoder();
 const textDecoder = new TextDecoder();
 
+// This regular expression checks if emails provided match the format of a valid email
 const emailRegEx = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+// Check if the user's web browser supports webauthn
+if (window.PublicKeyCredential) {
+    console.log('webAuth supported!');
+} else {
+    alert('Your browser does not support webAuth, please switch to a browser that does.');
+    throw new Error('webAuth not supported');
+}
 
 function validateSignupEmail() {
     const valid = emailRegEx.test(signupEmail.value);
@@ -29,12 +40,11 @@ function validateLoginEmail() {
 }
 loginEmail.addEventListener('focusout', validateLoginEmail);
 
-if (window.PublicKeyCredential) {
-    console.log('webAuth supported!');
-} else {
-    alert('Your browser does not support webAuth, please switch to a browser that does.');
-    throw new Error('webAuth not supported');
-}
+newDeviceLoginToggle.addEventListener('click', () => {
+    const loginHidden = loginForm.classList.toggle('hidden');
+    newDeviceLoginForm.classList.toggle('hidden');
+    newDeviceLoginToggle.innerHTML = loginHidden ? 'Return to normal login' : 'Login on this device for the first time';
+})
 
 const pubKeyCredParams = [{
         "type": "public-key",

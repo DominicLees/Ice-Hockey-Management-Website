@@ -35,14 +35,21 @@ body
 
         div.form-box
             h2 Login
+            label(for="loginEmail") Email: 
+            input#loginEmail(type="text" name="email")
             form#loginForm
-                label(for="loginEmail") Email: 
-                input(type="text" id="loginEmail" name="email")
-                br
                 br
                 input(type="submit", value="Login")
+            
+            form#newDeviceLoginForm.hidden
+                br
+                label(for="authCode") Enter Code: 
+                input#authCode(type="text" name="authCode")
+                p This code can be generated in the settings page
+                input(type="submit", value="Login")
+            button#newDeviceLoginToggle Login on this device for the first time
+            br
+            br
 
             if responses.invalidLoginEmail 
                 h3.error Please enter a valid email
-            if responses.authEmailSent
-                h3.error if an account with that email exists, we have sent a login link to that email
