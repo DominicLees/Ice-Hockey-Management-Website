@@ -130,7 +130,7 @@ authRouter.post('/signup', returnLoggedInUsersToDash, verifyClientData, (req, re
     })
     newUser.save().then(result => {
         req.session.responses.successfulSignUp = true;
-        res.status(200).send();
+        res.sendStatus(200);
     }).catch(error => {
         next(error);
     })
@@ -138,13 +138,11 @@ authRouter.post('/signup', returnLoggedInUsersToDash, verifyClientData, (req, re
 
 authRouter.get('/credentialId/:email', (req, res, next) => {
     User.findOne({email: req.params.email}).then(result => {
+        let credentials = [];
         if (result) {
-            let credentials = [];
             result.credentials.forEach(credential => credentials.push(credential.credentialId));
-            res.send(credentials);
-        } else {
-            res.sendStatus(404);
-        }
+        } 
+        res.send(credentials);
     }).catch(error => {
         next(error);
     })
@@ -160,6 +158,7 @@ authRouter.post('/login', returnLoggedInUsersToDash, verifyClientData, (req, res
     const authenticatorDataBuffer = Buffer.from(new Uint8Array(Object.values(req.body.authenticatorData)), 'base64');
     const dataBuffer = Buffer.concat([authenticatorDataBuffer, clientDataBuffer]);
     const signature = Buffer.from(Object.values(req.body.signature));
+    // Find the public key for the credential the user used
     const credential = req.foundUser.credentials.find(credential => Buffer.compare(Buffer.from(credential.credentialId), Buffer.from(req.body.credentialId, 'base64')) == 0);
 
     // Get User's public key
@@ -169,16 +168,16 @@ authRouter.post('/login', returnLoggedInUsersToDash, verifyClientData, (req, res
     .set(-1, credential.publicKey['neg1'])
     .set(-2, Buffer.from(credential.publicKey['neg2']))
     .set(-3, Buffer.from(credential.publicKey['neg3']))
-    // Key is converted from cose to jwk and crypto libary does not support cose
+    // Key is converted from cose to jwk as crypto libary does not support cose
     const parsedKey = cosekey.KeyParser.cose2jwk(coseMap);
     const publicKey = crypto.createPublicKey({key: parsedKey, format: 'jwk'});
 
     crypto.verify(null, dataBuffer, publicKey, signature, (error, result) => {
-        if (result == false) {
-            return res.status(403).send('Failed to verify signature');
-        } if (error) {
+        if (error) {
             return res.status(500).send();
-        }
+        } if (result == false) {
+            return res.status(403).send('Failed to verify signature');
+        } 
         
         // Authenticate User
         req.session.account = req.foundUser;
