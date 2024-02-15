@@ -43,11 +43,13 @@ authRouter.get('/challenge', (req, res) => {
     res.send(challenge);
 })
 
-// Check if the email given by the user already has an account
-authRouter.use(['/login', '/signup'], returnLoggedInUsersToDash, (req, res, next) => {
-    req.validEmail = validateEmail(req.body.email);
-    if (!req.validEmail) {return next()}
-    User.findOne({email: req.body.email}).then(result => {
+authRouter.use(['/login', '/credentialId/:email', '/new-user-code'], (req, res, next) => {
+    const email = req.method === "POST" ? req.body.email :
+        req.baseUrl === '/new-user-code' && req.session.authenticated ? req.session.account.email :
+        req.params.email || null;
+    if (!email) { return res.sendStatus(400); }
+
+    User.findOne({email}).then(result => {
         req.foundUser = result;
         next();
     }).catch(error => {
@@ -55,11 +57,23 @@ authRouter.use(['/login', '/signup'], returnLoggedInUsersToDash, (req, res, next
     })
 })
 
-authRouter.post('/signup', verifyClientData, (req, res, next) => {
+authRouter.get('/new-user-code', returnUnauthenticatedUsersToIndex, (req, res, next) => {
+    req.foundUser.authCode = {
+        code: crypto.randomBytes(16).toString('hex'),
+        timeout: Date.now() + 300000
+    }
+    req.foundUser.save().then(result => {
+        res.send(result.authCode.code);
+    }).catch(error => {
+        next(error);
+    })
+})
+
+authRouter.post('/signup', returnLoggedInUsersToDash, verifyClientData, (req, res, next) => {
     // Validate input
     if (req.foundUser) {
         req.session.responses.emailInUse = true;
-    } if (!req.validEmail) {
+    } if (!validateEmail(req.body.email)) {
         req.session.responses.invalidSignUpEmail = true;
     } if (req.body.name.length == 0) {
         req.session.responses.invalidName = true;
@@ -121,12 +135,7 @@ authRouter.get('/credentialId/:email', (req, res, next) => {
     })
 })
 
-authRouter.post('/login', verifyClientData, (req, res) => {
-    if (!req.validEmail) {
-        req.session.responses.invalidLoginEmail = true;
-        return res.redirect('/');
-    }
-
+authRouter.post('/login', returnLoggedInUsersToDash, verifyClientData, (req, res) => {
     if (!req.foundUser) {
         return res.redirect('/');
     }
