@@ -3,10 +3,22 @@ const signupEmail = document.getElementById('signupEmail');
 const signupForm = document.getElementById('signupForm');
 const loginEmail = document.getElementById('loginEmail');
 const loginForm = document.getElementById('loginForm');
+const newDeviceLoginToggle = document.getElementById('newDeviceLoginToggle');
+const newDeviceLoginForm = document.getElementById('newDeviceLoginForm');
+const authCode = document.getElementById('authCode');
 const textEncoder = new TextEncoder();
 const textDecoder = new TextDecoder();
 
+// This regular expression checks if emails provided match the format of a valid email
 const emailRegEx = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+// Check if the user's web browser supports webauthn
+if (window.PublicKeyCredential) {
+    console.log('webAuth supported!');
+} else {
+    alert('Your browser does not support webAuth, please switch to a browser that does.');
+    throw new Error('webAuth not supported');
+}
 
 function validateSignupEmail() {
     const valid = emailRegEx.test(signupEmail.value);
@@ -29,12 +41,18 @@ function validateLoginEmail() {
 }
 loginEmail.addEventListener('focusout', validateLoginEmail);
 
-if (window.PublicKeyCredential) {
-    console.log('webAuth supported!');
-} else {
-    alert('Your browser does not support webAuth, please switch to a browser that does.');
-    throw new Error('webAuth not supported');
+function validateAuthCode() {
+    const valid = authCode.value.length > 0;
+    authCode.style.backgroundColor = valid ? 'lightgreen' : 'lightcoral';
+    return valid;
 }
+authCode.addEventListener('focusout', validateAuthCode);
+
+newDeviceLoginToggle.addEventListener('click', () => {
+    const loginHidden = loginForm.classList.toggle('hidden');
+    newDeviceLoginForm.classList.toggle('hidden');
+    newDeviceLoginToggle.innerHTML = loginHidden ? 'Return to normal login' : 'Login on this device for the first time';
+})
 
 const pubKeyCredParams = [{
         "type": "public-key",
@@ -139,15 +157,19 @@ async function login(e) {
     const challenge = await challengeResponse.text();
     // Get credential Id from server
     const credentialIdResponse = await fetch(`/credentialId/${loginEmail.value}`);
-    const credentailId = await credentialIdResponse.arrayBuffer();
+    const credentailIds = JSON.parse(await credentialIdResponse.text());
+    let allowCredentials = [];
+    credentailIds.forEach(credential => {
+        allowCredentials.push({
+            id: new Uint8Array(Object.values(credential.data)),
+            type: 'public-key'
+        })
+    });
 
     const publicKeyCredentialRequestOptions = {
         challenge: textEncoder.encode(challenge),
-        allowCredentials: [{
-            id: credentailId,
-            type: 'public-key',
-        }],
-        timeout: 60000,
+        allowCredentials,
+        timeout: 60000
     }
 
     const assertion = await navigator.credentials.get({publicKey: publicKeyCredentialRequestOptions});
@@ -158,6 +180,7 @@ async function login(e) {
         },
         body: JSON.stringify({
             email: loginEmail.value,
+            credentialId: assertion.id,
             clientData: JSON.parse(textDecoder.decode(assertion.response.clientDataJSON)),
             clientDataJSON: new Uint8Array(assertion.response.clientDataJSON),
             authenticatorData: new Uint8Array(assertion.response.authenticatorData),
@@ -175,3 +198,77 @@ async function login(e) {
 }
 
 loginForm.addEventListener('submit', login);
+
+async function newDeviceLogin(e) {
+    e.preventDefault();
+
+    // Input validation
+    const validEmail = validateLoginEmail();
+    const validAuthCode = validateAuthCode();
+    if (!validEmail || !validAuthCode) {
+        return;
+    }
+    // Check that auth code is valid
+    const authCodeCheckResponse = await fetch('/valid-auth-code', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            email: loginEmail.value,
+            authCode: authCode.value
+        })
+    })
+    const authCodeCheck = await authCodeCheckResponse.text();
+    if (!authCodeCheck) {
+        return alert('Invalid code');
+    }
+
+    // Get challenge string from server
+    const challengeResponse = await fetch('/challenge');
+    const challenge = await challengeResponse.text();
+
+    const publicKeyCredentialCreationOptions = {
+        challenge: textEncoder.encode(challenge),
+        rp: {
+            name: "Hockey",
+        },
+        user: {
+            id: Uint8Array.from(Math.random().toString(20).substring(2, 20), c => c.charCodeAt(0)),
+            name: loginEmail.value,
+            displayName: loginEmail.value,
+        },
+        pubKeyCredParams,
+        authenticatorSelection: {
+            authenticatorAttachment: "platform",
+        },
+        timeout: 60000,
+        attestation: "direct"
+    };
+
+    navigator.credentials.create({publicKey: publicKeyCredentialCreationOptions}).then(credentials => {
+        // Send credentials to the server
+        return fetch('/new-credentials', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email: loginEmail.value,
+                clientData: JSON.parse(textDecoder.decode(credentials.response.clientDataJSON)),
+                attestationObject: new Uint8Array(credentials.response.attestationObject)
+            })
+        })
+    }).then(response => {
+        if (response.status == 200) {
+            window.location.reload();
+        } else {
+            alert(`Error code ${response.status}. Please ensure all details are complete.`);
+        }
+    }).catch(error => {
+        console.error(error);
+        alert('Something went wrong, try again.');
+    })
+}
+
+newDeviceLoginForm.addEventListener('submit', newDeviceLogin);

@@ -30,7 +30,7 @@ app.use(session({
 }))
 
 // Connect to MongoDB
-const dbName = enviroment === 'production' ? 'production' : 'development';
+const dbName = enviroment === 'production' ? 'production' : config.database ?? 'development';
 mongoose.connect(`mongodb+srv://${config.mongoLogin}/?retryWrites=true&w=majority`, {dbName})
 .then((result) => console.log(`Connected to database: ${result.connections[0].name}`))
 .catch((error) => console.log(error));

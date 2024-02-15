@@ -3,9 +3,36 @@ const authRouter = express.Router();
 const crypto = require('crypto');
 const cbor = require('cbor');
 const cosekey = require('parse-cosekey');
-const validateEmail = require("email-validator").validate;
+const validateEmail = require('email-validator').validate;
 const returnLoggedInUsersToDash = require('./../middleware/returnLoggedInUsersToDash.js');
+const returnUnauthenticatedUsersToIndex = require('./../middleware/returnUnauthenticatedUsersToIndex.js');
 const User = require('./../schemas/user');
+
+function parseAuthData(attestationObject) {
+    // Convert the authData from CBOR to an Object
+    const authData = cbor.decodeAllSync(new Uint8Array(Object.values(attestationObject)))[0].authData;
+    // Get the length of the credential ID
+    const dataView = new DataView(new ArrayBuffer(2));
+    const idLenBytes = authData.slice(53, 55);
+    idLenBytes.forEach((value, index) => dataView.setUint8(index, value));
+    const credentialIdLength = dataView.getUint16();
+    // Get the credential ID
+    const credentialId = authData.slice(55, 55 + credentialIdLength);
+    // Get the bytes for the public key object
+    const publicKeyBytes = authData.slice(55 + credentialIdLength);
+    // The public key bytes are encoded as CBOR
+    const publicKeyObject = cbor.decodeAllSync(publicKeyBytes)[0];
+    return {
+        credentialId,
+        publicKey: {
+            1: publicKeyObject.get(1),
+            3: publicKeyObject.get(3),
+            neg1: publicKeyObject.get(-1),
+            neg2: publicKeyObject.get(-2),
+            neg3: publicKeyObject.get(-3)
+        }
+    };
+}
 
 function verifyClientData(req, res, next) {
     if (req.body.clientData == null) {
@@ -21,7 +48,7 @@ function verifyClientData(req, res, next) {
         return res.status(400).send('Challenges did not match');
     } 
     // Client data must be from the correct authenticator method
-    const expectedType = req.path == '/signup' ? 'create' : 'get'
+    const expectedType = req.path == '/login' ? 'get' : 'create'
     if (req.body.clientData.type != `webauthn.${expectedType}`) {
         return res.status(400).send('Wrong type');
     } 
@@ -32,17 +59,23 @@ function verifyClientData(req, res, next) {
     next();
 }
 
+authRouter.get('/settings', returnUnauthenticatedUsersToIndex, (req, res) => {
+    res.render('settings');
+})
+
 authRouter.get('/challenge', (req, res) => {
     const challenge = crypto.randomBytes(32).toString();
     req.session.challenge = challenge;
     res.send(challenge);
 })
 
-// Check if the email given by the user already has an account
-authRouter.use(['/login', '/signup'], returnLoggedInUsersToDash, (req, res, next) => {
-    req.validEmail = validateEmail(req.body.email);
-    if (!req.validEmail) {return next()}
-    User.findOne({email: req.body.email}).then(result => {
+authRouter.use(['/login', '/credentialId/:email', '/new-user-code', '/valid-code', '/new-credentials'], (req, res, next) => {
+    const email = req.method === "POST" ? req.body.email :
+        req.baseUrl === '/new-user-code' && req.session.authenticated ? req.session.account.email :
+        req.params.email || null;
+    if (!email) { return res.sendStatus(400); }
+
+    User.findOne({email}).then(result => {
         req.foundUser = result;
         next();
     }).catch(error => {
@@ -50,11 +83,30 @@ authRouter.use(['/login', '/signup'], returnLoggedInUsersToDash, (req, res, next
     })
 })
 
-authRouter.post('/signup', verifyClientData, (req, res, next) => {
+authRouter.get('/new-user-code', returnUnauthenticatedUsersToIndex, (req, res, next) => {
+    req.foundUser.authCode = {
+        code: crypto.randomBytes(16).toString('hex'),
+        timeout: Date.now() + 300000
+    }
+    req.foundUser.save().then(result => {
+        res.send(result.authCode.code);
+    }).catch(error => {
+        next(error);
+    })
+})
+
+authRouter.post('/valid-auth-code', (req, res) => {
+    if (req.foundUser == null || req.foundUser.authCode == null || req.foundUser.authCode.code != req.body.authCode || new Date() > req.foundUser.authCode.timeout) {
+        return res.send(false);
+    }
+    res.send(true);
+})
+
+authRouter.post('/signup', returnLoggedInUsersToDash, verifyClientData, (req, res, next) => {
     // Validate input
     if (req.foundUser) {
         req.session.responses.emailInUse = true;
-    } if (!req.validEmail) {
+    } if (!validateEmail(req.body.email)) {
         req.session.responses.invalidSignUpEmail = true;
     } if (req.body.name.length == 0) {
         req.session.responses.invalidName = true;
@@ -65,32 +117,16 @@ authRouter.post('/signup', verifyClientData, (req, res, next) => {
         return res.redirect('/');
     }
     
-    // Convert the authData from CBOR to an Object
-    const authData = cbor.decodeAllSync(new Uint8Array(Object.values(req.body.attestationObject)))[0].authData;
-    // Get the length of the credential ID
-    const dataView = new DataView(new ArrayBuffer(2));
-    const idLenBytes = authData.slice(53, 55);
-    idLenBytes.forEach((value, index) => dataView.setUint8(index, value));
-    const credentialIdLength = dataView.getUint16();
-    // Get the credential ID
-    const credentialId = authData.slice(55, 55 + credentialIdLength);
-    // Get the bytes for the public key object
-    const publicKeyBytes = authData.slice(55 + credentialIdLength);
-    // The public key bytes are encoded as CBOR
-    const publicKeyObject = cbor.decodeAllSync(publicKeyBytes)[0];
+    const {publicKey, credentialId} = parseAuthData(req.body.attestationObject);
 
     // Add new user to database
     const newUser = new User({
         email: req.body.email,
         name: req.body.name,
-        credentialId,
-        publicKey: {
-            1: publicKeyObject.get(1),
-            3: publicKeyObject.get(3),
-            neg1: publicKeyObject.get(-1),
-            neg2: publicKeyObject.get(-2),
-            neg3: publicKeyObject.get(-3)
-        }
+        credentials:[{
+            credentialId,
+            publicKey
+        }]
     })
     newUser.save().then(result => {
         req.session.responses.successfulSignUp = true;
@@ -103,7 +139,9 @@ authRouter.post('/signup', verifyClientData, (req, res, next) => {
 authRouter.get('/credentialId/:email', (req, res, next) => {
     User.findOne({email: req.params.email}).then(result => {
         if (result) {
-            res.send(result.credentialId);
+            let credentials = [];
+            result.credentials.forEach(credential => credentials.push(credential.credentialId));
+            res.send(credentials);
         } else {
             res.sendStatus(404);
         }
@@ -112,12 +150,7 @@ authRouter.get('/credentialId/:email', (req, res, next) => {
     })
 })
 
-authRouter.post('/login', verifyClientData, (req, res) => {
-    if (!req.validEmail) {
-        req.session.responses.invalidLoginEmail = true;
-        return res.redirect('/');
-    }
-
+authRouter.post('/login', returnLoggedInUsersToDash, verifyClientData, (req, res) => {
     if (!req.foundUser) {
         return res.redirect('/');
     }
@@ -127,14 +160,15 @@ authRouter.post('/login', verifyClientData, (req, res) => {
     const authenticatorDataBuffer = Buffer.from(new Uint8Array(Object.values(req.body.authenticatorData)), 'base64');
     const dataBuffer = Buffer.concat([authenticatorDataBuffer, clientDataBuffer]);
     const signature = Buffer.from(Object.values(req.body.signature));
+    const credential = req.foundUser.credentials.find(credential => Buffer.compare(Buffer.from(credential.credentialId), Buffer.from(req.body.credentialId, 'base64')) == 0);
 
     // Get User's public key
     const coseMap = new Map()
-    .set(1, req.foundUser.publicKey['1'])
-    .set(3, req.foundUser.publicKey['3'])
-    .set(-1, req.foundUser.publicKey['neg1'])
-    .set(-2, Buffer.from(req.foundUser.publicKey['neg2']))
-    .set(-3, Buffer.from(req.foundUser.publicKey['neg3']))
+    .set(1, credential.publicKey['1'])
+    .set(3, credential.publicKey['3'])
+    .set(-1, credential.publicKey['neg1'])
+    .set(-2, Buffer.from(credential.publicKey['neg2']))
+    .set(-3, Buffer.from(credential.publicKey['neg3']))
     // Key is converted from cose to jwk and crypto libary does not support cose
     const parsedKey = cosekey.KeyParser.cose2jwk(coseMap);
     const publicKey = crypto.createPublicKey({key: parsedKey, format: 'jwk'});
@@ -151,6 +185,24 @@ authRouter.post('/login', verifyClientData, (req, res) => {
         req.session.authenticated = true;
         res.sendStatus(200);
     });
+})
+
+authRouter.post('/new-credentials', returnLoggedInUsersToDash, verifyClientData, (req, res, next) => {
+    if (!req.foundUser) {
+        return res.redirect('/');
+    }
+
+    const {publicKey, credentialId} = parseAuthData(req.body.attestationObject);
+    req.foundUser.credentials.push({
+        credentialId,
+        publicKey
+    })
+    req.foundUser.save().then(result => {
+        req.session.responses.successfullyAddedCredentials = true;
+        res.status(200).send();
+    }).catch(error => {
+        next(error);
+    })
 })
 
 authRouter.get('/logout', (req, res) => {
