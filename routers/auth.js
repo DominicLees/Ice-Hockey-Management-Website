@@ -188,7 +188,12 @@ authRouter.post('/login', returnLoggedInUsersToDash, verifyClientData, (req, res
 
 authRouter.post('/new-credentials', returnLoggedInUsersToDash, verifyClientData, (req, res, next) => {
     if (!req.foundUser || req.body.authCode == null) {
-        return res.status(400).send('Please check the email and code are correct');
+        return res.status(400).send('Please check the email and code are correct, and that the code is still valid');
+    }
+
+    // Check that the auth code provided is valid
+    if (req.body.authCode != req.foundUser.authCode.code || new Date() > req.foundUser.authCode.timeout) {
+        return res.Status(400).send('Please check the email and code are correct, and that the code is still valid');
     }
 
     const {publicKey, credentialId} = parseAuthData(req.body.attestationObject);
