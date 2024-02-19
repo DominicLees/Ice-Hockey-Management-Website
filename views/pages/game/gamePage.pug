@@ -7,7 +7,7 @@ body
     h2 #{game.atHome ? "Home" : "Away"} at #{game.date.toJSON().slice(0,10).split('-').reverse().join('/') + " at " + game.date.toLocaleTimeString()}
 
     div#buttons
-        if game.result
+        if game.resultSubmitted
             button
                 a(href=game.gameId+"/gamesheet") View Game Sheet
         else
@@ -19,12 +19,12 @@ body
                     button.green
                         a(href=game.gameId+"/signup") Sign Up
 
-            if game.lines && (isPlayer || isCoach)
+            if game.linesSubmitted && (isPlayer || isCoach)
                 button 
                     a(href=game.gameId+"/lines") View Lines
 
             if isCoach
-                if game.lines
+                if game.linesSubmitted
                     button 
                         a(href=game.gameId+"/line-builder")
                             if game.lines 
