@@ -50,7 +50,7 @@ async function generateDB() {
             players.push({
                 user: usersCopy.splice(Math.floor(Math.random() * usersCopy.length), 1)[0]._id,
                 team: team._id,
-                positions: positions.sort(() => Math.random() - Math.random()).slice(0, Math.floor(Math.random() * positions.length)),
+                positions: positions.sort(() => Math.random() - Math.random()).slice(0, Math.max(Math.floor(Math.random() * positions.length), 1)),
                 privacy: 'public'
             })
         }
