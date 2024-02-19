@@ -8,7 +8,7 @@ const gameSchema = new mongoose.Schema({
     playersSignedUp: {type: [mongoose.Schema.Types.ObjectId], ref: 'Player'},
     gameId: {type: String, required: true},
     lines: {
-        startingGoalie: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Player', autopopulate: true},
+        startingGoalie: {type: mongoose.Schema.Types.ObjectId, ref: 'Player', autopopulate: true},
         backupGoalie: {type: mongoose.Schema.Types.ObjectId, ref: 'Player', autopopulate: true},
         skaters: [{
             linePosition: {type: String, required: true},
