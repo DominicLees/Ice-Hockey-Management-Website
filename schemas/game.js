@@ -29,6 +29,14 @@ gameSchema.virtual('score').get(function() {
     return this.atHome ? this.result.teamGoals + '-' + this.result.opponentGoals : this.result.opponentGoals + '-' + this.result.teamGoals;
 });
 
+gameSchema.virtual('resultSubmitted').get(function() {
+    return this.result.teamGoals != null && this.result.opponentGoals != null;
+})
+
+gameSchema.virtual('linesSubmitted').get(function() {
+    return this.lines.skaters.length > 0;
+})
+
 gameSchema.set('toObject', { virtuals: true });
 
 gameSchema.plugin(require('mongoose-autopopulate'));
