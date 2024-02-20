@@ -44,7 +44,6 @@ input {
 
 table {
     table-layout: fixed;
-    border-collapse: collapse;
     width: 100%;
     margin-top: 10px;
 
@@ -54,10 +53,6 @@ table {
 
     td, td a, td span, th {
         padding: 5px;
-    }
-
-    td, th {
-        border: 1px solid black;
     }
 
     thead tr {
