@@ -50,7 +50,6 @@ table {
     width: calc(100vw - 40px);
     margin-left: 20px;
     table-layout: fixed;
-    border-collapse: collapse;
 
     @media (max-width: 600px) {
         margin-left: 0px;
@@ -58,7 +57,6 @@ table {
 
     td, th {
         text-align: center;
-        border: 1px solid black;
     }
 
     thead tr {

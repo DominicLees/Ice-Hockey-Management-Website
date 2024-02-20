@@ -29,6 +29,15 @@ button, input[type=submit] {
     background-color: aquamarine;
 }
 
+table {
+    border-collapse: collapse;
+
+    td, th {
+        border: 1px solid black;
+        padding: 2px;
+    }
+}
+
 // Utility Classes
 .error, .success {
     padding: 10px;
