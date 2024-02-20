@@ -1,5 +1,6 @@
 head
     title Build lines for #{game.title}
+    script(src="/public/js/lineBuilder.js" defer) 
 body
     include ../../partials/navbar.pug
     h1 Build lines for #{game.title}
@@ -12,19 +13,19 @@ body
         h3 You picked the same player in multiple 5 on 5 lines
 
     form(action="./line-builder", method="get")
-        label(for="numOfLines") Number of 5 on 5 lines:
-        input(type="number", name="numOfFSLines" value=numOfFSLines min="1" max="4")
+        label(for="numOfFSLines") Number of 5 on 5 lines:
+        input#numOfFSLines(type="number" name="numOfFSLines" value=numOfFSLines min="1" max="4")
         br
         label(for="numOfPPLines") Number of powerplay lines:
-        input(type="number", name="numOfPPLines" value=numOfPPLines min="1" max="4")
+        input#numOfPPLines(type="number" name="numOfPPLines" value=numOfPPLines min="1" max="4")
         br
         label(for="numOfPKLines") Number of penalty kill lines:
-        input(type="number", name="numOfPKLines" value=numOfPKLines min="1" max="4")
+        input#numOfPKLines(type="number" name="numOfPKLines" value=numOfPKLines min="1" max="4")
         br
-        input(type="submit", value="Update")
+        input(type="submit" value="Update")
 
     form(action="./line-builder/save", method="post")
-        input(type="submit", value="Save")
+        input(type="submit" value="Save")
         br
 
         h2 Goalies
