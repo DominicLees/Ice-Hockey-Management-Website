@@ -1,3 +1,4 @@
+const linesForm = document.getElementById('linesForm');
 const startingGoalie = document.getElementById('startingGoalie');
 const backupGoalie = document.getElementById('backupGoalie');
 const lineTypes = {
@@ -45,6 +46,14 @@ function validateSelection(selects) {
     });
     return valid; 
 }
+
+linesForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    if (validateGoalies() && validateSelection(lineTypes['lines']) && validateSelection(lineTypes['PPs']) && validateSelection(lineTypes['PKs'])) {
+        linesForm.submit();
+    }
+})
 
 Object.keys(lineTypes).forEach(type => {
     const validate = () => {
