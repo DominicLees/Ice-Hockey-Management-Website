@@ -22,17 +22,8 @@ body
             div.content#players
                 h2 Players
                 if players.length > 0
-                    table
-                        thead
-                            tr
-                                th Name
-                                th Positions
-                        tbody
-                            for player in players
-                                tr
-                                    td
-                                        a(href='/player/'+player._id)= player.user.name
-                                    td= player.positions
+                    include ../../partials/playerTable.pug
+                    +playerTable(players)
                 else
                     p No players registered
 

@@ -38,6 +38,5 @@ body
 
 
     h3 #{game.playersSignedUp.length} Players Signed Up
-    ul
-        for signedPlayer in game.playersSignedUp
-            li= signedPlayer.user.name
+    include ../../partials/playerTable.pug
+    +playerTable(game.playersSignedUp)
