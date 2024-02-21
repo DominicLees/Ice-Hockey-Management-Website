@@ -109,7 +109,8 @@ teamRouter.get('/:code', playerOrCoachOnly, (req, res) => {
     res.render('pages/team/teamProfile', {
         players: req.foundPlayers,
         isCoach: req.isCoach,
-        playerSort: req.query.playerSort
+        playerSort: req.query.playerSort,
+        playerFilter: req.query.playerFilter
     })
 })
 

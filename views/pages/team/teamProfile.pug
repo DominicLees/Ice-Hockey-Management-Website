@@ -27,13 +27,21 @@ body
                         option(value="joined") Date joined
                         option(value="name" selected=(playerSort == 'name')) Name
                         option(value="position" selected=(playerSort == 'position')) Position
-                        
+                    
+                    - const positions = ['LW', 'RW', 'C', 'LD', 'RD', 'G']
                     if playerSort == 'name'
                         - players.sort((a, b) => {return a.user.name.localeCompare(b.user.name)})
                     if playerSort == 'position'
-                        - 
-                            const positions = ['LW', 'RW', 'C', 'LD', 'RD', 'G']
-                            players.sort((a, b) => {return positions.indexOf(a.positions[0]) - positions.indexOf(b.positions[0])})
+                        - players.sort((a, b) => {return positions.indexOf(a.positions[0]) - positions.indexOf(b.positions[0])})
+
+                    label(for="playerFilter")  Filter 
+                    select#playerFilter
+                        option(value='none' selected=(!positions.includes(playerFilter))) None
+                        for position in positions
+                            option(value=position selected=(playerFilter == position))= position
+
+                    if positions.includes(playerFilter)
+                        - players = players.filter(player => player.positions.includes(playerFilter))
 
                     include ../../partials/playerTable.pug
                     +playerTable(players)
