@@ -22,6 +22,19 @@ body
             div.content#players
                 h2 Players
                 if players.length > 0
+                    label(for='playerSort') Sort 
+                    select#playerSort
+                        option(value="joined") Date joined
+                        option(value="name" selected=(playerSort == 'name')) Name
+                        option(value="position" selected=(playerSort == 'position')) Position
+                        
+                    if playerSort == 'name'
+                        - players.sort((a, b) => {return a.user.name.localeCompare(b.user.name)})
+                    if playerSort == 'position'
+                        - 
+                            const positions = ['LW', 'RW', 'C', 'LD', 'RD', 'G']
+                            players.sort((a, b) => {return positions.indexOf(a.positions[0]) - positions.indexOf(b.positions[0])})
+
                     include ../../partials/playerTable.pug
                     +playerTable(players)
                 else
