@@ -45,7 +45,20 @@ body
                     option(value=goalie._id)= goalie.user.name
 
         h2 Skaters
-        p You have #{players.length} skaters to pick from
+        -
+            function positionCount(position) {
+                let count = 0;
+                players.forEach(player => {
+                    if (player.positions.includes(position)) {count++};
+                })
+                return count;
+            }
+        ul
+            li Left Wingers: #{positionCount('LW')}
+            li Centres: #{positionCount('C')}
+            li Right Wingers: #{positionCount('RW')}
+            li Left Defencemen: #{positionCount('LD')}
+            li Right Defencemen: #{positionCount('RD')}
         include ../../partials/lineBuilderLines.pug
 
         h3 5 on 5
