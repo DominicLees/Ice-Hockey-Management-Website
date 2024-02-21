@@ -21,6 +21,10 @@ function windowResize() {
 }
 
 document.getElementById('joinTeamButton').addEventListener('click', () => {
+    if (teamCode.value.length != 6) {
+        teamCode.style.backgroundColor = 'lightcoral';
+        return;
+    }
     window.location = 'team/join/' + teamCode.value;
 })
 
