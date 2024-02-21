@@ -8,35 +8,33 @@ body
         p You have not been picked for this game
     else
         include ../../partials/expandPositionCode.pug
-        h3 Full Strength Lines
         ul
+            li Full Strength Lines
             li You are #{expandPositionCode(positions[0])}
             if numOfFSLines > 1
                 li You get on the ice when #{skaters[decrementNumberInCode(positions[0], 4)]} gets off
                 li #{skaters[incrementNumberInCode(positions[0], 2)]} gets on the ice when you get off
 
-        - const PPPos = positions.find((pos) => pos.startsWith('PP'))
-        if PPPos
-            h3 You are on powerplay
-            ul
+            - const PPPos = positions.find((pos) => pos.startsWith('PP'))
+            if PPPos
+                li You are on powerplay
                 li You are #{expandPositionCode(PPPos)}
                 if numOfPPLines > 1
                     li You get on the ice when #{skaters[decrementNumberInCode(PPPos, numOfPPLines)]} gets off
                     li #{skaters[incrementNumberInCode(PPPos, numOfPPLines)]} gets on the ice when you get off
                 else
                     li There is only 1 powerplay unit
-        else
-            h3 You are not on powerplay
+            else
+                li You are not on powerplay
 
-        - const PKPos = positions.find((pos) => pos.startsWith('PK'))
-        if PKPos
-            h3 You are on penalty kill
-            ul
+            - const PKPos = positions.find((pos) => pos.startsWith('PK'))
+            if PKPos
+                li You are on penalty kill
                 li You are #{expandPositionCode(PKPos)}
                 if numOfPKLines > 1
                     li You get on the ice when #{skaters[decrementNumberInCode(PKPos, numOfPKLines)]} gets off
                     li #{skaters[incrementNumberInCode(PKPos, numOfPKLines)]} gets on the ice when you get off
                 else
                     li There is only 1 penalty kill unit
-        else 
-            h3 You are not on penalty kill
+            else 
+                li You are not on penalty kill
