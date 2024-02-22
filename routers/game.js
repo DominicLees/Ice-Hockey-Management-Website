@@ -118,6 +118,8 @@ gameRouter.get('/:gameId', playerOrCoachOnly, (req, res) => {
 gameRouter.get('/:gameId/signup', playersOnly, (req, res, next) => {
     // If user is already signed up, do not add them to the list again
     if (req.foundGame.playersSignedUp.some(e => e._id.toString() == req.foundPlayer._id.toString())) { return res.redirect('back'); }
+    // If the user is on the list of players who rejected the game, remove them from it
+    req.foundGame.playersRejected = req.foundGame.playersRejected.filter(e => e._id.toString() != req.foundPlayer._id.toString());
 
     req.foundGame.playersSignedUp.push(req.foundPlayer._id);
     req.foundGame.save().then(result => {
