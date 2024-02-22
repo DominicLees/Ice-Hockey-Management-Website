@@ -4,9 +4,9 @@ main {
     display: flex;
     flex-direction: row;
     column-gap: 20px;
+    row-gap: 20px;
     align-items: stretch;
-    margin-left: 20px;
-    margin-right: 20px;
+    margin-right: 10px;
 
     @media (max-width: $mobileScreenSize) {
         flex-direction: column;

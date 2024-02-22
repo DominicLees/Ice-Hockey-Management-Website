@@ -11,6 +11,10 @@ main {
     h1 {
         margin-left: 10px;
     }
+
+    @media (max-width: $mobileScreenSize) {
+        margin-left: 0px;
+    }
 }
 
 h1 {
