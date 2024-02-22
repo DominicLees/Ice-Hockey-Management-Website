@@ -6,6 +6,7 @@ const gameSchema = new mongoose.Schema({
     atHome: {type: Boolean, required: true},
     date: {type: Date, required: true},
     playersSignedUp: {type: [mongoose.Schema.Types.ObjectId], ref: 'Player'},
+    playersRejected: {type: [mongoose.Schema.Types.ObjectId], ref: 'Player'},
     gameId: {type: String, required: true},
     lines: {
         startingGoalie: {type: mongoose.Schema.Types.ObjectId, ref: 'Player', autopopulate: true},
