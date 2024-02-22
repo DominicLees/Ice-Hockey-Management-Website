@@ -3,40 +3,50 @@ head
     link(rel="stylesheet", href="/public/css/gamePage.css")
 body
     include ../../partials/navbar.pug
-    h1= game.title
-    h2 #{game.atHome ? "Home" : "Away"} at #{game.date.toJSON().slice(0,10).split('-').reverse().join('/') + " at " + game.date.toLocaleTimeString()}
+    main
+        h1= game.title
+        h2 #{game.atHome ? "Home" : "Away"} at #{game.date.toJSON().slice(0,10).split('-').reverse().join('/') + " at " + game.date.toLocaleTimeString()}
 
-    div#buttons
-        if game.resultSubmitted
-            button
-                a(href=game.gameId+"/gamesheet") View Game Sheet
-        else
-            if isPlayer
-                if game.playersSignedUp.some(e => e.user._id == account._id)
-                    button.red
-                        a(href=game.gameId+"/leave") Leave Game
-                else
-                    button.green
-                        a(href=game.gameId+"/signup") Sign Up
+        div#buttons
+            if game.resultSubmitted
+                button
+                    a(href=game.gameId+"/gamesheet") View Game Sheet
+            else
+                if isPlayer
+                    if game.playersSignedUp.some(e => e.user._id == account._id)
+                        button.red
+                            a(href=game.gameId+"/reject") Leave Game
+                    else
+                        button.green
+                            a(href=game.gameId+"/signup") Sign Up
+                        if !game.playersRejected.some(e => e.user._id == account._id)
+                            button.red
+                                a(href=game.gameId+"/reject") Reject Game
 
-            if game.linesSubmitted && (isPlayer || isCoach)
-                button 
-                    a(href=game.gameId+"/lines") View Lines
-
-            if isCoach
-                if game.linesSubmitted
+                if game.linesSubmitted && (isPlayer || isCoach)
                     button 
-                        a(href=game.gameId+"/line-builder")
-                            if game.lines 
-                                span Update Lines
+                        a(href=game.gameId+"/lines") View Lines
 
-                    button
-                        a(href="result") Submit Game Result
-                else
-                    button 
-                        a(href=game.gameId+"/line-builder") Build Lines
+                if isCoach
+                    if game.linesSubmitted
+                        button 
+                            a(href=game.gameId+"/line-builder")
+                                if game.lines 
+                                    span Update Lines
 
+                        button
+                            a(href="result") Submit Game Result
+                    else
+                        button 
+                            a(href=game.gameId+"/line-builder") Build Lines
 
-    h3 #{game.playersSignedUp.length} Players Signed Up
-    include ../../partials/playerTable.pug
-    +playerTable(game.playersSignedUp)
+        include ../../partials/playerTable.pug
+        div
+            h3 #{game.playersSignedUp.length} Players Signed Up
+            if game.playersSignedUp.length > 0
+                +playerTable(game.playersSignedUp)
+
+        div
+            h3 #{game.playersRejected.length} Players Unavailable
+            if game.playersRejected.length > 0
+                +playerTable(game.playersRejected)
