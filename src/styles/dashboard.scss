@@ -10,6 +10,7 @@ main {
 
     @media (max-width: $mobileScreenSize) {
         flex-direction: column;
+        margin-right: 0px;
     }
 
     div {
@@ -80,4 +81,8 @@ table {
     button {
         background-color: lightgrey;
     }
+}
+
+.greyedOut {
+    background-color: lightgrey;
 }

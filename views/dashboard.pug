@@ -45,15 +45,25 @@ body
             h2 Upcoming Games
             if games.length > 0
                 for game in games
-                    div.game-card
+                    - const rejected = playerProfiles.some(e => game.playersRejected.includes(e._id))
+                    div.game-card(class={greyedOut: rejected})
                         a(href=`/team/${game.team.code}/game/${game.gameId}`)
                             h3= game.title
                         - const date = new Date(game.date)
-                        p= date.toJSON().slice(0,10).split('-').reverse().join('/') + " at " + date.toLocaleTimeString()   
-                        if game.linesSubmitted
-                            a(href=`/team/${game.team.code}/game/${game.gameId}/lines`) 
-                                button View lines
-                        else
-                            p Waiting for lines
+                        p= date.toJSON().slice(0,10).split('-').reverse().join('/') + " at " + date.toLocaleTimeString() 
+                        //- User has signed up to game
+                        if playerProfiles.some(e => game.playersSignedUp.includes(e._id))
+                            if game.linesSubmitted
+                                a(href=`/team/${game.team.code}/game/${game.gameId}/lines`) 
+                                    button View lines
+                            else
+                                p Waiting for lines
+                        //- User has not signed up to or rejected game
+                        else if !rejected 
+                            p Let the coach know if you can play
+                            button
+                                a(href=`team/${game.team.code}/game/${game.gameId}/signup`) Sign Up
+                            button
+                                a(href=`team/${game.team.code}/game/${game.gameId}/reject`) Reject Game
             else
                 p You currently have no upcoming games
