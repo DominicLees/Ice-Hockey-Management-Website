@@ -10,7 +10,7 @@ body
         a(href="/team/"+player.team.code)=player.team.name
 
     if player.user._id == account._id
-        h2#settingsToggle Settings +
+        button#settingsToggle Settings +
         form#settingsForm.hidden(action=player._id+"/update", method="post") 
             p Profile privacy setting
             input#public(type="radio", name="privacy" value="public" checked=(player.privacy == 'public'))
