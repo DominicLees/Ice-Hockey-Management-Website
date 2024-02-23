@@ -49,8 +49,7 @@ body
                     div.game-card(class={greyedOut: rejected})
                         a(href=`/team/${game.team.code}/game/${game.gameId}`)
                             h3= game.title
-                        - const date = new Date(game.date)
-                        p= date.toJSON().slice(0,10).split('-').reverse().join('/') + " at " + date.toLocaleTimeString() 
+                        p= game.dateTimeString
                         //- User has signed up to game
                         if playerProfiles.some(e => game.playersSignedUp.includes(e._id))
                             if game.linesSubmitted

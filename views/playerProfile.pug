@@ -53,8 +53,8 @@ body
             tbody
                 for game in player.games
                     tr
-                        td= game.game.date.toJSON().slice(0,10).split('-').reverse().join('/')
-                        td= `${game.game.opponent} (${game.game.atHome ? 'H' : 'A'})`
+                        td= game.game.dateString
+                        td= game.game.shortTitle
                         th= game.game.score
                         td= game.goals
                         td= game.assists

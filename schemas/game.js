@@ -26,12 +26,27 @@ gameSchema.virtual('title').get(function() {
     return this.atHome ? `${this.team.name} vs ${this.opponent}` : `${this.opponent} vs ${this.team.name}`;
 });
 
+gameSchema.virtual('shortTitle').get(function() {
+    return `${this.atHome ? 'Vs' : '@'} ${this.opponent}`;
+});
+
+gameSchema.virtual('dateString').get(function() {
+    return this.date.toJSON().slice(0,10).split('-').reverse().join('/');
+});
+
+gameSchema.virtual('dateTimeString').get(function() {
+    return `${this.date.toJSON().slice(0,10).split('-').reverse().join('/')} at ${this.date.toLocaleTimeString()}`;
+});
+
 gameSchema.virtual('score').get(function() {
+    if (this.result == null) {
+        return 'Awaiting result';
+    }
     return this.atHome ? `${this.result.teamGoals}-${this.result.opponentGoals}` : `${this.result.opponentGoals}-${this.result.teamGoals}`;
 });
 
 gameSchema.virtual('resultSubmitted').get(function() {
-    return this.result.teamGoals != null && this.result.opponentGoals != null;
+    return this.result != null && this.result.teamGoals != null && this.result.opponentGoals != null;
 })
 
 gameSchema.virtual('linesSubmitted').get(function() {
