@@ -18,51 +18,49 @@ body
         br
 
     div.container
-        if players
-            div.content#players
-                h2 Players
-                if players.length > 0
-                    label(for='playerSort') Sort 
-                    select#playerSort
-                        option(value="joined") Date joined
-                        option(value="name" selected=(playerSort == 'name')) Name
-                        option(value="position" selected=(playerSort == 'position')) Position
-                    
-                    - const positions = ['LW', 'RW', 'C', 'LD', 'RD', 'G']
-                    if playerSort == 'name'
-                        - players.sort((a, b) => {return a.user.name.localeCompare(b.user.name)})
-                    if playerSort == 'position'
-                        - players.sort((a, b) => {return positions.indexOf(a.positions[0]) - positions.indexOf(b.positions[0])})
+        div.content#players
+            h2 Players
+            if players.length > 0
+                label(for='playerSort') Sort 
+                select#playerSort
+                    option(value="joined") Date joined
+                    option(value="name" selected=(playerSort == 'name')) Name
+                    option(value="position" selected=(playerSort == 'position')) Position
+                
+                - const positions = ['LW', 'RW', 'C', 'LD', 'RD', 'G']
+                if playerSort == 'name'
+                    - players.sort((a, b) => {return a.user.name.localeCompare(b.user.name)})
+                if playerSort == 'position'
+                    - players.sort((a, b) => {return positions.indexOf(a.positions[0]) - positions.indexOf(b.positions[0])})
 
-                    label(for="playerFilter")  Filter 
-                    select#playerFilter
-                        option(value='none' selected=(!positions.includes(playerFilter))) None
-                        for position in positions
-                            option(value=position selected=(playerFilter == position))= position
+                label(for="playerFilter")  Filter 
+                select#playerFilter
+                    option(value='none' selected=(!positions.includes(playerFilter))) None
+                    for position in positions
+                        option(value=position selected=(playerFilter == position))= position
 
-                    if positions.includes(playerFilter)
-                        - players = players.filter(player => player.positions.includes(playerFilter))
+                if positions.includes(playerFilter)
+                    - players = players.filter(player => player.positions.includes(playerFilter))
 
-                    include ../../partials/playerTable.pug
-                    +playerTable(players)
-                else
-                    p No players registered
+                include ../../partials/playerTable.pug
+                +playerTable(players)
+            else
+                p No players registered
 
-        if games
-            div.content#schedule
-                h2 Schedule
-                if games.length > 0
-                    table
-                        thead
+        div.content#schedule
+            h2 Schedule
+            if games.length > 0
+                table
+                    thead
+                        tr
+                            th Date
+                            th Opponent
+                    tbody
+                        for game in games
                             tr
-                                th Date
-                                th Opponent
-                        tbody
-                            for game in games
-                                tr
-                                    - const date = new Date(game.date)
-                                    td= date.toJSON().slice(0,10).split('-').reverse().join('/') + " at " + date.toLocaleTimeString()
-                                    td
-                                        a(href="./" + team.code + "/game/" + game.gameId)= game.opponent
-                else
-                    p No games scheduled
+                                - const date = new Date(game.date)
+                                td= date.toJSON().slice(0,10).split('-').reverse().join('/') + " at " + date.toLocaleTimeString()
+                                td
+                                    a(href="./" + team.code + "/game/" + game.gameId) #{game.atHome ? 'Vs' : '@'} #{game.opponent}
+            else
+                p No games scheduled
