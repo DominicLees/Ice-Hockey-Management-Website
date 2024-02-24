@@ -47,6 +47,7 @@ table {
     table-layout: fixed;
     width: 100%;
     margin-top: 10px;
+    text-align: center;
 
     @media (max-width: $mobileScreenSize) {
         margin-left: 0px;
