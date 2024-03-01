@@ -11,9 +11,14 @@ body
         ul
             li Full Strength Lines
             li You are #{expandPositionCode(positions[0])}
+            - const lineMates = getLineMates(positions[0], skaters)
+            if lineMates.length == 2
+                li Your line mates are #{lineMates[0]} and #{lineMates[1]}
+            else
+                li Your D man partner is #{lineMates[0]}
             if numOfFSLines > 1
-                li You get on the ice when #{skaters[decrementNumberInCode(positions[0], 4)]} gets off
-                li #{skaters[incrementNumberInCode(positions[0], 2)]} gets on the ice when you get off
+                li You get on the ice when #{skaters[decrementNumberInCode(positions[0], numOfFSLines)]} gets off
+                li #{skaters[incrementNumberInCode(positions[0], numOfFSLines)]} gets on the ice when you get off
 
             - const PPPos = positions.find((pos) => pos.startsWith('PP'))
             if PPPos

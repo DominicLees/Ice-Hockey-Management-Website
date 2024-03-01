@@ -56,3 +56,10 @@
             return decrementedNumber >= 1 ? String(decrementedNumber) : String(loopValue);
         });
     }
+
+    function getLineMates(code, skaters) {
+        const line = code.slice(0, code.split(/\d/)[0].length + 1)
+        const dLineMates = Object.entries(skaters).filter(([k, v]) => k.startsWith(line) && k.endsWith('D') && v != account.name).map(([k,v]) => {return v});
+        const fLineMates = Object.entries(skaters).filter(([k, v]) => k.startsWith(line) && (k.endsWith('W') || k.endsWith('C')) && v != account.name).map(([k,v]) => {return v});
+        return code.endsWith('D') ? dLineMates : fLineMates;
+    }
