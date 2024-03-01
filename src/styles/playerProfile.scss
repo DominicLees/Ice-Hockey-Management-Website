@@ -3,8 +3,13 @@ h1 {
     text-transform: capitalize;
 }
 
-h2 {
-    margin-left: 20px;
+#settingsToggle {
+    margin: 20px;
+    margin-top: 0px;
+}
+
+#settingsForm {
+    margin-top: -20px;
 }
 
 .stats {

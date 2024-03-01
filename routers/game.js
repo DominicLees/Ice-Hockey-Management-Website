@@ -85,6 +85,11 @@ gameRouter.use(['/:gameId'], (req, res, next) => {
         populate: {
             path: 'user'
         }
+    }).populate({
+        path: 'playersRejected',
+        populate: {
+            path: 'user'
+        }
     }).then(result => {
         if (result == null) {
             return res.redirect('/404');
@@ -113,6 +118,8 @@ gameRouter.get('/:gameId', playerOrCoachOnly, (req, res) => {
 gameRouter.get('/:gameId/signup', playersOnly, (req, res, next) => {
     // If user is already signed up, do not add them to the list again
     if (req.foundGame.playersSignedUp.some(e => e._id.toString() == req.foundPlayer._id.toString())) { return res.redirect('back'); }
+    // If the user is on the list of players who rejected the game, remove them from it
+    req.foundGame.playersRejected = req.foundGame.playersRejected.filter(e => e._id.toString() != req.foundPlayer._id.toString());
 
     req.foundGame.playersSignedUp.push(req.foundPlayer._id);
     req.foundGame.save().then(result => {
@@ -122,10 +129,13 @@ gameRouter.get('/:gameId/signup', playersOnly, (req, res, next) => {
     })
 })
 
-// Handles the user removing themselves from a game
-gameRouter.get('/:gameId/leave', playersOnly, (req, res, next) => {
-    // Remove the user from the list of players signed up
+// Handles the user rejecting a game
+gameRouter.get('/:gameId/reject', playersOnly, (req, res, next) => {
+    // If user has already rejected the game, do not add them to the list again
+    if (req.foundGame.playersRejected.some(e => e._id.toString() == req.foundPlayer._id.toString())) { return res.redirect('back'); }
+    // Remove the user from the list of players signed up and add them to the rejected list
     req.foundGame.playersSignedUp = req.foundGame.playersSignedUp.filter(e => e._id.toString() != req.foundPlayer._id.toString());
+    req.foundGame.playersRejected.push(req.foundPlayer._id);
     req.foundGame.save().then(result => {
         res.redirect('back');
     }).catch(error => {

@@ -1,0 +1,12 @@
+mixin playerTable(players)
+    table
+        thead
+            tr
+                th Name
+                th Positions
+        tbody
+            for player in players
+                tr
+                    td
+                        a(href='/player/'+player._id)= player.user.name
+                    td= player.positions

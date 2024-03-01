@@ -95,20 +95,26 @@ teamRouter.use('/:code', (req, res, next) => {
     } if (req.foundPlayers && req.foundPlayers.filter(player => player.user._id == req.session.account._id).length > 0) {
         req.isPlayer = true; 
     }
-    
-    // Next find all the games this team is playing
-    Game.find({team: req.foundTeam._id}).lean().then(result => {
-        res.locals.games = result;
-        next();
-    }).catch(error => {
-        next(error);
-    })
+    next();
 })
 
-teamRouter.get('/:code', playerOrCoachOnly, (req, res) => {
-    res.render('pages/team/teamProfile', {
-        players: req.foundPlayers,
-        isCoach: req.isCoach
+teamRouter.get('/:code', playerOrCoachOnly, (req, res, next) => {
+    // Find all the games this team is playing in the future
+    Game.find({team: req.foundTeam._id, date: {$gt: new Date()}}).lean({virtuals: true}).then(result => {
+        res.locals.games = result;
+
+        // Get the last 5 results
+        return Game.find({team: req.foundTeam._id, date: {$lt: new Date()}}).limit(5).lean({virtuals: true});
+    }).then(result => {
+        res.render('pages/team/teamProfile', {
+            players: req.foundPlayers,
+            isCoach: req.isCoach,
+            results: result,
+            playerSort: req.query.playerSort,
+            playerFilter: req.query.playerFilter
+        })
+    }).catch(error => {
+        next(error);
     })
 })
 

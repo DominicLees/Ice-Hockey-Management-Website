@@ -4,12 +4,13 @@ main {
     display: flex;
     flex-direction: row;
     column-gap: 20px;
+    row-gap: 20px;
     align-items: stretch;
-    margin-left: 20px;
-    margin-right: 20px;
+    margin-right: 10px;
 
     @media (max-width: $mobileScreenSize) {
         flex-direction: column;
+        margin-right: 0px;
     }
 
     div {
@@ -46,6 +47,7 @@ table {
     table-layout: fixed;
     width: 100%;
     margin-top: 10px;
+    text-align: center;
 
     @media (max-width: $mobileScreenSize) {
         margin-left: 0px;
@@ -80,4 +82,8 @@ table {
     button {
         background-color: lightgrey;
     }
+}
+
+.greyedOut {
+    background-color: lightgrey;
 }
