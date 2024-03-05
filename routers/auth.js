@@ -59,12 +59,45 @@ function verifyClientData(req, res, next) {
     next();
 }
 
+// A map is used to store the IPs attempting to access auth routes
+const limitMap = new Map()
+// Every 5 mins, clear all ips that have not made any requests in the last 5 mins
+setInterval(() => {
+    limitMap.forEach((ip, record) => {
+        if (record.lastRequest < new Date() - 300000) {
+            limitMap.delete(ip);
+        }
+    })
+}, 300000)
+function rateLimit(req, res, next) {
+    // If a record does not exist for this ip, create one
+    const record = limitMap.get(req.ip)
+    if (record == null) {
+        limitMap.set(req.ip, {
+            requests: 1,
+            lastRequest: new Date()
+        })
+        return next();
+    }
+
+    limitMap.set(req.ip, {
+        requests: record.requests + 1,
+        lastRequest: new Date()
+    })
+
+    // If an ip has made more than 100 requests to authentication routes in the last 5 mins block the request
+    if (record.requests > 100) {
+        return res.sendStatus(403);
+    }
+    next();
+}
+
 authRouter.get('/settings', returnUnauthenticatedUsersToIndex, (req, res) => {
     res.render('settings');
 })
 
 // Generates a challenge and sends it to the client to be used for authentication attempts
-authRouter.get('/challenge', (req, res) => {
+authRouter.get('/challenge', rateLimit, (req, res) => {
     const challenge = crypto.randomBytes(32).toString();
     req.session.challenge = challenge;
     res.send(challenge);
@@ -99,14 +132,14 @@ authRouter.get('/new-user-code', returnUnauthenticatedUsersToIndex, (req, res, n
 })
 
 // Checks that the auth code sent is valid for the user 
-authRouter.post('/valid-auth-code', (req, res) => {
+authRouter.post('/valid-auth-code', rateLimit, (req, res) => {
     if (req.foundUser == null || req.foundUser.authCode == null || req.foundUser.authCode.code != req.body.authCode || new Date() > req.foundUser.authCode.timeout) {
         return res.send(false);
     }
     res.send(true);
 })
 
-authRouter.post('/signup', returnLoggedInUsersToDash, verifyClientData, (req, res, next) => {
+authRouter.post('/signup', returnLoggedInUsersToDash, rateLimit, verifyClientData, (req, res, next) => {
     // Validate input
     if (req.foundUser) {
         req.session.responses.emailInUse = true;
@@ -140,7 +173,7 @@ authRouter.post('/signup', returnLoggedInUsersToDash, verifyClientData, (req, re
     })
 })
 
-authRouter.get('/credentialId/:email', (req, res, next) => {
+authRouter.get('/credentialId/:email', rateLimit, (req, res, next) => {
     User.findOne({email: req.params.email}).then(result => {
         let credentials = [];
         if (result) {
@@ -152,7 +185,7 @@ authRouter.get('/credentialId/:email', (req, res, next) => {
     })
 })
 
-authRouter.post('/login', returnLoggedInUsersToDash, verifyClientData, (req, res) => {
+authRouter.post('/login', returnLoggedInUsersToDash, rateLimit, verifyClientData, (req, res) => {
     if (!req.foundUser) {
         return res.status(400).send('Please check the email entered is correct');
     }
@@ -192,7 +225,7 @@ authRouter.post('/login', returnLoggedInUsersToDash, verifyClientData, (req, res
     });
 })
 
-authRouter.post('/new-credentials', returnLoggedInUsersToDash, verifyClientData, (req, res, next) => {
+authRouter.post('/new-credentials', returnLoggedInUsersToDash, rateLimit, verifyClientData, (req, res, next) => {
     if (!req.foundUser || req.body.authCode == null) {
         return res.status(400).send('Please check the email and code are correct, and that the code is still valid');
     }
