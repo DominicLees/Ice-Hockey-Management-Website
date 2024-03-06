@@ -46,20 +46,26 @@ body
             if games.length > 0
                 for game in games
                     - const rejected = playerProfiles.some(e => game.playersRejected.includes(e._id))
+                    - const signedUp = playerProfiles.some(e => game.playersSignedUp.includes(e._id))
+                    - const isCoach = game.team.coach == account._id
                     div.game-card(class={greyedOut: rejected})
                         a(href=`/team/${game.team.code}/game/${game.gameId}`)
                             h3= game.title
                         p= game.dateTimeString
-                        //- User has signed up to game
-                        if playerProfiles.some(e => game.playersSignedUp.includes(e._id))
-                            if game.linesSubmitted
-                                a(href=`/team/${game.team.code}/game/${game.gameId}/lines`) 
-                                    button View lines
-                            else
-                                p Waiting for lines
-                        //- User has not signed up to or rejected game
-                        else if !rejected 
-                            p Let the coach know if you can play
+                        //- Lines have been submitted, and user signed up or is the coach of the team
+                        if game.linesSubmitted && (signedUp || isCoach)
+                            a(href=`/team/${game.team.code}/game/${game.gameId}/lines`) 
+                                button View lines
+                        //- No lines and the user is the coach
+                        else if !games.linesSubmitted && isCoach
+                            a(href=`/team/${game.team.code}/game/${game.gameId}/line-builder`) 
+                                button Build lines
+                        else if signedUp
+                            p Waiting for lines
+                        //- User has not signed up to or rejected the game
+                        if !signedUp && !rejected && playerProfiles.some(e => e.team._id.toString() == game.team._id.toString())
+                            if !isCoach
+                                p Let the coach know if you can play
                             button
                                 a(href=`team/${game.team.code}/game/${game.gameId}/signup`) Sign Up
                             button
