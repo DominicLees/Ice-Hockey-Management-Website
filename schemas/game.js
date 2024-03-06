@@ -42,7 +42,7 @@ gameSchema.virtual('score').get(function() {
     if (this.result == null) {
         return 'Awaiting result';
     }
-    return this.atHome ? `${this.result.teamGoals}-${this.result.opponentGoals}` : `${this.result.opponentGoals}-${this.result.teamGoals}`;
+    return `${this.result.teamGoals}-${this.result.opponentGoals}`;
 });
 
 gameSchema.virtual('resultSubmitted').get(function() {
