@@ -1,9 +1,45 @@
+$mobileScreenSize: 722px;
+
 #buttons button {
     font-size: 18px;
     padding: 5px;
     margin-right: 10px;
 }
 
-h2 {
+h2, h3, td, th {
     text-align: center;
+}
+
+.tables {
+    display: flex;
+    flex-direction: row;
+    column-gap: 20px;
+    row-gap: 20px;
+
+    @media (max-width: $mobileScreenSize) {
+        flex-direction: column;
+    }
+
+    div {
+        flex: 1 1 0px;
+
+        table {
+            width: 80%;
+            margin-left: 10%;
+            table-layout: fixed;
+
+            @media (max-width: $mobileScreenSize) {
+                width: 100%;
+                margin-left: 0;
+            }
+
+            thead tr {
+                background-color: lightgray;
+            }
+        
+            tr:nth-child(even){
+                background-color: #b2ffe5;
+            }
+        }
+    }
 }

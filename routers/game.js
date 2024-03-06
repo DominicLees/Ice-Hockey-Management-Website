@@ -100,6 +100,10 @@ gameRouter.use(['/:gameId'], (req, res, next) => {
         return Player.findOne({user: req.session.account._id, team: result.team});
     }).then(result => {
         req.foundPlayer = result;
+        // Find all players who haven't responed to the game
+        return Player.find({_id: {$nin: req.foundGame.playersRejected.concat(req.foundGame.playersSignedUp)}, team: req.foundGame.team})
+    }).then(result => {
+        res.locals.playersUnanswered = result;
         next();
     }).catch(error => {
         next(error);

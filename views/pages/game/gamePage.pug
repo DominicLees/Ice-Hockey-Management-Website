@@ -45,12 +45,18 @@ body
                             a(href=game.gameId+"/line-builder") Build Lines
 
         include ../../partials/playerTable.pug
-        div
-            h3 #{game.playersSignedUp.length} Players Signed Up
-            if game.playersSignedUp.length > 0
-                +playerTable(game.playersSignedUp)
+        div.tables
+            div
+                h3 #{game.playersSignedUp.length} #{game.playersSignedUp.length == 1 ? 'Player' : 'Players'} Signed Up
+                if game.playersSignedUp.length > 0
+                    +playerTable(game.playersSignedUp)
 
-        div
-            h3 #{game.playersRejected.length} Players Unavailable
-            if game.playersRejected.length > 0
-                +playerTable(game.playersRejected)
+            div
+                h3 #{playersUnanswered.length} #{playersUnanswered.length == 1 ? 'Player Has' : 'Players Have'} Not Responded
+                if playersUnanswered.length > 0
+                    +playerTable(playersUnanswered)
+
+            div
+                h3 #{game.playersRejected.length} #{game.playersRejected.length == 1 ? 'Player' : 'Players'} Unavailable
+                if game.playersRejected.length > 0
+                    +playerTable(game.playersRejected)
