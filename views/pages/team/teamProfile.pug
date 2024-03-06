@@ -12,7 +12,7 @@ body
         button#copyTeamLinkButton Copy link to clipboard
         br
         button
-            a(href=team.code+"/game/new") Create Game +
+            a(href=`${team.code}/game/new`) Create Game +
         br
         button#delete-team.red Delete Team
         br
@@ -60,7 +60,7 @@ body
                             tr
                                 td= game.dateTimeString
                                 td
-                                    a(href="./" + team.code + "/game/" + game.gameId)= game.shortTitle
+                                    a(href=`./${team.code}/game/${game.gameId}`)= game.shortTitle
             else
                 p No games scheduled
 
@@ -76,5 +76,9 @@ body
                         for result in results
                             tr
                                 td= result.dateString
-                                td= result.shortTitle
+                                td
+                                    if result.resultSubmitted
+                                        a(href=`./${team.code}/game/${result.gameId}/gamesheet`)= result.shortTitle
+                                    else
+                                        a(href=`./${team.code}/game/${result.gameId}`)= result.shortTitle
                                 td= result.score

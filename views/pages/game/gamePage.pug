@@ -39,7 +39,7 @@ body
                                     span Update Lines
 
                         button
-                            a(href="result") Submit Game Result
+                            a(href=game.gameId+"/result") Submit Game Result
                     else
                         button 
                             a(href=game.gameId+"/line-builder") Build Lines

@@ -248,8 +248,8 @@ gameRouter.get('/:gameId/summary', playersOnly, (req, res) => {
 
 // The player is checked if they are the coach for this route here, to save getting the list of skaters if they are not
 gameRouter.use('/:gameId/result', coachOnly, (req, res, next) => {
-    // If the result for this game ahs already been submitted, prevent the user from submitting another
-    if (req.foundGame.result) {
+    // If the result for this game has already been submitted, prevent the user from submitting another
+    if (req.foundGame.resultSubmitted) {
         return res.redirect(`/team/${req.params.code}/game/${req.params.gameId}/gamesheet`);
     }
     next();
