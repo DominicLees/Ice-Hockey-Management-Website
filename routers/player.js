@@ -28,8 +28,6 @@ playerRouter.use('/:id', (req, res, next) => {
 playerRouter.get('/:id', (req, res, next) => {
     // Check user has permission to view this page
     const isCoach = req.foundPlayer.team.coach == req.session.account._id;
-    const isTeammate = req.foundPlayer.team.players.includes(req.session.account._id)
-    const isUser = req.foundPlayer.user._id == req.session.account._id;
     if (!isCoach && req.foundPlayer.privacy == 'coachOnly') {
         return next(forbiddenError());
     }
