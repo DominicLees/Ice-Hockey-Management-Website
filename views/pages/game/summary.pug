@@ -46,9 +46,10 @@ body
                     li There is only 1 penalty kill unit
             else 
                 li#PenaltyKill You are not on penalty kill
-            li
-                button 
-                    a(href=`/team/${game.team.code}/game/${game.gameId}`) Return to game page
+        li
+            button 
+                a(href=`/team/${game.team.code}/game/${game.gameId}`) Return to game page
+            if !isGoalie && positions.length > 0
                 br
                 button 
                     a(href="#FullStrength") Back to full strength lines
