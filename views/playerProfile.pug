@@ -56,7 +56,8 @@ body
                         tr
                             td= game.game.dateString
                             td= game.game.shortTitle
-                            th= game.game.score
+                            th
+                                a(href=`/team/${player.team.code}/game/${game.game.gameId}/gamesheet`)= game.game.score
                             td= game.goals
                             td= game.assists
                             td= game.pims
