@@ -30,7 +30,7 @@ playerRouter.get('/:id', (req, res, next) => {
     const isCoach = req.foundPlayer.team.coach == req.session.account._id;
     const isTeammate = req.foundPlayer.team.players.includes(req.session.account._id)
     const isUser = req.foundPlayer.user._id == req.session.account._id;
-    if (!((isCoach && req.foundPlayer.privacy == 'coachOnly') || ((isCoach || isTeammate) && req.foundPlayer.privacy == 'teamOnly') || isUser)) {
+    if (!isCoach && req.foundPlayer.privacy == 'coachOnly') {
         return next(forbiddenError());
     }
     res.render('playerProfile', {player: req.foundPlayer});

@@ -69,7 +69,7 @@ const gameRouter = require('./routers/game.js');
 app.use('/team/:code/game', gameRouter);
 
 const playerRouter = require('./routers/player.js');
-app.use('/player', playerRouter);
+app.use('/player', returnUnauthenticatedUsersToIndex, playerRouter);
 
 // ERROR HANDLING
 
