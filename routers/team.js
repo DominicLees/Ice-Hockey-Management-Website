@@ -100,11 +100,11 @@ teamRouter.use('/:code', (req, res, next) => {
 
 teamRouter.get('/:code', playerOrCoachOnly, (req, res, next) => {
     // Find all the games this team is playing in the future
-    Game.find({team: req.foundTeam._id, date: {$gt: new Date()}}).lean({virtuals: true}).then(result => {
+    Game.find({team: req.foundTeam._id, date: {$gt: new Date()}}).sort({date: 1}).lean({virtuals: true}).then(result => {
         res.locals.games = result;
 
         // Get the last 5 results
-        return Game.find({team: req.foundTeam._id, date: {$lt: new Date()}}).limit(5).lean({virtuals: true});
+        return Game.find({team: req.foundTeam._id, date: {$lt: new Date()}}).sort({date: 1}).limit(5).lean({virtuals: true});
     }).then(result => {
         res.render('pages/team/teamProfile', {
             players: req.foundPlayers,
