@@ -4,6 +4,7 @@ const gameSchema = new mongoose.Schema({
     team: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Team', autopopulate: true},
     opponent: {type: String, required: true},
     atHome: {type: Boolean, required: true},
+    location: {type: String, required: true},
     date: {type: Date, required: true},
     playersSignedUp: {type: [mongoose.Schema.Types.ObjectId], ref: 'Player'},
     playersRejected: {type: [mongoose.Schema.Types.ObjectId], ref: 'Player'},
