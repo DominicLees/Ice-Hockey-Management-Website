@@ -5,6 +5,7 @@ body
     include /partials/navbar.pug
     h1= team.name
     h2 Head Coach: #{team.coach.name}
+    h2 Home Rink: #{team.location}
     if isCoach
         script(src="/public/js/teamProfile.js" defer) 
         span Share this link with your players: 
