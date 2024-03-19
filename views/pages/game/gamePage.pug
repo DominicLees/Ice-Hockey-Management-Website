@@ -5,7 +5,10 @@ body
     include ../../partials/navbar.pug
     main
         h1= game.title
-        h2 #{game.atHome ? "Home" : "Away"} at #{game.dateTimeString}
+        if game.atHome
+            h2 Home at #{game.dateTimeString}
+        else
+            h2 Away at #{game.location} at #{game.dateTimeString}
 
         div#buttons
             if game.resultSubmitted
