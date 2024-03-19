@@ -7,8 +7,8 @@ const returnLoggedInUsersToDash = require('./middleware/returnLoggedInUsersToDas
 const returnUnauthenticatedUsersToIndex = require('./middleware/returnUnauthenticatedUsersToIndex.js');
 
 // CONFIGURATION
-const port = 8000;
 const config = require('./config.json');
+const port = config.port || 8000;
 const enviroment = process.env.NODE_ENV || config.enviroment || "dev";
 
 // SETUP
