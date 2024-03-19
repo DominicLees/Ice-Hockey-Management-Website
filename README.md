@@ -1,4 +1,4 @@
-# How to host the website locally on your device
+# How to host the website locally on your device
 
 ## Create a config.json file
 
