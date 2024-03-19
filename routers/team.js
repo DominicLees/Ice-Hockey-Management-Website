@@ -16,7 +16,13 @@ teamRouter.post('/new', (req, res, next) => {
     // Validate input
     if (req.body.name.length == 0) {
         req.session.responses.noTeamName = true;
-        return res.redirect('/new');
+    } if (req.body.location.length == 0) {
+        req.session.responses.noLocation = true;
+    }
+
+    // Invalid details given, return to new team page
+    if (Object.keys(req.session.responses).length > 0) {
+        return res.redirect('back');
     }
 
     const code = crypto.randomBytes(3).toString('hex');
@@ -25,6 +31,7 @@ teamRouter.post('/new', (req, res, next) => {
     const newTeam = new Team({
         name: req.body.name,
         coach: req.session.account._id,
+        location: req.body.location,
         code: code
     })
 
