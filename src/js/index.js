@@ -155,7 +155,7 @@ async function login(e) {
     // Get challenge string from server
     const challengeResponse = await fetch('/challenge');
     const challenge = await challengeResponse.text();
-    // Get credential Id from server
+    // Get credential Ids from server
     const credentialIdResponse = await fetch(`/credentialId/${loginEmail.value}`);
     const credentailIds = JSON.parse(await credentialIdResponse.text());
     // Check the server returned at least one credential, otherwise the account does not exist
