@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "prestart": "gulp"
+    "start": "gulp && node app.js"
   },
   "repository": {
     "type": "git",
