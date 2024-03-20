@@ -1,0 +1,24 @@
+head
+    title Schedule
+body
+    include partials/navbar.pug
+    link(rel="stylesheet", href="/public/css/schedule.css")
+
+    if games.length > 0
+        div#games
+            - const currentDate = new Date()
+            for game in games
+                div.game-card
+                    span= game.dateTimeString
+                    br
+                    span
+                        a(href=`/team/${game.team.code}/game/${game.gameId}`)= game.title
+                    br
+                    span At #{game.location}
+                    br
+                    span
+                        if currentDate > game.date
+                            if game.resultSubmitted
+                                a(href=`/team/${game.team.code}/game/${game.gameId}/gamesheet`)= game.score
+                            else
+                                span= game.score

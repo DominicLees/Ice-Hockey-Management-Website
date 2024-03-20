@@ -57,8 +57,9 @@ app.get('/', returnLoggedInUsersToDash, (req, res) => {
 const authRouter = require('./routers/auth.js');
 app.use('/', authRouter);
 
+// Handles routes for the dashboard and schedule page
 const dashRouter = require('./routers/dashboard');
-app.use('/dashboard', returnUnauthenticatedUsersToIndex, dashRouter);
+app.use('/', returnUnauthenticatedUsersToIndex, dashRouter);
 
 // Handles creating and joining teams
 const teamRouter = require('./routers/team.js');
@@ -68,6 +69,7 @@ app.use('/team', returnUnauthenticatedUsersToIndex, teamRouter);
 const gameRouter = require('./routers/game.js');
 app.use('/team/:code/game', gameRouter);
 
+// Handles routes for player profiles
 const playerRouter = require('./routers/player.js');
 app.use('/player', returnUnauthenticatedUsersToIndex, playerRouter);
 
