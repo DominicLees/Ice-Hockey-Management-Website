@@ -51,7 +51,7 @@ body
                     div.game-card(class={greyedOut: rejected})
                         a(href=`/team/${game.team.code}/game/${game.gameId}`)
                             h3= game.title
-                        p= game.dateTimeString
+                        p #{game.dateTimeString} at #{game.location}
                         //- Lines have been submitted, and user signed up or is the coach of the team
                         if game.linesSubmitted && (signedUp || isCoach)
                             a(href=`/team/${game.team.code}/game/${game.gameId}/lines`) 

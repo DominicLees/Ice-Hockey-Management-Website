@@ -50,6 +50,8 @@ gameRouter.post('/new', coachOnly, (req, res, next) => {
         req.session.responses.noOpponent = true;
     } if (req.body.homeOrAway == null) {
         req.session.responses.noHomeOrAway = true;
+    } else if (req.body.homeOrAway == 'away' && req.body.location.length == 0) {
+        req.session.responses.noLocation = true;
     }
     // Check date given is in the future
     const inputDate = new Date(req.body.date);
@@ -65,7 +67,8 @@ gameRouter.post('/new', coachOnly, (req, res, next) => {
     const newGame = new Game({
         team: req.foundTeam._id,
         opponent: req.body.opponent,
-        atHome: req.body.homeOrAway == "home",
+        atHome: req.body.homeOrAway == 'home',
+        location: req.body.homeOrAway == 'home' ? req.foundTeam.location : req.body.location,
         date: inputDate,
         gameId: crypto.randomBytes(3).toString('hex')
     });

@@ -9,7 +9,13 @@ body
         input(type="text" name="name" id="name")
         br
         br
+        label(for="location") Home Rink: 
+        input(type="text" name="location" id="location")
+        br
+        br
         input(type="submit", value="Create Team") 
 
     if responses.noTeamName
-        h3 Please enter a team name
+        h3.error Please enter a team name
+    if responses.noLocation
+        h3.error Please enter a home rink name
