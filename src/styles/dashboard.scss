@@ -58,7 +58,7 @@ table {
     }
 
     td, td a, td span, th {
-        padding: 5px;
+        padding: 5px !important;
     }
 
     thead tr {
@@ -78,9 +78,14 @@ table {
     margin-bottom: 20px;
     text-align: center;
 
-    h3, p {
+    p {
         margin: 0px;
         margin-bottom: 10px;
+    }
+
+    a h3 {
+        margin: 0;
+        padding: 5px;
     }
 
     button {
