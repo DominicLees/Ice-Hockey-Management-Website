@@ -32,7 +32,7 @@ function playersOnly(req, res, next) {
 }
 
 function linesRequired(req, res, next) {
-    if (req.foundGame.lines == null) {
+    if (req.foundGame.linesSubmitted == false) {
         return res.redirect(`/team/${req.params.code}/game/${req.params.gameId}`);
     }
     next();
@@ -82,7 +82,7 @@ gameRouter.post('/new', coachOnly, (req, res, next) => {
 
 // Check that the game for the gameId provided exists
 gameRouter.use(['/:gameId'], (req, res, next) => {
-    // Find the user data for all of the players that have signed up
+    // Find the user data for all of the players that have signed up or rejected the game
     Game.findOne({gameId: req.params.gameId}).populate({
         path: 'playersSignedUp',
         populate: {
@@ -99,11 +99,11 @@ gameRouter.use(['/:gameId'], (req, res, next) => {
         }
         req.foundGame = result;
         res.locals.game = result;
-        // Find the player profile for the user for this team
+        // Find the user's player profile for this team
         return Player.findOne({user: req.session.account._id, team: result.team});
     }).then(result => {
         req.foundPlayer = result;
-        // Find all players who haven't responed to the game
+        // Find all players who haven't responded to the game
         return Player.find({_id: {$nin: req.foundGame.playersRejected.concat(req.foundGame.playersSignedUp)}, team: req.foundGame.team})
     }).then(result => {
         res.locals.playersUnanswered = result;
@@ -123,7 +123,7 @@ gameRouter.get('/:gameId', playerOrCoachOnly, (req, res) => {
 
 // Handles the user signing up to a game
 gameRouter.get('/:gameId/signup', playersOnly, (req, res, next) => {
-    // If user is already signed up, do not add them to the list again
+    // If the user is already signed up, do not add them to the list again
     if (req.foundGame.playersSignedUp.some(e => e._id.toString() == req.foundPlayer._id.toString())) { return res.redirect('back'); }
     // If the user is on the list of players who rejected the game, remove them from it
     req.foundGame.playersRejected = req.foundGame.playersRejected.filter(e => e._id.toString() != req.foundPlayer._id.toString());
@@ -138,7 +138,7 @@ gameRouter.get('/:gameId/signup', playersOnly, (req, res, next) => {
 
 // Handles the user rejecting a game
 gameRouter.get('/:gameId/reject', playersOnly, (req, res, next) => {
-    // If user has already rejected the game, do not add them to the list again
+    // If the user has already rejected the game, do not add them to the list again
     if (req.foundGame.playersRejected.some(e => e._id.toString() == req.foundPlayer._id.toString())) { return res.redirect('back'); }
     // Remove the user from the list of players signed up and add them to the rejected list
     req.foundGame.playersSignedUp = req.foundGame.playersSignedUp.filter(e => e._id.toString() != req.foundPlayer._id.toString());
@@ -165,7 +165,7 @@ gameRouter.get('/:gameId/line-builder', coachOnly, (req, res) => {
         players,
         numOfFSLines,
         numOfPPLines,
-        numOfPKLines,
+        numOfPKLines
     })
 })
 
@@ -262,7 +262,7 @@ gameRouter.use('/:gameId/result', coachOnly, (req, res, next) => {
     next();
 });
 
-// Gets the list of player document objects for those who player
+// Gets the list of player document objects for those who played
 gameRouter.use(['/:gameId/result', '/:gameId/gamesheet'], (req, res, next) => {
     // Get the goalies
     req.players = [req.foundGame.lines.startingGoalie];
@@ -282,7 +282,7 @@ gameRouter.get('/:gameId/result', (req, res) => {
 
 // Save the game result to the database
 gameRouter.post('/:gameId/result', (req, res, next) => {
-    // Add each player's stats for that game to their list of game results
+    // Add each player's stats for the game to their list of game results
     req.players.forEach(player => {
         player.games.push({
             game: req.foundGame._id,
@@ -304,7 +304,7 @@ gameRouter.post('/:gameId/result', (req, res, next) => {
 })
 
 gameRouter.get('/:gameId/gamesheet', (req, res) => {
-    if (!req.foundGame.result) {
+    if (!req.foundGame.resultSubmitted) {
         return res.redirect(`/team/${req.params.code}/game/${req.params.gameId}`);
     }
     res.render('pages/game/gamesheet', {players: req.players});
