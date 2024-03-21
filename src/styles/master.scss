@@ -95,27 +95,44 @@ table {
 }
 
 // Navbar
-nav {
-    display: flex;
+.nav {
+    background-color: lightgray;
     justify-content: space-between;
     align-items: center;
-    background-color: lightgray;
+    display: flex;
+
+    h3 {
+        margin: 0px;
+        font-size: 32px;
+        padding: .5rem;
+    }
 
     .left {
         float: left;
 
         h3 {
-            margin: 0px;
             margin-left: 5px;
-            font-size: 32px;
         }
     }
 
     .right {
         float: right;
 
+        h3 {
+            margin-right: 5px;
+        }
+    }
+
+    ul {
+        list-style: none;
+    }
+}
+
+.desktop {
+
+    .right {
+
         ul {
-            list-style: none;
             height: 100%;
 
             li {
@@ -131,5 +148,36 @@ nav {
                 }
             }
         }
+    }
+}
+
+.mobile {
+    ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        background-color: lightgray;
+        text-align: center;
+
+        li {
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        li:has(a:hover) {
+            background-color: gray;
+        }
+    }
+}
+
+@media (max-width: $mobileScreenSize) {
+    .desktop {
+        display: none;
+    }
+}
+
+@media (min-width: calc($mobileScreenSize + 1px)) {
+    .mobile {
+        display: none;
     }
 }
