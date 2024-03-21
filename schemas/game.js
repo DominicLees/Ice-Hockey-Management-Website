@@ -40,7 +40,7 @@ gameSchema.virtual('dateTimeString').get(function() {
 });
 
 gameSchema.virtual('score').get(function() {
-    if (this.result == null) {
+    if (this.result == null || this.result.teamGoals == null || this.result.opponentGoals == null) {
         return 'Awaiting result';
     }
     return `${this.result.teamGoals}-${this.result.opponentGoals}`;

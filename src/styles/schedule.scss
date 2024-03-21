@@ -1,0 +1,34 @@
+$mobileScreenSize: 722px;
+
+#games {
+    text-align: center;
+    width: 100%;
+
+    .game-card {
+        padding-top: 10px;
+        padding-bottom: 10px;
+
+        span {
+            margin-left: 20px;
+        }
+    }
+
+    div:nth-child(even){
+        background-color: #b2ffe5;
+    }
+}
+
+@media (min-width: $mobileScreenSize) {
+    .game-card br {
+        display: none;
+    }
+
+    .game-card {
+        display: flex;
+        align-items: center;
+
+        span {
+            flex: 1 1 0px;
+        }
+    }
+}
