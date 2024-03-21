@@ -48,12 +48,17 @@ body
                     - const rejected = playerProfiles.some(e => game.playersRejected.includes(e._id))
                     - const signedUp = playerProfiles.some(e => game.playersSignedUp.includes(e._id))
                     - const isCoach = game.team.coach == account._id
-                    div.game-card(class={greyedOut: rejected})
+                    - const picked = game.linesSubmitted && signedUp && (playerProfiles.some(e => game.lines.startingGoalie == e._id) || playerProfiles.some(e => game.lines.backupGoalie == e._id) || playerProfiles.some(e => game.lines.skaters.some(f => f.playerId._id.toString() == e._id.toString())))
+                    div.game-card(class={greyedOut: rejected || (game.linesSubmitted && !picked)})
                         a(href=`/team/${game.team.code}/game/${game.gameId}`)
                             h3= game.title
                         p #{game.dateTimeString} at #{game.location}
                         //- Lines have been submitted, and user signed up or is the coach of the team
                         if game.linesSubmitted && (signedUp || isCoach)
+                            if picked
+                                h4 You have been picked for this game
+                            else
+                                h4 You have not been picked for this game
                             a(href=`/team/${game.team.code}/game/${game.gameId}/lines`) 
                                 button View lines
                         //- No lines and the user is the coach
