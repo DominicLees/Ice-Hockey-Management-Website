@@ -4,19 +4,21 @@ const teamMenuButton = document.getElementById('teamMenuButton');
 
 function hideMenu() {
     teamMenu.classList.add('hidden');
-    teamMenuButton.innerHTML = 'Show Menu';
+    teamMenuButton.innerHTML = 'Show Team Menu';
 }
 
 function showMenu() {
     teamMenu.classList.remove('hidden');
-    teamMenuButton.innerHTML = 'Hide Menu';
+    teamMenuButton.innerHTML = 'Hide Team Menu';
 }
 
 function windowResize() {
     if (window.innerWidth <= 722) {
         hideMenu();
+        teamMenuButton.classList.remove('hidden');
     } else {
         showMenu();
+        teamMenuButton.classList.add('hidden');
     }
 }
 
