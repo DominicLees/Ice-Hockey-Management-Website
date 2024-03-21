@@ -155,8 +155,13 @@ table {
         text-align: center;
 
         li {
-            padding: 15px;
             box-sizing: border-box;
+
+            a {
+                padding: 15px;
+                display: inline-block;
+                width: calc(100% - 30px);
+            }
         }
 
         li:has(a:hover) {
