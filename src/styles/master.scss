@@ -46,9 +46,13 @@ a {
 button, input[type=submit] {
     padding: 10px 15px;
     font-size: 18px;
+    font-weight: bold;
     border-radius: 0;
     border: 1px solid transparent;
     background-color: aquamarine;
+    color: black;
+    appearance: none;
+    -webkit-appearance: none;
 }
 
 table {
