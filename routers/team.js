@@ -6,6 +6,7 @@ const Player = require('./../schemas/player');
 const Game = require('./../schemas/game');
 
 const coachOnly = require('./../middleware/coachOnly');
+const playersOnly = require('./../middleware/playersOnly');
 const playerOrCoachOnly = require('./../middleware/playerOrCoachOnly');
 
 teamRouter.get('/new', (req, res) => {
@@ -116,10 +117,20 @@ teamRouter.get('/:code', playerOrCoachOnly, (req, res, next) => {
         res.render('pages/team/teamProfile', {
             players: req.foundPlayers,
             isCoach: req.isCoach,
+            isPlayer: req.isPlayer,
             results: result,
             playerSort: req.query.playerSort,
             playerFilter: req.query.playerFilter
         })
+    }).catch(error => {
+        next(error);
+    })
+})
+
+teamRouter.get('/:code/leave', playersOnly, (req, res, next) => {
+    Player.deleteOne({team: req.foundTeam._id, user: req.session.account._id}).then(() => {
+        req.session.responses.leaveTeamSuccessful = true;
+        res.redirect('/dashboard');
     }).catch(error => {
         next(error);
     })
