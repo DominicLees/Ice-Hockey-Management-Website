@@ -126,7 +126,11 @@ teamRouter.get('/:code', playerOrCoachOnly, (req, res, next) => {
 })
 
 teamRouter.get('/:code/delete', coachOnly, (req, res, next) => {
-    Team.deleteOne({_id: req.foundTeam._id}).then(() => {
+    // Delete player profiles
+    Player.deleteMany({team: req.foundTeam._id}).then(() => {
+        // Delete Team
+        return Team.deleteOne({_id: req.foundTeam._id});
+    }).then(() => {
         req.session.responses.teamDeleteSuccessful = true;
         res.redirect('/dashboard');
     }).catch(error => {
