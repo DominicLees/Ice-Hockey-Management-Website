@@ -23,6 +23,9 @@ body
     div.container
         div.content#players
             h2 Players
+            if responses.playerRemoveSuccessful
+                h3.success Player removed successfully
+
             if players.length > 0
                 label(for='playerSort') Sort 
                 select#playerSort
@@ -45,8 +48,20 @@ body
                 if positions.includes(playerFilter)
                     - players = players.filter(player => player.positions.includes(playerFilter))
 
-                include ../../partials/playerTable.pug
-                +playerTable(players)
+                table
+                    thead
+                        tr
+                            th Name
+                            th Positions
+                    tbody
+                        for player in players
+                            tr
+                                td
+                                    a(href='/player/'+player._id)= player.user.name
+                                td= player.positions
+                                if isCoach
+                                    td
+                                        button(data-id=player._id).removePlayer.red Remove
             else
                 p No players registered
 

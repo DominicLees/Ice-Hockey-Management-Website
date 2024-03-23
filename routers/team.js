@@ -136,6 +136,15 @@ teamRouter.get('/:code/leave', playersOnly, (req, res, next) => {
     })
 })
 
+teamRouter.get('/:code/remove/:playerId', playersOnly, (req, res, next) => {
+    Player.deleteOne({_id: req.params.playerId}).then(() => {
+        req.session.responses.playerRemoveSuccessful = true;
+        res.redirect('back');
+    }).catch(error => {
+        next(error);
+    })
+})
+
 teamRouter.get('/:code/delete', coachOnly, (req, res, next) => {
     // Delete player profiles
     Player.deleteMany({team: req.foundTeam._id}).then(() => {
