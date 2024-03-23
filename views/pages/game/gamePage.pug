@@ -15,7 +15,7 @@ body
                 button
                     a(href=game.gameId+"/gamesheet") View Game Sheet
             else
-                if isPlayer
+                if isPlayer && !game.linesSubmitted
                     if game.playersSignedUp.some(e => e.user._id == account._id)
                         button.red
                             a(href=game.gameId+"/reject") Leave Game
