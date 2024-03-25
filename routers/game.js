@@ -8,8 +8,6 @@ const Player = require('../schemas/player');
 
 const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 
-const forbiddenError = require('./../functions/forbiddenError');
-
 const calcLineCount = (prefix, skaters) => {
     let count = 0;
     while (Object.keys(skaters).some(key => key.startsWith(prefix + (count + 1)))) {
@@ -67,7 +65,7 @@ gameRouter.post('/new', coachOnly, (req, res, next) => {
     });
 
     newGame.save().then(result => {
-        res.redirect('/dashboard');
+        res.redirect(`/team/${req.foundTeam.code}/game/${result.gameId}`);
     }).catch(error => {
         next(error);
     })
@@ -86,20 +84,20 @@ gameRouter.use(['/:gameId'], (req, res, next) => {
         populate: {
             path: 'user'
         }
-    }).then(result => {
-        if (result == null) {
+    }).then(foundGame => {
+        if (foundGame == null) {
             return res.redirect('/404');
         }
-        req.foundGame = result;
-        res.locals.game = result;
+        req.foundGame = foundGame;
+        res.locals.game = foundGame;
         // Find the user's player profile for this team
         return Player.findOne({user: req.session.account._id, team: result.team});
-    }).then(result => {
-        req.foundPlayer = result;
+    }).then(foundPlayer => {
+        req.foundPlayer = foundPlayer;
         // Find all players who haven't responded to the game
         return Player.find({_id: {$nin: req.foundGame.playersRejected.concat(req.foundGame.playersSignedUp)}, team: req.foundGame.team})
-    }).then(result => {
-        res.locals.playersUnanswered = result;
+    }).then(playersUnanswered => {
+        res.locals.playersUnanswered = playersUnanswered;
         next();
     }).catch(error => {
         next(error);
@@ -114,8 +112,8 @@ gameRouter.get('/:gameId', playerOrCoachOnly, (req, res) => {
     })
 })
 
-// Players can't change their availabiltiy once the lines have been submitted
-gameRouter.use(['/:gameId/signup', '/:gameId/reject'], (req, res, next) => {
+// Players can't change their availability once the lines have been submitted
+gameRouter.use(['/:gameId/signup', '/:gameId/reject'], playersOnly, (req, res, next) => {
     if (req.found.linesSubmitted) {
         res.redirect('back');
     }
@@ -123,7 +121,7 @@ gameRouter.use(['/:gameId/signup', '/:gameId/reject'], (req, res, next) => {
 })
 
 // Handles the user signing up to a game
-gameRouter.get('/:gameId/signup', playersOnly, (req, res, next) => {
+gameRouter.get('/:gameId/signup', (req, res, next) => {
     // If the user is already signed up, do not add them to the list again
     if (req.foundGame.playersSignedUp.some(e => e._id.toString() == req.foundPlayer._id.toString())) { return res.redirect('back'); }
     // If the user is on the list of players who rejected the game, remove them from it
@@ -138,7 +136,7 @@ gameRouter.get('/:gameId/signup', playersOnly, (req, res, next) => {
 })
 
 // Handles the user rejecting a game
-gameRouter.get('/:gameId/reject', playersOnly, (req, res, next) => {
+gameRouter.get('/:gameId/reject', (req, res, next) => {
     // If the user has already rejected the game, do not add them to the list again
     if (req.foundGame.playersRejected.some(e => e._id.toString() == req.foundPlayer._id.toString())) { return res.redirect('back'); }
     // Remove the user from the list of players signed up and add them to the rejected list
