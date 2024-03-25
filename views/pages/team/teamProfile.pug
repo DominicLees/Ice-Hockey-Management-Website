@@ -1,13 +1,13 @@
 head
     title= team.name
     link(rel="stylesheet", href="/public/css/teamProfile.css")
+    script(src="/public/js/teamProfile.js" defer)
 body
     include /partials/navbar.pug
     h1= team.name
     h2 Head Coach: #{team.coach.name}
     h2 Home Rink: #{team.location}
-    if isCoach
-        script(src="/public/js/teamProfile.js" defer) 
+    if isCoach 
         span Share this link with your players: 
         a#teamCode(href="join/"+team.code) join/#{team.code}
         button#copyTeamLinkButton Copy link to clipboard
@@ -17,10 +17,15 @@ body
         br
         button#delete-team.red Delete Team
         br
+    if isPlayer
+        button#leave-team.red Leave Team
 
     div.container
         div.content#players
             h2 Players
+            if responses.playerRemoveSuccessful
+                h3.success Player removed successfully
+
             if players.length > 0
                 label(for='playerSort') Sort 
                 select#playerSort
@@ -43,8 +48,20 @@ body
                 if positions.includes(playerFilter)
                     - players = players.filter(player => player.positions.includes(playerFilter))
 
-                include ../../partials/playerTable.pug
-                +playerTable(players)
+                table
+                    thead
+                        tr
+                            th Name
+                            th Positions
+                    tbody
+                        for player in players
+                            tr
+                                td
+                                    a(href='/player/'+player._id)= player.user.name
+                                td= player.positions
+                                if isCoach
+                                    td
+                                        button(data-id=player._id).removePlayer.red Remove
             else
                 p No players registered
 

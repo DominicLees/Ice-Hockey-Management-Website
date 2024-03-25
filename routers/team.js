@@ -6,6 +6,7 @@ const Player = require('./../schemas/player');
 const Game = require('./../schemas/game');
 
 const coachOnly = require('./../middleware/coachOnly');
+const playersOnly = require('./../middleware/playersOnly');
 const playerOrCoachOnly = require('./../middleware/playerOrCoachOnly');
 
 teamRouter.get('/new', (req, res) => {
@@ -116,6 +117,7 @@ teamRouter.get('/:code', playerOrCoachOnly, (req, res, next) => {
         res.render('pages/team/teamProfile', {
             players: req.foundPlayers,
             isCoach: req.isCoach,
+            isPlayer: req.isPlayer,
             results: result,
             playerSort: req.query.playerSort,
             playerFilter: req.query.playerFilter
@@ -125,8 +127,30 @@ teamRouter.get('/:code', playerOrCoachOnly, (req, res, next) => {
     })
 })
 
+teamRouter.get('/:code/leave', playersOnly, (req, res, next) => {
+    Player.deleteOne({team: req.foundTeam._id, user: req.session.account._id}).then(() => {
+        req.session.responses.leaveTeamSuccessful = true;
+        res.redirect('/dashboard');
+    }).catch(error => {
+        next(error);
+    })
+})
+
+teamRouter.get('/:code/remove/:playerId', playersOnly, (req, res, next) => {
+    Player.deleteOne({_id: req.params.playerId}).then(() => {
+        req.session.responses.playerRemoveSuccessful = true;
+        res.redirect('back');
+    }).catch(error => {
+        next(error);
+    })
+})
+
 teamRouter.get('/:code/delete', coachOnly, (req, res, next) => {
-    Team.deleteOne({_id: req.foundTeam._id}).then(() => {
+    // Delete player profiles
+    Player.deleteMany({team: req.foundTeam._id}).then(() => {
+        // Delete Team
+        return Team.deleteOne({_id: req.foundTeam._id});
+    }).then(() => {
         req.session.responses.teamDeleteSuccessful = true;
         res.redirect('/dashboard');
     }).catch(error => {

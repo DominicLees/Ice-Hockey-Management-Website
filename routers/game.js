@@ -21,15 +21,8 @@ const calcLineCount = (prefix, skaters) => {
 // MIDDLEWARE
 
 const coachOnly = require('./../middleware/coachOnly');
-
+const playersOnly = require('./../middleware/playersOnly');
 const playerOrCoachOnly = require('./../middleware/playerOrCoachOnly');
-
-function playersOnly(req, res, next) {
-    if (!req.isPlayer) {
-        next(forbiddenError());
-    }
-    next();
-}
 
 function linesRequired(req, res, next) {
     if (req.foundGame.linesSubmitted == false) {
@@ -119,6 +112,14 @@ gameRouter.get('/:gameId', playerOrCoachOnly, (req, res) => {
         isCoach: req.isCoach,
         isPlayer: req.isPlayer
     })
+})
+
+// Players can't change their availabiltiy once the lines have been submitted
+gameRouter.use(['/:gameId/signup', '/:gameId/reject'], (req, res, next) => {
+    if (req.found.linesSubmitted) {
+        res.redirect('back');
+    }
+    next();
 })
 
 // Handles the user signing up to a game

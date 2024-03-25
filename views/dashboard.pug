@@ -20,6 +20,8 @@ body
 
             if responses.teamDeleteSuccessful
                 h3.success Team deleted successfully
+            if responses.leaveTeamSuccessful
+                h3.success Team left successfully
 
             if teams.length > 0
                 table
@@ -68,7 +70,7 @@ body
                         else if signedUp
                             p Waiting for lines
                         //- User has not signed up to or rejected the game
-                        if !signedUp && !rejected && playerProfiles.some(e => e.team._id.toString() == game.team._id.toString())
+                        if !game.linesSubmitted && !signedUp && !rejected && playerProfiles.some(e => e.team._id.toString() == game.team._id.toString())
                             if !isCoach
                                 p Let the coach know if you can play
                             button
