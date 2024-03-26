@@ -91,7 +91,7 @@ gameRouter.use(['/:gameId'], (req, res, next) => {
         req.foundGame = foundGame;
         res.locals.game = foundGame;
         // Find the user's player profile for this team
-        return Player.findOne({user: req.session.account._id, team: result.team});
+        return Player.findOne({user: req.session.account._id, team: foundGame.team});
     }).then(foundPlayer => {
         req.foundPlayer = foundPlayer;
         // Find all players who haven't responded to the game
