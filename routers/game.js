@@ -156,8 +156,8 @@ gameRouter.get('/:gameId/line-builder', coachOnly, (req, res) => {
 
     // Validate user input
     const numOfFSLines = req.query.numOfFSLines == null ? 3 : clamp(req.query.numOfFSLines, 1, 4);
-    const numOfPPLines = req.query.numOfPPLines == null ? 2 : clamp(req.query.numOfPPLines, 1, 4);
-    const numOfPKLines = req.query.numOfPKLines == null ? 2 : clamp(req.query.numOfPKLines, 1, 4);
+    const numOfPPLines = req.query.numOfPPLines == null ? 1 : clamp(req.query.numOfPPLines, 0, 4);
+    const numOfPKLines = req.query.numOfPKLines == null ? 1 : clamp(req.query.numOfPKLines, 0, 4);
 
     res.render('pages/game/lineBuilder', {
         goalies,

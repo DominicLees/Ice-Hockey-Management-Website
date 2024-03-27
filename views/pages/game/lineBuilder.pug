@@ -20,10 +20,10 @@ body
             input#numOfFSLines(type="number" name="numOfFSLines" value=numOfFSLines min="1" max="4")
             br
             label(for="numOfPPLines") Number of powerplay lines:
-            input#numOfPPLines(type="number" name="numOfPPLines" value=numOfPPLines min="1" max="4")
+            input#numOfPPLines(type="number" name="numOfPPLines" value=numOfPPLines min="0" max="4")
             br
             label(for="numOfPKLines") Number of penalty kill lines:
-            input#numOfPKLines(type="number" name="numOfPKLines" value=numOfPKLines min="1" max="4")
+            input#numOfPKLines(type="number" name="numOfPKLines" value=numOfPKLines min="0" max="4")
             br
             input(type="submit" value="Update")
 
@@ -68,15 +68,17 @@ body
                 +line(i)
             - }
 
-            h3 Power Play
-            - for (var i = 1; i <= numOfPPLines; ++i) {
-                +powerplayLine(i)
-            - }
+            if numOfPPLines > 0
+                h3 Power Play
+                - for (var i = 1; i <= numOfPPLines; ++i) {
+                    +powerplayLine(i)
+                - }
 
-            h3 Penalty Kill
-            - for (var i = 1; i <= numOfPKLines; ++i) {
-                +penaltyKillLine(i)
-            - }
+            if numOfPKLines > 0
+                h3 Penalty Kill
+                - for (var i = 1; i <= numOfPKLines; ++i) {
+                    +penaltyKillLine(i)
+                - }
 
             br
             input(type="submit" value="Save")
