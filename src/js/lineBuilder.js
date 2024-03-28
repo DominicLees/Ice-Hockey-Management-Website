@@ -23,7 +23,7 @@ function validateSelection(selects) {
         }
     })
     selects.forEach(select => {
-        // If a select's value appears more than once, there is a clash, and it is invalid
+        // If a select's value appears more than once, there is a clash, so it is invalid
         if (knownValues.filter(x => x == select.value).length > 1) {
             select.style.backgroundColor = 'lightcoral';
         } else {
@@ -33,12 +33,12 @@ function validateSelection(selects) {
     return valid;
 }
 
+const allSelects = [startingGoalie, backupGoalie].concat(lineTypes['lines'], lineTypes['PPs'], lineTypes['PKs']);
 function validateAll() {
-    const allSelects = [startingGoalie, backupGoalie].concat(lineTypes['lines'], lineTypes['PPs'], lineTypes['PKs']);
     return validateSelection(allSelects);
 }
 
-// Each time a new selection is made, validate the lines
+// Each time a new selection is made, validate the lines of that type
 Object.keys(lineTypes).forEach(type => {
     const validate = () => {
         validateSelection(lineTypes[type]);
@@ -46,6 +46,7 @@ Object.keys(lineTypes).forEach(type => {
     lineTypes[type].forEach(select => {select.addEventListener('change', validate)});
 })
 
+// Check all selects whenever a goalie is changed to check if a goalie has also been picked as a skater
 startingGoalie.addEventListener('change', validateAll);
 backupGoalie.addEventListener('change', validateAll);
 
