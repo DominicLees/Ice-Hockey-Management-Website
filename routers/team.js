@@ -137,9 +137,7 @@ teamRouter.get('/:code', playerOrCoachOnly, (req, res, next) => {
             players: req.foundPlayers,
             isCoach: req.isCoach,
             isPlayer: req.isPlayer,
-            results: result,
-            playerSort: req.query.playerSort,
-            playerFilter: req.query.playerFilter
+            results: result
         })
     }).catch(error => {
         next(error);

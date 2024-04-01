@@ -40,8 +40,11 @@ mongoose.connect(`mongodb+srv://${config.mongoLogin}/?retryWrites=true&w=majorit
 // Pass any responses and account information to res.locals
 app.use('/', (req, res, next) => {
     if (req.method == 'GET') {
+        // Responses only copied to locals on get requests, as the user will not see them if a page is not rendered
         res.locals.responses = req.session.responses || {};
         req.session.responses = {};
+        // Copy the variables in the GET query to locals
+        res.locals = Object.assign(res.locals, req.query);
     }
     res.locals.account = req.session.account;
     next();
