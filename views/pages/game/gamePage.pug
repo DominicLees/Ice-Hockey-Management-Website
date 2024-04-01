@@ -47,6 +47,10 @@ body
                         button 
                             a(href=game.gameId+"/line-builder") Build Lines
 
+                if isCoach || isPlayer
+                    button
+                        a(href=`/team/${team.code}`) Team Page
+
         include ../../partials/playerTable.pug
         div.tables
             div
