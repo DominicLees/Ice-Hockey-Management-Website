@@ -9,13 +9,13 @@ const returnUnauthenticatedUsersToIndex = require('./middleware/returnUnauthenti
 // CONFIGURATION
 const config = require('./config.json');
 const port = config.port || 8000;
-const enviroment = process.env.NODE_ENV || config.enviroment || "dev";
+const enviroment = process.env.NODE_ENV || config.enviroment || 'dev';
 
 // SETUP
 
 // Setup Express
 const app = express();
-app.set('view engine', "pug");
+app.set('view engine', 'pug');
 app.locals.basedir = path.join(__dirname, 'views');
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
@@ -26,7 +26,7 @@ app.use(session({
     secret: config.cookieSecret,
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: enviroment == "production" }
+    cookie: { secure: enviroment == 'production' }
 }))
 
 // Connect to MongoDB
@@ -39,7 +39,7 @@ mongoose.connect(`mongodb+srv://${config.mongoLogin}/?retryWrites=true&w=majorit
 
 // Pass any responses and account information to res.locals
 app.use('/', (req, res, next) => {
-    if (req.method == "GET") {
+    if (req.method == 'GET') {
         res.locals.responses = req.session.responses || {};
         req.session.responses = {};
     }
@@ -84,7 +84,7 @@ app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).render('error', {
         code: err.status,
-        stack: enviroment == "dev" ? err.stack : null
+        stack: enviroment == 'dev' ? err.stack : null
     })
 })
 
