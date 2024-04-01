@@ -33,14 +33,20 @@ dashRouter.get('/dashboard', (req, res, next) => {
         res.render('dashboard', {
             games: result
         });
+    }).catch(error => {
+        next(error);
     })
 })
 
 dashRouter.get('/schedule', (req, res, next) => {
-    Game.find({team: {$in: req.teamIds}}).sort({date: 1}).populate('team').then(result => {
+    const teamIds = (req.query.teamFilter == null || req.query.teamFilter == 'all') ? req.teamIds : [req.query.teamFilter];
+    const dateFilter = req.query.dateFilter == 'past' ? {$lte: new Date()} : {$gte: new Date()};
+    Game.find({team: {$in: teamIds}, date: dateFilter}).sort({date: 1}).populate('team').then(result => {
         res.render('schedule', {
             games: result
         });
+    }).catch(error => {
+        next(error);
     })
 })
 

@@ -1,5 +1,18 @@
 $mobileScreenSize: 722px;
 
+.top {
+    margin-top: 15px;
+}
+
+#filters {
+    margin-left: 10px;
+
+    select {
+        font-size: inherit;
+        margin-right: 10px;
+    }
+}
+
 #games {
     text-align: center;
     width: 100%;
@@ -7,13 +20,18 @@ $mobileScreenSize: 722px;
     .game-card {
         padding-top: 10px;
         padding-bottom: 10px;
+        border-bottom: 1px black solid;
 
         span {
             margin-left: 20px;
         }
     }
 
-    div:nth-child(even){
+    .game-card:first-of-type {
+        border-top: 1px black solid;
+    }
+
+    div:nth-child(odd){
         background-color: #b2ffe5;
     }
 }
