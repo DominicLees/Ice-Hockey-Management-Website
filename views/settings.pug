@@ -17,4 +17,6 @@ body
             input(type="text" name="name" value=account.name)
             input(type="submit", value="Update Name")
         if responses.invalidName
-            h3 Please enter a name
+            h3.error Please enter a name
+        if responses.nameChangeSuccessful
+            h3.success Name changed successfully

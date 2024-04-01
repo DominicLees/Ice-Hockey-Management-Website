@@ -262,6 +262,7 @@ authRouter.post('/update/name', returnUnauthenticatedUsersToIndex, (req, res, ne
     }
     User.updateOne({_id: req.session.account._id}, {name: req.body.name}).then(() => {
         req.session.account.name = req.body.name;
+        req.session.responses.nameChangeSuccessful = true;
         res.redirect('/settings');
     }).catch(error => {
         next(error);
