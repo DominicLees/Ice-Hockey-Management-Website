@@ -11,12 +11,16 @@ body
                     option(value="all") All
                     for team in teams
                         option(value=team._id selected=(teamFilter==team._id))= team.name
+                br
+                br
                 label(for="dateFilter") Time: 
                 select#dateFilter(name="dateFilter") 
                     option(value="future" selected=(dateFilter=="future")) Upcoming games
                     option(value="past" selected=(dateFilter=="past")) Past results
+                br
+                br
                 input(type="submit", value="Filter")
-                
+
     if games.length > 0
         div#games.top
             - const currentDate = new Date()
@@ -28,10 +32,11 @@ body
                         a(href=`team/${game.team.code}`)= game.team.name
                     span
                         a(href=`/team/${game.team.code}/game/${game.gameId}`)= game.shortTitle
-                    br
-                    span
-                        if currentDate > game.date
-                            if game.resultSubmitted
-                                a(href=`/team/${game.team.code}/game/${game.gameId}/gamesheet`)= game.score
-                            else
-                                span= game.score
+                    if dateFilter == "past"
+                        br
+                        span
+                            if currentDate > game.date
+                                if game.resultSubmitted
+                                    a(href=`/team/${game.team.code}/game/${game.gameId}/gamesheet`)= game.score
+                                else
+                                    span= game.score
