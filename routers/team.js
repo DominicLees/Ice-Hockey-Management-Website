@@ -44,7 +44,7 @@ teamRouter.post('/new', (req, res, next) => {
 })
 
 // Check for all routes that use a team code, that the team code is valid
-teamRouter.use(['/join/:code', '/:code'], (req, res, next) => {
+teamRouter.use(['/join/:code', '/:code', '/:code/update-profile'], (req, res, next) => {
     Team.findOne({code: req.params.code}).populate('coach').then(result => {
         if (result == null) { return; }
         // Save data for later so we don't have to query for it again
@@ -71,17 +71,28 @@ teamRouter.use('/join/:code', (req, res, next) => {
     next();
 })
 
-teamRouter.get('/join/:code', (req, res) => {
-    res.render('pages/team/join');
+teamRouter.use('/:code/update-profile', (req, res, next) => {
+    res.locals.player = req.foundPlayers.find(player => {return player.user._id.equals(req.session.account._id)});
+    if (res.locals.player == null) {
+        res.redirect('back');
+    }
+    next();
 })
 
-teamRouter.post('/join/:code', (req, res, next) => {
+teamRouter.get('/:code/update-profile', (req, res) => {
+    res.render('pages/team/updateProfile');
+})
+
+teamRouter.use(['/join/:code', '/:code/update-profile'], (req, res, next) => {
     // Validate user input
     if (req.body.positions == null) {
         req.session.responses.noPositionsSelected = true;
         return res.redirect(req.originalUrl);
     }
+    next();
+})
 
+teamRouter.post('/join/:code', (req, res, next) => {
     // Save player profile to DB
     const newPlayer = new Player({
         user: req.session.account._id,
@@ -95,6 +106,14 @@ teamRouter.post('/join/:code', (req, res, next) => {
         next(error);
     });
 
+})
+
+teamRouter.post('/:code/update-profile', (req, res, next) => {
+    Player.updateOne({_id: res.locals.player._id}, {positions: req.body.positions}).then(() => {
+        res.redirect('/dashboard');
+    }).catch(error => {
+        next(error);
+    })
 })
 
 teamRouter.use('/:code', (req, res, next) => {

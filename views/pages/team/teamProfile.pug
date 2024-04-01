@@ -18,6 +18,8 @@ body
         button#delete-team.red Delete Team
         br
     if isPlayer
+        button
+            a(href=`${team.code}/update-profile`) Update player profile
         button#leave-team.red Leave Team
 
     div.container

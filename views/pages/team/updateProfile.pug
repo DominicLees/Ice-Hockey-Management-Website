@@ -1,0 +1,28 @@
+head
+    title Update your player profile for the #{team.name}
+body
+    include ../../partials/navbar.pug
+
+    h2 Update your player profile for the #{team.name}
+    form(method="post") 
+        h3 Positions
+        fieldset 
+            input(type="checkbox", value="LW", name="positions" checked=player.positions.includes('LW'))
+            label LW
+            input(type="checkbox", value="C", name="positions" checked=player.positions.includes('C'))
+            label C
+            input(type="checkbox", value="RW", name="positions" checked=player.positions.includes('RW'))
+            label RW
+            input(type="checkbox", value="LD", name="positions" checked=player.positions.includes('LD'))
+            label LD
+            input(type="checkbox", value="RD", name="positions" checked=player.positions.includes('RD'))
+            label RD
+            input(type="checkbox", value="G", name="positions" checked=player.positions.includes('G'))
+            label G
+
+        br
+        br
+        input(type="submit", value="Update Profile")
+
+        if responses.noPositionsSelected 
+            h3 Please select which positions you want to play
