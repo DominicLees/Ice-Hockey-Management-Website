@@ -114,7 +114,7 @@ gameRouter.get('/:gameId', playerOrCoachOnly, (req, res) => {
 
 // Players can't change their availability once the lines have been submitted
 gameRouter.use(['/:gameId/signup', '/:gameId/reject'], playersOnly, (req, res, next) => {
-    if (req.found.linesSubmitted) {
+    if (req.foundGame.linesSubmitted) {
         res.redirect('back');
     }
     next();
