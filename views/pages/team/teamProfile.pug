@@ -97,8 +97,6 @@ body
                             tr
                                 td= result.dateString
                                 td
-                                    if result.resultSubmitted
-                                        a(href=`./${team.code}/game/${result.gameId}/gamesheet`)= result.shortTitle
-                                    else
-                                        a(href=`./${team.code}/game/${result.gameId}`)= result.shortTitle
-                                td= result.score
+                                    a(href=`./${team.code}/game/${result.gameId}`)= result.shortTitle
+                                td
+                                    a(href=`./${team.code}/game/${result.gameId}/gamesheet`)= result.score
