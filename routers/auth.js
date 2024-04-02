@@ -246,8 +246,7 @@ authRouter.post('/new-credentials', returnLoggedInUsersToDash, rateLimit, verify
 })
 
 authRouter.get('/logout', (req, res) => {
-    req.session.authenticated = false;
-    req.session.account = {};
+    req.session.destroy();
     res.redirect('/');
 })
 
