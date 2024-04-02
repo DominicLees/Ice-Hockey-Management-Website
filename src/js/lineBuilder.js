@@ -12,6 +12,7 @@ const lineTypes = {
 If a player is selected multiple times in the same type of line, it is invalid
 Takes an array of select element as input */
 function validateSelection(selects) {
+    selects = selects.concat([startingGoalie, backupGoalie]);
     let valid = true;
     let knownValues = [];
     // Get an array of all players that have been selected
@@ -33,9 +34,8 @@ function validateSelection(selects) {
     return valid;
 }
 
-const allSelects = [startingGoalie, backupGoalie].concat(lineTypes['lines'], lineTypes['PPs'], lineTypes['PKs']);
 function validateAll() {
-    return validateSelection(allSelects);
+    return validateSelection(lineTypes['lines']) && validateSelection(lineTypes['PPs']) && validateSelection(lineTypes['PKs']);
 }
 
 // Each time a new selection is made, validate the lines of that type
