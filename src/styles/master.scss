@@ -79,6 +79,16 @@ table {
     }
 }
 
+.table-padding {
+    table-layout: fixed;
+    width: min(100%, 400px);
+
+    td {
+        padding: 5px;
+        font-size: min(18px, 5vw);
+    }
+}
+
 // Utility Classes
 .error, .success {
     padding: 10px;
