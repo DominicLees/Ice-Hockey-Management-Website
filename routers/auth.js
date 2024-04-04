@@ -92,10 +92,6 @@ function rateLimit(req, res, next) {
     next();
 }
 
-authRouter.get('/settings', returnUnauthenticatedUsersToIndex, (req, res) => {
-    res.render('settings');
-})
-
 // Generates a challenge and sends it to the client to be used for authentication attempts
 authRouter.get('/challenge', rateLimit, (req, res) => {
     const challenge = crypto.randomBytes(32).toString();
@@ -250,9 +246,26 @@ authRouter.post('/new-credentials', returnLoggedInUsersToDash, rateLimit, verify
 })
 
 authRouter.get('/logout', (req, res) => {
-    req.session.authenticated = false;
-    req.session.account = {};
+    req.session.destroy();
     res.redirect('/');
+})
+
+authRouter.get('/settings', returnUnauthenticatedUsersToIndex, (req, res) => {
+    res.render('settings');
+})
+
+authRouter.post('/update/name', returnUnauthenticatedUsersToIndex, (req, res, next) => {
+    if (req.body.name == null || req.body.name.length == 0) {
+        req.session.responses.invalidName = true;
+        return res.redirect('/settings');
+    }
+    User.updateOne({_id: req.session.account._id}, {name: req.body.name}).then(() => {
+        req.session.account.name = req.body.name;
+        req.session.responses.nameChangeSuccessful = true;
+        res.redirect('/settings');
+    }).catch(error => {
+        next(error);
+    })
 })
 
 module.exports = authRouter;

@@ -18,6 +18,8 @@ body
         button#delete-team.red Delete Team
         br
     if isPlayer
+        button
+            a(href=`${team.code}/update-profile`) Update player profile
         button#leave-team.red Leave Team
 
     div.container
@@ -95,8 +97,6 @@ body
                             tr
                                 td= result.dateString
                                 td
-                                    if result.resultSubmitted
-                                        a(href=`./${team.code}/game/${result.gameId}/gamesheet`)= result.shortTitle
-                                    else
-                                        a(href=`./${team.code}/game/${result.gameId}`)= result.shortTitle
-                                td= result.score
+                                    a(href=`./${team.code}/game/${result.gameId}`)= result.shortTitle
+                                td
+                                    a(href=`./${team.code}/game/${result.gameId}/gamesheet`)= result.score

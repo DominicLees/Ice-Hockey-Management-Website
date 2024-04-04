@@ -52,13 +52,10 @@ table {
     width: 100%;
     margin-top: 10px;
     text-align: center;
+    font-size: 18px;
 
     @media (max-width: $mobileScreenSize) {
         margin-left: 0px;
-    }
-
-    td, td a, td span, th {
-        padding: 5px !important;
     }
 
     thead tr {
@@ -95,4 +92,8 @@ table {
 
 .greyedOut {
     background-color: lightgrey;
+
+    button {
+        background-color: aquamarine;
+    }
 }

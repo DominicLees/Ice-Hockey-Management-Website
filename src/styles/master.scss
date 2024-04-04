@@ -61,9 +61,31 @@ input[type=submit] {
 table {
     border-collapse: collapse;
 
+    // Make the link fill the entire parent td element
+    td a {
+        display:inline-block;
+        width:100%;
+        height:100%;
+    }
+
+    th, td a {
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
     td, th {
         border: 1px solid black;
-        padding: 2px;
+        font-size: 18px;
+    }
+}
+
+.table-padding {
+    table-layout: fixed;
+    width: min(100%, 400px);
+
+    td {
+        padding: 5px;
+        font-size: min(18px, 5vw);
     }
 }
 
