@@ -32,11 +32,11 @@ body
                         a(href=`team/${game.team.code}`)= game.team.name
                     span
                         a(href=`/team/${game.team.code}/game/${game.gameId}`)= game.shortTitle
-                    if dateFilter == "past"
-                        br
-                        span
-                            if currentDate > game.date
-                                if game.resultSubmitted
+                    if dateFilter == 'past'
+                        if currentDate > game.date
+                            br
+                            if game.resultSubmitted
+                                span
                                     a(href=`/team/${game.team.code}/game/${game.gameId}/gamesheet`)= game.score
-                                else
-                                    span= game.score
+                            else
+                                span Awaiting Result
