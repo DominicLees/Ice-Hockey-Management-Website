@@ -43,7 +43,7 @@ gameSchema.virtual('score').get(function() {
     if (this.result == null || this.result.teamGoals == null || this.result.opponentGoals == null) {
         return 'Awaiting result';
     }
-    return `${this.result.teamGoals}-${this.result.opponentGoals}`;
+    return `${this.result.teamGoals}-${this.result.opponentGoals} ${this.result.teamGoals > this.result.opponentGoals ? 'W' : this.result.teamGoals < this.result.opponentGoals ? 'L' : 'D'}`;
 });
 
 gameSchema.virtual('resultSubmitted').get(function() {
