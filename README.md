@@ -52,8 +52,8 @@ Makes the provided user the coach of a team
 node testing/scripts/makeUserCoach.js
 ```
 The parameters are:
-email - the email of the user account you want to make the coach
-teamCode - the team code of the team you want to be coach of
+- email - the email of the user account you want to make the coach
+- teamCode - the team code of the team you want to be coach of
 
 ### Signup All Players to a Game
 
