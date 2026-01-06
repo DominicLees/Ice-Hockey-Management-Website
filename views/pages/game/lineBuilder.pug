@@ -1,0 +1,84 @@
+head
+    title Build lines for #{game.title}
+    script(src="/public/js/lineBuilder.js" defer) 
+    link(rel="stylesheet", href="/public/css/lineBuilder.css")
+body
+    include ../../partials/navbar.pug
+    main
+        h1 Build lines for #{game.title}
+
+        if responses.linesSaved
+            h3 Lines saved successfully
+        if responses.sameGoalie
+            h3 You picked the same goalie to start and backup
+        if responses.samePlayerMultipleTimes
+            h3 You picked the same player in multiple 5 on 5 lines
+
+        h2 Number of Lines
+        form(action="./line-builder", method="get")
+            label(for="numOfFSLines") Number of 5 on 5 lines:
+            input#numOfFSLines(type="number" name="numOfFSLines" value=numOfFSLines min="1" max="4")
+            br
+            label(for="numOfPPLines") Number of powerplay lines:
+            input#numOfPPLines(type="number" name="numOfPPLines" value=numOfPPLines min="0" max="4")
+            br
+            label(for="numOfPKLines") Number of penalty kill lines:
+            input#numOfPKLines(type="number" name="numOfPKLines" value=numOfPKLines min="0" max="4")
+            br
+            input(type="submit" value="Update")
+
+        form#linesForm(action="./line-builder/save", method="post")
+            h2 Goalies
+            if goalies.length == 0
+                h3 No goalies have signed up for this game!
+            else
+                p You have #{goalies.length + (goalies.length > 1 ? ' goalies' : ' goalie')} to pick from:
+                label(for="startingGoalie") Starting Goalie:  
+                select(name="startingGoalie" id="startingGoalie") 
+                    for goalie in goalies
+                        option(value=goalie._id)= goalie.user.name
+                br
+                label(for="backupGoalie") Backup Goalie: 
+                select(name="backupGoalie" id="backupGoalie")
+                    option(value="noneSelected") None selected
+                    for goalie in goalies
+                        option(value=goalie._id)= goalie.user.name
+
+            h2 Skaters
+            -
+                function positionCount(position) {
+                    let count = 0;
+                    players.forEach(player => {
+                        if (player.positions.includes(position)) {count++};
+                    })
+                    return count;
+                }
+            p You have #{players.length} skaters to pick from:
+            ul
+                li Left Wingers: #{positionCount('LW')}
+                li Centres: #{positionCount('C')}
+                li Right Wingers: #{positionCount('RW')}
+                li Left Defencemen: #{positionCount('LD')}
+                li Right Defencemen: #{positionCount('RD')}
+            
+            include ../../partials/lineBuilderLines.pug
+
+            h3 5 on 5
+            - for (var i = 1; i <= numOfFSLines; ++i) {
+                +line(i)
+            - }
+
+            if numOfPPLines > 0
+                h3 Power Play
+                - for (var i = 1; i <= numOfPPLines; ++i) {
+                    +powerplayLine(i)
+                - }
+
+            if numOfPKLines > 0
+                h3 Penalty Kill
+                - for (var i = 1; i <= numOfPKLines; ++i) {
+                    +penaltyKillLine(i)
+                - }
+
+            br
+            input(type="submit" value="Save")

@@ -1,0 +1,77 @@
+mixin positionSelection(type, positionName, selectablePositions, noneSelectable)
+    select(name=(type + positionName) class=type)
+        if noneSelectable
+            option(value="noneSelected") None selected
+        for player in players
+            if player.positions.some(item => selectablePositions.includes(item))
+                option(value=player._id)= player.user.name
+
+mixin line(number)
+    h4 Line #{number}
+    table
+        tr
+            td LW
+            td C
+            td RW
+        tr
+            td
+                +positionSelection('line', number + 'LW', ['LW'], true)
+            td
+                +positionSelection('line', number + 'C', ['C'], true)
+            td
+                +positionSelection('line', number + 'RW', ['RW'], true)
+        tr
+            td LD
+            td
+            td RD
+        tr
+            td
+                +positionSelection('line', number + 'LD', ['LD'], true)
+            td
+            td
+                +positionSelection('line', number + 'RD', ['RD'], true)
+
+mixin powerplayLine(number)
+    h4 Unit #{number}
+    table
+        tr
+            td LW
+            td C
+            td RW
+        tr
+            td
+                +positionSelection('PP', number + 'LW', ['LW', 'C', 'RW'])
+            td
+                +positionSelection('PP', number + 'C', ['LW', 'C', 'RW'])
+            td
+                +positionSelection('PP', number + 'RW', ['LW', 'C', 'RW'])
+        tr
+            td LD
+            td
+            td RD
+        tr
+            td
+                +positionSelection('PP', number + 'LD', ['LD', 'RD', 'LW', 'C', 'RW'])
+            td
+            td
+                +positionSelection('PP', number + 'RD', ['LD', 'RD', 'LW', 'C', 'RW'])
+
+mixin penaltyKillLine(number)
+    h4 Unit #{number}
+    table
+        tr
+            td Winger
+            td C
+        tr
+            td
+                +positionSelection('PK', number + 'W', ['LW', 'C', 'RW'])
+            td
+                +positionSelection('PK', number + 'C', ['LW', 'C', 'RW'])
+        tr
+            td LD
+            td RD
+        tr
+            td
+                +positionSelection('PK', number + 'LD', ['LD', 'RD'])
+            td
+                +positionSelection('PK', number + 'RD', ['LD', 'RD'])

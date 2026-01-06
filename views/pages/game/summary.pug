@@ -1,0 +1,61 @@
+head
+    title Line summary for #{game.title}
+    link(rel="stylesheet", href="/public/css/master.css")
+    link(rel="stylesheet", href="/public/css/summary.css")
+    script(src="/public/js/summary.js" defer) 
+body
+    ul
+        li Your lines summary for #{game.title}
+        if isGoalie
+            li You are the #{game.lines.startingGoalie.user._id == account._id ? 'starting' : 'backup'} goalie
+        else if positions.length == 0
+            li You have not been picked for this game
+        else
+            include ../../partials/expandPositionCode.pug
+            li#FullStrength Full Strength Lines
+            li You are #{expandPositionCode(positions[0])}
+            - const lineMates = getLineMates(positions[0], skaters)
+            if lineMates.length == 2
+                li Your line mates are #{lineMates[0]} and #{lineMates[1]}
+            else
+                li Your D man partner is #{lineMates[0]}
+            if numOfFSLines > 1
+                li You get on the ice when #{skaters[decrementNumberInCode(positions[0], numOfFSLines)]} gets off
+                li #{skaters[incrementNumberInCode(positions[0], numOfFSLines)]} gets on the ice when you get off
+
+            - const PPPos = positions.find((pos) => pos.startsWith('PP'))
+            if PPPos
+                li#Powerplay You are on powerplay
+                li You are #{expandPositionCode(PPPos)}
+                if numOfPPLines > 1
+                    li On powerplay, you get on the ice when #{skaters[decrementNumberInCode(PPPos, numOfPPLines)]} gets off
+                    li On powerplay, #{skaters[incrementNumberInCode(PPPos, numOfPPLines)]} gets on the ice when you get off
+                else
+                    li There is only 1 powerplay unit
+            else
+                li#Powerplay You are not on powerplay
+
+            - const PKPos = positions.find((pos) => pos.startsWith('PK'))
+            if PKPos
+                li#PenaltyKill You are on penalty kill
+                li You are #{expandPositionCode(PKPos)}
+                if numOfPKLines > 1
+                    li On penalty kill, you get on the ice when #{skaters[decrementNumberInCode(PKPos, numOfPKLines)]} gets off
+                    li On penalty kill, #{skaters[incrementNumberInCode(PKPos, numOfPKLines)]} gets on the ice when you get off
+                else
+                    li There is only 1 penalty kill unit
+            else 
+                li#PenaltyKill You are not on penalty kill
+        li
+            button 
+                a(href=`/team/${game.team.code}/game/${game.gameId}`) Return to game page
+            if !isGoalie && positions.length > 0
+                br
+                button 
+                    a(href="#FullStrength") Back to full strength lines
+                br
+                button 
+                    a(href="#Powerplay") Back to powerplay
+                br 
+                button 
+                    a(href="#PenaltyKill") Back to penalty kill

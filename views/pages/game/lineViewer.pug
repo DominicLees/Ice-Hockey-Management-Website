@@ -1,0 +1,33 @@
+head
+    title Lines for #{game.title}
+    link(rel="stylesheet", href="/public/css/lineViewer.css")
+body
+    include ../../partials/navbar.pug
+    main
+        h1 Lines for #{game.title}
+
+        if isPlayer
+            a(href="summary")
+                button View Animated Summary Of Lines
+
+        h2 Goalies
+        p Starting Goalie: #{game.lines.startingGoalie.user.name}
+        if game.lines.backupGoalie
+            p Backup Goalie: #{game.lines.backupGoalie.user.name}
+
+        include ../../partials/lineViewerLines.pug
+
+        h2 Skaters
+        h3 5 v 5
+        - for (var i = 1; i <= numOfFSLines; ++i) {
+            +line(skaters, i)
+        - }
+
+        h3 Special Teams
+        - for (var i = 1; i <= numOfPPLines; ++i) {
+            +powerplayLine(skaters, i)
+        - }
+        
+        - for (var i = 1; i <= numOfPKLines; ++i) {
+            +penaltyKillLine(skaters, i)
+        - }

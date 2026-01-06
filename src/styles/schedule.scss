@@ -1,0 +1,57 @@
+$mobileScreenSize: 722px;
+
+.top {
+    margin-top: 15px;
+}
+
+#filters {
+    margin-left: 10px;
+    text-align: center;
+    font-size: 20px;
+
+    select {
+        font-size: inherit;
+        padding: 5px;
+        margin-right: 10px;
+    }
+}
+
+#games {
+    text-align: center;
+    width: 100%;
+
+    .game-card {
+        padding-top: 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px black solid;
+
+        @media (max-width: $mobileScreenSize) {
+            span {
+                margin-left: 5px;
+            }
+        }
+    }
+
+    .game-card:first-of-type {
+        border-top: 1px black solid;
+    }
+
+    div:nth-child(odd){
+        background-color: #b2ffe5;
+    }
+}
+
+@media (min-width: $mobileScreenSize) {
+    br {
+        display: none;
+    }
+
+    .game-card {
+        display: flex;
+        align-items: center;
+
+        span {
+            flex: 1 1 0px;
+        }
+    }
+}

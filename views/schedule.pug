@@ -1,0 +1,42 @@
+head
+    title Schedule
+body
+    include partials/navbar.pug
+    link(rel="stylesheet", href="/public/css/schedule.css")
+
+    div#filters.top
+            form(method="get")
+                label(for="teamFilter") Team: 
+                select#teamFilter(name="teamFilter") 
+                    option(value="all") All
+                    for team in teams
+                        option(value=team._id selected=(teamFilter==team._id))= team.name
+                br
+                br
+                label(for="dateFilter") Time: 
+                select#dateFilter(name="dateFilter") 
+                    option(value="future" selected=(dateFilter=="future")) Upcoming games
+                    option(value="past" selected=(dateFilter=="past")) Past results
+                br
+                br
+                input(type="submit", value="Filter")
+
+    if games.length > 0
+        div#games.top
+            - const currentDate = new Date()
+            for game in games
+                div.game-card
+                    span= game.dateTimeString
+                    br
+                    span
+                        a(href=`team/${game.team.code}`)= game.team.name
+                    span
+                        a(href=`/team/${game.team.code}/game/${game.gameId}`)= game.shortTitle
+                    if dateFilter == 'past'
+                        if currentDate > game.date
+                            br
+                            if game.resultSubmitted
+                                span
+                                    a(href=`/team/${game.team.code}/game/${game.gameId}/gamesheet`)= game.score
+                            else
+                                span Awaiting Result

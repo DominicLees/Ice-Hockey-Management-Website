@@ -1,0 +1,99 @@
+$mobileScreenSize: 722px;
+
+main {
+    display: flex;
+    flex-direction: row;
+    column-gap: 20px;
+    row-gap: 20px;
+    align-items: stretch;
+    margin-right: 10px;
+
+    @media (max-width: $mobileScreenSize) {
+        flex-direction: column;
+        margin-right: 0px;
+    }
+
+    div {
+        flex: 1 1 0px;
+
+        h2, p {
+            text-align: center;
+        }
+
+        h2 {
+            margin: 10px;
+            margin-top: 0px;
+            font-size: 32px;
+        }
+    }
+}
+
+button, input {
+    display: inline-block;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+
+input {
+    padding: 10px 15px;
+    font-size: 18px;
+    border-radius: 0;
+    border: 1px solid transparent;
+    border-bottom: 1px solid black;
+    width: 18ch;
+}
+
+#teamMenuWrapper {
+    text-align: center;
+}
+
+table {
+    table-layout: fixed;
+    width: 100%;
+    margin-top: 10px;
+    text-align: center;
+    font-size: 18px;
+
+    @media (max-width: $mobileScreenSize) {
+        margin-left: 0px;
+    }
+
+    thead tr {
+        background-color: lightgray;
+    }
+
+    tr:nth-child(even){
+        background-color: #b2ffe5;
+    }
+}
+
+.game-card {
+    background-color: aquamarine;
+    border-radius: 10px;
+    padding: 5px;
+    box-shadow: 0 5px 5px gray;
+    margin-bottom: 20px;
+    text-align: center;
+
+    p {
+        margin: 0px;
+        margin-bottom: 10px;
+    }
+
+    a h3 {
+        margin: 0;
+        padding: 5px;
+    }
+
+    button {
+        background-color: lightgrey;
+    }
+}
+
+.greyedOut {
+    background-color: lightgrey;
+
+    button {
+        background-color: aquamarine;
+    }
+}

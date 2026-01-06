@@ -1,0 +1,65 @@
+-
+    const positionCodes = {
+            'W': ' winger',
+            'LW': ' left winger',
+            'C': ' centre',
+            'RW': ' right winger',
+            'LD': ' left defenceman',
+            'RD': ' right defenceman',
+            'G': ' goalie'   
+    }
+    function getPositionFullName(abbrevation) {
+        return positionCodes[abbrevation];
+    }
+
+//-
+    All the functions below take a position code as input, a position code is made up of 3 parts:
+    - The type of line (line/PP/PK)
+    - The line number
+    - The position of the player
+
+-
+    // Takes the shorten form of a position and expands into a readable version, e.g: 'PP1C' -> 'powerplay 1 centre'
+    function expandPositionCode(code) {
+        let result = '';
+
+        // Get the type of line the player is on
+        const lineCodes = {
+            'line': 'line ',
+            'PP': 'powerplay ',
+            'PK': 'penalty kill '
+        }
+        const lineCode = code.split(/\d/)[0]; // Splits the string up to the first number
+        result += lineCodes[lineCode];
+        code = code.slice(lineCode.length); // Remove the first part of the string 
+
+        // Get the line number from the position code
+        result += code.slice(0, 1);
+        code = code.slice(1);
+
+        // Expand the appreviation of the player's position
+        return result += getPositionFullName(code);
+    }
+
+    // Takes a position code and increments the number in it, if it would exceed the maximum value, the number loops back around to 1 
+    function incrementNumberInCode(code, maxValue) {
+        return code.replace(/\d/, match => {
+            let incrementedNumber = Number(match) + 1;
+            return incrementedNumber > maxValue ? '1' : String(incrementedNumber);
+        });
+    }
+
+    // Takes a position code and decrements the number in it, if it would go below 1, the number loops back around to the loopValue
+    function decrementNumberInCode(code, loopValue) {
+        return code.replace(/\d/, match => {
+            let decrementedNumber = Number(match) - 1;
+            return decrementedNumber >= 1 ? String(decrementedNumber) : String(loopValue);
+        });
+    }
+
+    function getLineMates(code, skaters) {
+        const line = code.slice(0, code.split(/\d/)[0].length + 1)
+        const dLineMates = Object.entries(skaters).filter(([k, v]) => k.startsWith(line) && k.endsWith('D') && v != account.name).map(([k,v]) => {return v});
+        const fLineMates = Object.entries(skaters).filter(([k, v]) => k.startsWith(line) && (k.endsWith('W') || k.endsWith('C')) && v != account.name).map(([k,v]) => {return v});
+        return code.endsWith('D') ? dLineMates : fLineMates;
+    }

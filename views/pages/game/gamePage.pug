@@ -1,0 +1,69 @@
+head
+    title= game.title
+    link(rel="stylesheet", href="/public/css/gamePage.css")
+body
+    include ../../partials/navbar.pug
+    main
+        h1= game.title
+        if game.atHome
+            h2 Home at #{game.dateTimeString}
+        else
+            h2 Away at #{game.location} at #{game.dateTimeString}
+
+        div#buttons
+            if game.resultSubmitted
+                button
+                    a(href=game.gameId+"/gamesheet") View Game Sheet
+            else
+                if isPlayer && !game.linesSubmitted
+                    if game.playersSignedUp.some(e => e.user._id == account._id)
+                        button.red
+                            a(href=game.gameId+"/reject") Leave Game
+                        p You have said you are available 
+                    else
+                        button.green
+                            a(href=game.gameId+"/signup") Sign Up
+                        if !game.playersRejected.some(e => e.user._id == account._id)
+                            button.red
+                                a(href=game.gameId+"/reject") Reject Game
+                            p Let the coach know if you can play this game
+                        else
+                            p You have said you are unavailable
+
+                if game.linesSubmitted && (isPlayer || isCoach)
+                    button 
+                        a(href=game.gameId+"/lines") View Lines
+
+                if isCoach
+                    if game.linesSubmitted
+                        button 
+                            a(href=game.gameId+"/line-builder")
+                                if game.lines 
+                                    span Update Lines
+
+                        button
+                            a(href=game.gameId+"/result") Submit Game Result
+                    else
+                        button 
+                            a(href=game.gameId+"/line-builder") Build Lines
+
+                if isCoach || isPlayer
+                    button
+                        a(href=`/team/${team.code}`) Team Page
+
+        include ../../partials/playerTable.pug
+        div.tables
+            div
+                h3 #{game.playersSignedUp.length} #{game.playersSignedUp.length == 1 ? 'Player' : 'Players'} Signed Up
+                if game.playersSignedUp.length > 0
+                    +playerTable(game.playersSignedUp)
+
+            div
+                h3 #{playersUnanswered.length} #{playersUnanswered.length == 1 ? 'Player Has' : 'Players Have'} Not Responded
+                if playersUnanswered.length > 0
+                    +playerTable(playersUnanswered)
+
+            div
+                h3 #{game.playersRejected.length} #{game.playersRejected.length == 1 ? 'Player' : 'Players'} Unavailable
+                if game.playersRejected.length > 0
+                    +playerTable(game.playersRejected)

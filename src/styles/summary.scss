@@ -1,0 +1,33 @@
+@keyframes fadeIn {
+    from {
+        opacity: 0%;
+    }
+
+    to {
+        opacity: 100%;
+    }
+}
+
+.animatedText {
+    animation-name: fadeIn;
+    animation-duration: 2s;
+    animation-iteration-count: 1;
+    opacity: 100%;
+}
+
+li {
+    margin-bottom: 100vh;
+    opacity: 0%;
+    font-size: 72px;
+    text-align: center;
+    font-weight: bold;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+
+    :last-child {
+        margin-bottom: 20vh;
+    }
+}

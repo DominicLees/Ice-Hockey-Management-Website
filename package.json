@@ -1,0 +1,39 @@
+{
+  "name": "finalyearproject",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "gulp && node app.js"
+  },
+  "author": "Dominic Lees",
+  "license": "ISC",
+  "dependencies": {
+    "cbor": "^9.0.2",
+    "email-validator": "^2.0.4",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "mongoose": "^8.0.0",
+    "mongoose-autopopulate": "^1.1.0",
+    "mongoose-lean-virtuals": "^0.9.1",
+    "parse-cosekey": "^1.0.2",
+    "pug": "^3.0.2"
+  },
+  "devDependencies": {
+    "gulp": "^4.0.2",
+    "gulp-if": "^3.0.0",
+    "gulp-minify": "^3.1.0",
+    "gulp-sass": "^5.1.0",
+    "sass": "^1.69.5",
+    "yargs": "^17.7.2"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "./gulpfile.js",
+      "src/js/*.js",
+      "public/js/*.js",
+      "testing/scripts/*.js",
+      "testing/data/*.json"
+    ]
+  }
+}

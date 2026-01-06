@@ -1,0 +1,102 @@
+head
+    title= team.name
+    link(rel="stylesheet", href="/public/css/teamProfile.css")
+    script(src="/public/js/teamProfile.js" defer)
+body
+    include /partials/navbar.pug
+    h1= team.name
+    h2 Head Coach: #{team.coach.name}
+    h2 Home Rink: #{team.location}
+    if isCoach 
+        span Share this link with your players: 
+        a#teamCode(href="join/"+team.code) join/#{team.code}
+        button#copyTeamLinkButton Copy link to clipboard
+        br
+        button
+            a(href=`${team.code}/game/new`) Create Game +
+        br
+        button#delete-team.red Delete Team
+        br
+    if isPlayer
+        button
+            a(href=`${team.code}/update-profile`) Update player profile
+        button#leave-team.red Leave Team
+
+    div.container
+        div.content#players
+            h2 Players
+            if responses.playerRemoveSuccessful
+                h3.success Player removed successfully
+
+            if players.length > 0
+                label(for='playerSort') Sort 
+                select#playerSort
+                    option(value="joined") Date joined
+                    option(value="name" selected=(playerSort == 'name')) Name
+                    option(value="position" selected=(playerSort == 'position')) Position
+                
+                - const positions = ['LW', 'RW', 'C', 'LD', 'RD', 'G']
+                if playerSort == 'name'
+                    - players.sort((a, b) => {return a.user.name.localeCompare(b.user.name)})
+                if playerSort == 'position'
+                    - players.sort((a, b) => {return positions.indexOf(a.positions[0]) - positions.indexOf(b.positions[0])})
+
+                label(for="playerFilter")  Filter 
+                select#playerFilter
+                    option(value='none' selected=(!positions.includes(playerFilter))) None
+                    for position in positions
+                        option(value=position selected=(playerFilter == position))= position
+
+                if positions.includes(playerFilter)
+                    - players = players.filter(player => player.positions.includes(playerFilter))
+
+                table
+                    thead
+                        tr
+                            th Name
+                            th Positions
+                    tbody
+                        for player in players
+                            tr
+                                td
+                                    a(href='/player/'+player._id)= player.user.name
+                                td= player.positions
+                                if isCoach
+                                    td
+                                        button(data-id=player._id).removePlayer.red Remove
+            else
+                p No players registered
+
+        div.content#schedule
+            h2 Schedule
+            if games.length > 0
+                table
+                    thead
+                        tr
+                            th Date
+                            th Opponent
+                    tbody
+                        for game in games
+                            tr
+                                td= game.dateTimeString
+                                td
+                                    a(href=`./${team.code}/game/${game.gameId}`)= game.shortTitle
+            else
+                p No games scheduled
+
+            if results.length > 0
+                h2 Recent Results
+                table
+                    thead
+                        tr
+                            th Date
+                            th Opponent
+                            th Score
+                    tbody
+                        for result in results
+                            tr
+                                td= result.dateString
+                                td
+                                    a(href=`./${team.code}/game/${result.gameId}`)= result.shortTitle
+                                td
+                                    a(href=`./${team.code}/game/${result.gameId}/gamesheet`)= result.score

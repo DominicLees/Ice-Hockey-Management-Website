@@ -1,0 +1,37 @@
+link(rel="stylesheet", href="/public/css/master.css")
+meta(name="viewport" content="width=device-width, initial-scale=1.0")
+script(src="/public/js/navbar.js" defer) 
+
+nav
+    div.desktop.nav
+        div.left
+            h3 
+                a(href="/") Hockey
+        div.right
+            if account
+                ul
+                    li
+                        a(href="/dashboard") Dashboard
+                    li
+                        a(href="/schedule") Schedule
+                    li
+                        a(href="/settings") Settings
+                    li
+                        a(href="/logout") Logout
+    
+    div.mobile
+        div.nav
+            div.left
+                h3 
+                    a(href="/") Hockey
+            div.right
+                h3#nav-toggle Menu
+        ul#nav.hidden
+            li
+                a(href="/dashboard") Dashboard
+            li
+                a(href="/schedule") Schedule
+            li
+                a(href="/settings") Settings
+            li
+                a(href="/logout") Logout

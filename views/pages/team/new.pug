@@ -1,0 +1,21 @@
+head
+    title New Team
+body
+    include ../../partials/navbar.pug
+
+    h1 New Team
+    form(action="./new", method="post") 
+        label(for="name") Team Name: 
+        input(type="text" name="name" id="name")
+        br
+        br
+        label(for="location") Home Rink: 
+        input(type="text" name="location" id="location")
+        br
+        br
+        input(type="submit", value="Create Team") 
+
+    if responses.noTeamName
+        h3.error Please enter a team name
+    if responses.noLocation
+        h3.error Please enter a home rink name

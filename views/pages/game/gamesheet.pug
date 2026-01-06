@@ -1,0 +1,28 @@
+head
+    title Gamesheet for #{game.title}
+    link(rel="stylesheet", href="/public/css/gamesheet.css")
+body 
+    include ../../partials/navbar.pug
+    
+    if game.atHome
+        h1= `${game.team.name} ${game.result.teamGoals} - ${game.result.opponentGoals} ${game.opponent}`
+    else
+        h1= `${game.opponent} ${game.result.opponentGoals} - ${game.result.teamGoals} ${game.team.name}`
+
+    table
+        thead
+            tr
+                th Name
+                th Goals
+                th Assists
+                th Points
+                th Penalty Minutes
+        tbody
+            for player in players
+                - const stats = player.games.find(gameStats => gameStats.game.toString() == game._id.toString())
+                tr
+                    td= player.user.name
+                    td= stats.goals
+                    td= stats.assists
+                    td= stats.goals + stats.assists
+                    td= stats.pims

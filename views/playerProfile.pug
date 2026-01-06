@@ -1,0 +1,63 @@
+head
+    title #{player.user.name}'s Profile
+    link(rel="stylesheet", href="/public/css/playerProfile.css")
+    script(src="/public/js/playerProfile.js" defer) 
+body
+    include partials/navbar.pug
+    include partials/expandPositionCode.pug
+
+    main
+        h1 #{player.user.name} - #{getPositionFullName(player.positions[0])} for 
+            a(href="/team/"+player.team.code)=player.team.name
+
+        if player.user._id == account._id
+            button#settingsToggle Settings +
+            form#settingsForm.hidden(action=player._id+"/update", method="post") 
+                p Profile privacy setting
+                input#public(type="radio", name="privacy" value="public" checked=(player.privacy == 'public'))
+                label(for="public") Public
+                br
+                input#teamOnly(type="radio", name="privacy" value="teamOnly" checked=(player.privacy == 'teamOnly'))
+                label(for="teamOnly") Team members only
+                br
+                input#coachOnly(type="radio", name="privacy" value="coachOnly" checked=(player.privacy == 'coachOnly'))
+                label(for="coachOnly") Coach only
+                br
+                br
+                input(type="submit", value="Update Settings")
+
+        div.stats
+            div
+                h3 Games
+                p= player.totalGames
+            div
+                h3 Goals
+                p= player.totalGoals
+            div
+                h3 Assists
+                p= player.totalAssists
+            div
+                h3 Points
+                p= player.totalGoals + player.totalAssists
+
+        if player.totalGames > 0
+            h2 Game History
+            table
+                thead
+                    tr
+                        th Date
+                        th Opponent
+                        th Score
+                        th Goals
+                        th Assists
+                        th Penalty Minutes
+                tbody
+                    for game in player.games
+                        tr
+                            td= game.game.dateString
+                            td= game.game.shortTitle
+                            th
+                                a(href=`/team/${player.team.code}/game/${game.game.gameId}/gamesheet`)= game.game.score
+                            td= game.goals
+                            td= game.assists
+                            td= game.pims

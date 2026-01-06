@@ -1,0 +1,26 @@
+{
+    "places": [
+        "Wycombe",
+        "Birmingham",
+        "Slough",
+        "Hull",
+        "Stoke",
+        "Liverpool",
+        "Coventry",
+        "Bradford",
+        "Bolton",
+        "Crewe",
+        "Gosport",
+        "Basingstoke"
+    ],
+    "teamNames": [
+        "Lions",
+        "Bears",
+        "Penguins",
+        "Knights",
+        "Blokes",
+        "Dudes",
+        "Panthers",
+        "Sirens"
+    ]
+}

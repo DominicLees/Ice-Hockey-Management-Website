@@ -1,0 +1,36 @@
+mixin line(skaters, number)
+    if skaters['line' + number + 'LW'] || skaters['line' + number + 'C'] || skaters['line' + number + 'RW'] || skaters['line' + number + 'LD'] || skaters['line' + number + 'RD'] 
+        h4 Line #{number}
+        table.table-padding
+            tr
+                td= skaters['line' + number + 'LW']
+                td= skaters['line' + number + 'C']
+                td= skaters['line' + number + 'RW']
+            tr
+                td= skaters['line' + number + 'LD']
+                td
+                td= skaters['line' + number + 'RD']
+
+mixin powerplayLine(skaters, number)
+    if skaters['PP' + number + 'LW'] || skaters['PP' + number + 'C'] || skaters['PP' + number + 'RW'] || skaters['PP' + number + 'LD'] || skaters['PP' + number + 'RD'] 
+        h4 Powerplay Unit #{number}
+        table.table-padding
+            tr
+                td= skaters['PP' + number + 'LW']
+                td= skaters['PP' + number + 'C']
+                td= skaters['PP' + number + 'RW']
+            tr
+                td= skaters['PP' + number + 'LD']
+                td
+                td= skaters['PP' + number + 'RD']
+
+mixin penaltyKillLine(skaters, number)
+    if skaters['PK' + number + 'W'] || skaters['PK' + number + 'C'] || skaters['PK' + number + 'LD'] || skaters['PK' + number + 'RD'] 
+        h4 Penalty Kill Unit #{number}
+        table.table-padding
+            tr
+                td= skaters['PK' + number + 'W']
+                td= skaters['PK' + number + 'C']
+            tr
+                td= skaters['PK' + number + 'LD']
+                td= skaters['PK' + number + 'RD']

@@ -1,0 +1,48 @@
+$mobileScreenSize: 722px;
+
+#buttons button {
+    margin-right: 10px;
+}
+
+h2, h3, td, th {
+    text-align: center;
+}
+
+.tables {
+    display: flex;
+    flex-direction: row;
+    column-gap: 20px;
+    row-gap: 20px;
+    flex-wrap: wrap;
+
+    @media (max-width: $mobileScreenSize) {
+        flex-direction: column;
+    }
+
+    div {
+        flex: 1 1 0px;
+
+        @media (max-width: 1020px) {
+            flex-basis: 33%;
+        }
+
+        table {
+            width: 80%;
+            margin-left: 10%;
+            table-layout: fixed;
+
+            @media (max-width: $mobileScreenSize) {
+                width: 100%;
+                margin-left: 0;
+            }
+
+            thead tr {
+                background-color: lightgray;
+            }
+        
+            tr:nth-child(even){
+                background-color: #b2ffe5;
+            }
+        }
+    }
+}

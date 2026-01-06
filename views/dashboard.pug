@@ -1,0 +1,81 @@
+head
+    title Dashboard
+    link(rel="stylesheet", href="/public/css/dashboard.css")
+    script(src="/public/js/dashboard.js" defer) 
+body
+    include partials/navbar.pug
+    h1 Welcome #{account.name}
+
+    main
+        div
+            div#teamMenuWrapper
+                button#teamMenuButton Show Team Menu
+                div#teamMenu
+                    input#teamCode(type="text" placeholder="Enter Team Code")
+                    button#joinTeamButton Join Team
+                    button
+                        a(href="/team/new") Create New Team
+
+            h2 Your Teams
+
+            if responses.teamDeleteSuccessful
+                h3.success Team deleted successfully
+            if responses.leaveTeamSuccessful
+                h3.success Team left successfully
+
+            if teams.length > 0
+                table
+                    thead 
+                        tr
+                            th Team Name
+                            th Role
+                    tbody
+                        each team in teams
+                            tr
+                                td
+                                    a(href=`/team/${team.code}`)= team.name
+                                td
+                                    - const playerProfile = playerProfiles.find((profile => profile.team._id == team._id));
+                                    if playerProfile
+                                        a(href=`/player/${playerProfile._id}`)= team.coach == account._id ? 'Player/Coach' : 'Player'
+                                    else
+                                        span Coach
+            else 
+                p You are not currently part of any teams. Create one or join an existing one using their team code
+
+        div
+            h2 Upcoming Games
+            if games.length > 0
+                for game in games
+                    - const rejected = playerProfiles.some(e => game.playersRejected.includes(e._id))
+                    - const signedUp = playerProfiles.some(e => game.playersSignedUp.includes(e._id))
+                    - const isCoach = game.team.coach == account._id
+                    - const picked = game.linesSubmitted && signedUp && (playerProfiles.some(e => game.lines.startingGoalie == e._id) || playerProfiles.some(e => game.lines.backupGoalie == e._id) || playerProfiles.some(e => game.lines.skaters.some(f => f.playerId._id.toString() == e._id.toString())))
+                    div.game-card(class={greyedOut: rejected || (game.linesSubmitted && !picked)})
+                        a(href=`/team/${game.team.code}/game/${game.gameId}`)
+                            h3= game.title
+                        p #{game.dateTimeString} at #{game.location}
+                        //- Lines have been submitted, and user signed up or is the coach of the team
+                        if game.linesSubmitted && (signedUp || isCoach)
+                            if picked
+                                h4 You have been picked for this game
+                            else
+                                h4 You have not been picked for this game
+                            a(href=`/team/${game.team.code}/game/${game.gameId}/lines`) 
+                                button View lines
+                        //- No lines and the user is the coach
+                        else if !games.linesSubmitted && isCoach
+                            a(href=`/team/${game.team.code}/game/${game.gameId}/line-builder`) 
+                                button Build lines
+                        else if signedUp
+                            p Waiting for lines
+                        //- User has not signed up to or rejected the game
+                        if !game.linesSubmitted && !signedUp && !rejected && playerProfiles.some(e => e.team._id.toString() == game.team._id.toString())
+                            if !isCoach
+                                p Let the coach know if you can play
+                            button
+                                a(href=`team/${game.team.code}/game/${game.gameId}/signup`) Sign Up
+                            button
+                                a(href=`team/${game.team.code}/game/${game.gameId}/reject`) Reject Game
+            else
+                p You currently have no upcoming games

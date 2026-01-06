@@ -1,0 +1,42 @@
+$mobileScreenSize: 722px;
+
+h1 {
+    text-align: center;
+    font-size: 72px;
+    margin: 20px;
+}
+
+.container {
+    // Flexbox
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: stretch;
+    column-gap: 30px;
+    row-gap: 30px;
+    margin: 30px;
+    margin-top: 0px;
+
+    @media (max-width: $mobileScreenSize) {
+        flex-direction: column;
+        margin-right: 0px;
+        margin-left: 0px;
+    }
+}
+
+.form-box {
+    flex: 1 1 0px;
+    text-align: center;
+    background-color: lightgray;
+    box-shadow: 0 10px 10px gray;
+    border-radius: 5px;
+    font-size: 18px;
+
+    @media (max-width: $mobileScreenSize) {
+        width: 100%;
+    }
+
+    input {
+        font-size: 18px;
+    }
+}

@@ -1,0 +1,36 @@
+head
+    title New Game
+    script(src="/public/js/newGame.js" defer) 
+body
+    include ../../partials/navbar.pug
+    h1 New Game
+    form(action="./new", method="post")
+        label(for="opponent") Opponent: 
+        input(type="text" name="opponent" id="opponent")
+        br
+        br
+        label(for="date") Start time: 
+        input(type="datetime-local", name="date" id="date")
+        br
+        br
+        label(for="homeOrAway") Home or Away: 
+        input(type="radio" name="homeOrAway" id="home" value="home" checked)
+        label(for="home") Home
+        input(type="radio" name="homeOrAway" id="away" value="away")
+        label(for="away") Away
+        br
+        div#locationForm.hidden
+            br
+            label(for="rink") Location: 
+            input(type="text" name="location" id="rink")
+        br
+        input(type="submit", value="Create Game")
+
+    if responses.noOpponent
+        h3.error Please enter the name of the opponent
+    if responses.noHomeOrAway
+        h3.error Please enter if game is home or away
+    if responses.pastDate
+        h3.error Please enter a date in the future
+    if responses.noLocation
+        h3.error Please enter a location for this away game

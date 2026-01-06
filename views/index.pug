@@ -1,0 +1,55 @@
+head
+    title Hockey
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    link(rel="stylesheet", href="public/css/master.css")
+    link(rel="stylesheet", href="public/css/index.css")
+    script(src="public/js/index.js" defer) 
+body
+    h1 Hockey
+
+    div.container
+        div.form-box
+            h2 Sign Up
+            form#signupForm
+                label(for="signupEmail") Email: 
+                input(type="text" id="signupEmail" name="email")
+                br
+                br
+                label(for="name") Name: 
+                input(type="text" id="name" name="name")
+                br
+                br
+                input(type="submit", value="Sign Up")
+
+            if responses.emailInUse
+                h3.error An account with that email already exists
+                br
+            if responses.invalidSignUpEmail
+                h3.error Please enter a valid email
+                br
+            if responses.invalidName
+                h3.error Please enter a name
+                br
+            if responses.successfulSignUp
+                h3.success Account created successfully
+
+        div.form-box
+            h2 Login
+            label(for="loginEmail") Email: 
+            input#loginEmail(type="text" name="email")
+            form#loginForm
+                br
+                input(type="submit", value="Login")
+            
+            form#newDeviceLoginForm.hidden
+                br
+                label(for="authCode") Enter Code: 
+                input#authCode(type="text" name="authCode")
+                p This code can be generated in the settings page
+                input(type="submit", value="Login")
+            button#newDeviceLoginToggle Login on this device for the first time
+            br
+            br
+
+            if responses.successfullyAddedCredentials
+                h3.success New device added successfully
