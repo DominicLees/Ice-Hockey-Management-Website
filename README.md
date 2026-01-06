@@ -12,6 +12,7 @@ This is the repository for my undergrad final project, a website for managing ic
 
 ## Features
 
+- Passwordless authentication
 - Player and coach accounts
 - Users able to be members of multiple teams
 - Game sign ups
