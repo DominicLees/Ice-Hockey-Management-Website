@@ -1,0 +1,6 @@
+{
+    "cookieSecret": "This can be any string, leaving it as this will work",
+    "mongoLogin": "",
+    "enviroment": "dev",
+    "database": "FinalYearProject"
+}

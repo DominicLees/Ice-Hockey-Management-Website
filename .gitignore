@@ -1,6 +1,5 @@
 node_modules/
 public/
-/config.json
 .DS_Store
 .vscode/
 testing/testingDBs/
